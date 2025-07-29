@@ -1,12 +1,12 @@
 ---
 import NewsCard from "../../news/parts/NewsCard.astro";
 
-const { currentId } = Astro.props;
+const { currentSlug } = Astro.props;
 
 const allNews = [
   {
     id: 1,
-    slug: 'detail',
+    slug: 'we-want-yu-exhibition',
     title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
     date: '2025.04.18',
     category: 'Project',
@@ -14,7 +14,7 @@ const allNews = [
   },
   {
     id: 2,
-    slug: 'detail',
+    slug: 'tokyo-office-opening',
     title: '東京オフィス新設のお知らせ',
     date: '2025.04.15',
     category: 'Press',
@@ -22,7 +22,7 @@ const allNews = [
   },
   {
     id: 3,
-    slug: 'detail',
+    slug: 'design-award-news',
     title: 'デザインアワード受賞のお知らせ',
     date: '2025.04.10',
     category: 'Press',
@@ -30,7 +30,7 @@ const allNews = [
   },
 ];
 
-const related = allNews.filter(item => item.id !== currentId).slice(0, 3);
+const related = allNews.filter(item => item.slug !== currentSlug).slice(0, 3);
 ---
 
 <aside class="p-news-detail-related">
