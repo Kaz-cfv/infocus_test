@@ -1,7 +1,7 @@
 ---
 import NewsCard from "../../news/parts/NewsCard.astro";
 
-const { currentSlug } = Astro.props;
+const { currentId } = Astro.props;
 
 const allNews = [
   {
@@ -30,7 +30,7 @@ const allNews = [
   },
 ];
 
-const related = allNews.filter(item => item.slug !== currentSlug).slice(0, 3);
+const related = allNews.filter(item => item.id !== currentId).slice(0, 3);
 ---
 
 <aside class="p-news-detail-related">
@@ -42,7 +42,7 @@ const related = allNews.filter(item => item.slug !== currentSlug).slice(0, 3);
           title={item.title}
           date={item.date}
           category={item.category}
-          url={`/news/${item.slug}`}
+          url={`/news/${item.id}`}
           pic={item.pic}
         />
       </li>

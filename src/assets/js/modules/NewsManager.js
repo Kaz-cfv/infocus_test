@@ -118,7 +118,7 @@ class NewsList {
         title: title,
         date: formatDate(item.date),
         category: item.type || 'News',
-        url: `/news/${slug}`,
+        url: `/news/${item.id || index}`,
         pic: getThumbnail(item),
         slug: slug
       };

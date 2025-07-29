@@ -100,13 +100,13 @@ export async function getStaticPaths() {
 
 
     const staticPaths = newsData.map((news) => ({
-      params: { slug: news.slug },
+      params: { id: news.id.toString() },
       props: { news }
     }));
 
     console.log('🛤️ 生成される静的パス一覧:');
     staticPaths.forEach((path, index) => {
-      console.log(`  ${index + 1}. /news/${path.params.slug} (ID: ${path.props.news.id}, Title: ${path.props.news.title})`);
+      console.log(`  ${index + 1}. /news/${path.params.id} (ID: ${path.props.news.id}, Title: ${path.props.news.title})`);
     });
 
     console.log(`✨ 合計${staticPaths.length}個の静的パスを生成完了`);
@@ -119,7 +119,7 @@ export async function getStaticPaths() {
     console.log('🚨 緊急フォールバック: ニュースAPIもプロジェクトAPIも利用不可');
     return [
       {
-        params: { slug: 'fallback-news' },
+        params: { id: '1' },
         props: {
           news: {
             id: 1,
@@ -141,10 +141,10 @@ export async function getStaticPaths() {
 }
 
 const { news } = Astro.props;
-const { slug } = Astro.params;
+const { id } = Astro.params;
 
 console.log('🎯 現在の詳細を検証:');
-console.log(`   Slug: "${slug}"`);
+console.log(`   ID: "${id}"`);
 console.log(`   News ID: ${news?.id}`);
 console.log(`   News Slug: ${news?.slug}`);
 console.log(`   タイトル: "${news?.title}"`);
@@ -175,38 +175,38 @@ const pageMeta = {
 <!-- 開発時詳細表示パネル -->
 {import.meta.env.DEV && (
   <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.95); color: #00ff00; padding: 15px; font-family: 'Courier New', monospace; font-size: 11px; z-index: 9999; border-radius: 8px; max-width: 350px; border: 1px solid #00ff00;">
-    <div style="color: #ffff00; margin-bottom: 8px;">🔍 News Detail Panel (Slug-based)</div>
+    <div style="color: #ffff00; margin-bottom: 8px;">🔍 News Detail Panel (ID-based)</div>
     <div>News ID: {news.id}</div>
-    <div>Slug: "{slug}"</div>
+    <div>ID: "{id}"</div>
     <div>News Slug: {news.slug}</div>
     <div>Title: {news.title?.substring(0, 25)}...</div>
     <div>Category: {news.category}</div>
     <div>Date: {news.date}</div>
-    <div style="color: #00ff00; margin-top: 5px;">✅ Slug-based News API</div>
+    <div style="color: #00ff00; margin-top: 5px;">✅ ID-based News API</div>
   </div>
 )}
 
 <Article news={news} />
-<Related currentSlug={news.slug} />
+<Related currentId={news.id} />
 
-<script define:vars={{ news, slug }}>
-  console.log(`📋 Slug: "${slug}"`);
+<script define:vars={{ news, id }}>
+  console.log(`📋 ID: "${id}"`);
   console.log('📊 データ:', news);
 
   window.newsData = news;
   window.NewsArticle = news;
-  window.currentSlug = slug;
-  window.routingMode = 'SLUG_BASED_NEWS';
+  window.currentId = id;
+  window.routingMode = 'ID_BASED_NEWS';
 
   // URL検証
   const currentPath = window.location.pathname;
-  const expectedPath = `/news/${slug}`;
+  const expectedPath = `/news/${id}`;
 
   console.log(`🔗 現在位置: ${currentPath}`);
   console.log(`🎯 予想位置: ${expectedPath}`);
 
   if (currentPath === expectedPath) {
-    console.log('✅ スラッグベースニュースモードで正常動作');
+    console.log('✅ IDベースニュースモードで正常動作');
   } else {
     console.warn('⚠️ 位置情報に矛盾あり - 追加調査が必要');
   }
