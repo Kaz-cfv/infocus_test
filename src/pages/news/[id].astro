@@ -9,7 +9,7 @@ export async function getStaticPaths() {
     let projects = [];
 
     try {
-      console.log('📡 プロジェクトAPIからデータを取得中...');
+      console.log(':satellite_antenna: プロジェクトAPIからデータを取得中...');
       const projectResponse = await fetch('https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects', {
         headers: {
           'User-Agent': 'Astro-Build/1.0.0',
@@ -18,14 +18,29 @@ export async function getStaticPaths() {
         }
       });
 
-      if (projectResponse.ok) {
-        projects = await projectResponse.json();
-        console.log(`✅ ${projects.length}件のプロジェクトを取得`);
-      } else {
-        console.log(`⚠️ プロジェクトAPI接続失敗: ${projectResponse.status}`);
+      // 詳細なエラー情報を取得
+      if (!projectResponse.ok) {
+        const errorText = await projectResponse.text();
+        console.log(`:warning: プロジェクトAPI接続失敗: ${projectResponse.status}`);
+        console.log(`:clipboard: エラー詳細: ${errorText}`);
+        console.log(`:link: Response headers:`, Object.fromEntries(projectResponse.headers.entries()));
+
+        // JSONエラーレスポンスを試行
+        try {
+          const errorJson = JSON.parse(errorText);
+          console.log(`:boom: エラーコード: ${errorJson.code || 'unknown'}`);
+          console.log(`:speech_balloon: エラーメッセージ: ${errorJson.message || 'no message'}`);
+        } catch (parseError) {
+          console.log(`:page_facing_up: Raw response: ${errorText}`);
+        }
+        return;
       }
+
+      projects = await projectResponse.json();
+      console.log(`:white_check_mark: ${projects.length}件のプロジェクトを取得`);
     } catch (projectError) {
-      console.log('ℹ️ プロジェクトAPI接続エラー:', projectError.message);
+      console.log(':information_source: プロジェクトAPI接続エラー:', projectError.message);
+      console.log(':mag: Stack trace:', projectError.stack);
     }
 
     // 日本語パラメータ付きでニュースAPIから収集
