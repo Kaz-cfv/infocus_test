@@ -1,0 +1,183 @@
+---
+interface Position {
+  caption: string;
+}
+
+interface Links {
+  type: string;
+  caption: string;
+  url: string;
+}
+
+interface Props {
+  name: string;
+  position: Position[];
+  description: string;
+  links: Links[];
+}
+
+const { name, position, description, links } = Astro.props;
+---
+
+<div class="p-team-detail__about">
+  <div class="p-team-detail__about-inner">
+    <h1 class="p-team-detail__about-name">{name}</h1>
+    {position && position.length > 0 && (
+      <ul class="p-team-detail__about-position">
+        {position.map((item => (
+          <li>{item.caption}</li>
+        )))}
+      </ul>
+    )}
+    <div class="p-team-detail__about-description" set:html={description}></div>
+    {links && links.length > 0 && (
+      <ul class="p-team-detail__about-link">
+        {links.map((link) => (
+          <li data-link={link.type}>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">{link.caption}</a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-team-detail__about {
+  @include me.pc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  @include me.sp {
+    padding-block: 40px 60px;
+    padding-inline: 20px;
+  }
+
+  &-inner {
+    @include me.pc {
+      width: 65.5172%;
+      max-width: 570px;
+    }
+  }
+
+  &-name {
+    font-size: 4rem;
+    font-weight: 700;
+    @include me.sp {
+      font-size: 3.2rem;
+    }
+  }
+
+  &-position {
+    display: flex;
+    column-gap: 4px;
+    margin-block-start: 12px;
+
+    li {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--c-gray);
+      font-size: 1.3rem;
+      &::after {
+        content: "/";
+        display: inline-block;
+      }
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &-description {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    row-gap: 20px;
+    margin-block-start: 40px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+
+    p {
+      font-size: 1.4rem;
+      line-height: 1.8;
+    }
+
+    a {
+      display: inline-block;
+      position: relative;
+      color: var(--c-white);
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+      }
+    }
+  }
+
+  &-link {
+    display: flex;
+    align-items: center;
+    column-gap: 24px;
+    margin-block-start: 40px;
+    @include me.sp {
+      column-gap: 20px;
+    }
+
+    li {
+      &[data-link="icon"] {
+        display: flex;
+        align-items: center;
+        transform: translateY(2px);
+        width: 22px;
+        height: 22px;
+        a {
+          width: 100%;
+          height: 100%;
+          font-size: 0;
+          background-image: url(/common/images/common/icon_instagram_w.svg);
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      }
+      &[data-link="text"] {
+        a {
+          @include me.pc {
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 100%;
+              height: 1px;
+              background-color: var(--c-white);
+            }
+          }
+          @include me.sp {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      a {
+        display: inline-block;
+        position: relative;
+        color: var(--c-white);
+        font-size: 1.4rem;
+        letter-spacing: -.05rem;
+      }
+    }
+  }
+}
+</style>

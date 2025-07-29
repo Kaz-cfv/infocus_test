@@ -1,0 +1,166 @@
+---
+import RelatedCard from "../../ProjectCard.astro";
+
+const projects = [
+  {
+    id: 1,
+    title: 'LOEWE x GR8L',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/01.jpg',
+    url: '#'
+  },
+  {
+    id: 2,
+    title: 'HUMAN MADE',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/02.jpg',
+    url: '#'
+  },
+  {
+    id: 3,
+    title: 'Adobe Photoshop',
+    tags: [
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/03.jpg',
+    url: '#'
+  },
+  {
+    id: 4,
+    title: 'KEI Collection PARIS',
+    tags: [
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/04.jpg',
+    url: '#'
+  },
+  {
+    id: 5,
+    title: 'uka Regenerative Good',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/05.jpg',
+    url: '#'
+  },
+  {
+    id: 6,
+    title: 'TOGA ARCHIVES',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/06.jpg',
+    url: '#'
+  },
+  {
+    id: 7,
+    title: 'CANADA GOOSE',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/07.jpg',
+    url: '#'
+  },
+  {
+    id: 8,
+    title: 'BLUE NOTE PLACE',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' },
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/08.jpg',
+    url: '#'
+  },
+];
+
+---
+<aside class="p-project-detail-related">
+  <div class="p-project-detail-related__title">(RELATED PROJECTS)</div>
+  <ul class="p-project-detail-related__list">
+    {projects.map((project) => (
+      <li class="p-project-detail-related__list-item">
+        <RelatedCard
+          id={project.id}
+          title={project.title}
+          tags={project.tags}
+          imageSrc={project.imageSrc}
+          url={project.url}
+        />
+      </li>
+    ))}
+  </ul>
+</aside>
+
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-project-detail-related {
+  border-top: solid 2px var(--c-white);
+  @include me.pc {
+    border-bottom: solid 2px var(--c-white);
+  }
+
+  &__title {
+    padding-block: 70px 60px;
+    border-bottom: solid 1px var(--c-gray);
+    font-size: 2.2rem;
+    text-align: center;
+    @include me.sp {
+      padding-block: 50px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-content: flex-start;
+    @include me.sp {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &-item {
+      border-right: solid 1px var(--c-gray);
+      @include me.pc {
+        &:nth-child(4n) {
+          border-right: none;
+        }
+      }
+      @include me.sp {
+        border-bottom: solid 1px var(--c-gray);
+        &:nth-child(2n) {
+          border-right: none;
+        }
+      }
+    }
+
+    .c-project-card {
+      padding-block-end: 78px;
+      @include me.sp {
+        padding-block-end: 32px;
+      }
+
+      &__content {
+        padding-inline: 30px;
+        @include me.sp {
+          padding-inline: 16px;
+        }
+      }
+    }
+  }
+
+}
+
+
+</style>

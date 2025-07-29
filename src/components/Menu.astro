@@ -1,0 +1,336 @@
+---
+const menu = [
+  {
+    name: 'PROJECTS',
+    url: '/projects/',
+    navi: 'projects'
+  },
+  {
+    name: 'NEWS',
+    url: '/news/',
+    navi: 'news'
+  },
+  {
+    name: 'ABOUT',
+    url: '/about/',
+    navi: 'about'
+  },
+  {
+    name: 'TEAM',
+    url: '/team/',
+    navi: 'team'
+  },
+  {
+    name: 'CAREERS',
+    url: '/careers/',
+    navi: 'careers'
+  },
+  {
+    name: 'CONTACT',
+    url: '/contact/',
+    navi: 'contact'
+  },
+]
+
+const sns = [
+  {
+    name: 'instagram',
+    url: 'https://www.instagram.com/in_focus_inc/'
+  },
+  {
+    name: 'twitter',
+    url: 'https://twitter.com/InFocus_Inc'
+  },
+  {
+    name: 'note',
+    url: 'https://note.com/infocusinc/'
+  },
+  {
+    name: 'fb',
+    url: 'https://www.facebook.com/infocusjp/'
+  }
+]
+---
+
+<div class="l-menu js-menu">
+  <!-- ナビゲーション -->
+  <div class="l-menu__inner">
+    <nav class="l-menu__navi">
+      <ul class="l-menu__navi-list">
+        {menu.map((item) => (
+          <li class="l-menu__navi-item" data-menu={item.navi}>
+            <a href={item.url}>{item.name}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <!-- インフォメーション -->
+    <div class="l-menu__info">
+      <div class="l-menu__info-inner" data-info="office">
+        <section class="l-menu__section" data-section="tokyo">
+          <span class="l-menu__section-heading">TOKYO</span>
+          <p>
+            1-49-4, TOMIGAYA, SHIBUYA-KU, TOKYO, 151-0063
+          </p>
+          <p>
+            TEL / FAX +81 3 6427 5227
+          </p>
+        </section>
+        <section class="l-menu__section" data-section="newyork">
+          <span class="l-menu__section-heading">NEWYORK</span>
+          <p>
+            ny@infocusinc.com
+          </p>
+        </section>
+      </div>
+
+      <div class="l-menu__info-inner" data-info="sns">
+        <ul class="l-menu__sns">
+          {sns.map((item) => (
+            <li class="l-menu__sns-item" data-sns={item.name}>
+              <a href={item.url} target="_blank">{item.name}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="l-menu__info-inner" data-info="lang">
+        <ul class="l-menu__lang">
+          <li class="l-menu__lang-item"><a href="#">EN</a></li>
+          <li class="l-menu__lang-item"><a href="#">JP</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="l-menu__logo"><img src="/common/images/common/logo_hd_fade.png" width="652px" height="280px"></div>
+</div>
+
+<style lang="scss">
+@use '../assets/scss/mediaquery' as me;
+@use '../assets/scss/mixin' as mi;
+
+.l-menu {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100dvh;
+  background-color: var(--cp-menu-bg);
+  transition: opacity .3s ease-out, visibility .3s ease-out;
+  @include me.pc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  @include me.sp {
+    padding-inline: 17px;
+    padding-block: 85px;
+  }
+  &.is-opened {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  &__inner {
+    @include me.pc {
+      display: grid;
+      grid-template-columns: 55% 45%;
+      align-content: flex-start;
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      width: 100vw;
+      margin-inline: auto;
+    }
+  }
+
+  &__navi {
+
+    &-list {
+      display: grid;
+      @include me.pc {
+        row-gap: 4px;
+      }
+    }
+
+    &-item {
+      font-size: 4.4rem;
+      font-weight: 600;
+      @include me.sp {
+        font-size: 3.8rem;
+      }
+
+      a {
+        @include me.pc {
+          transition: color .3s ease-out, text-shadow .3s ease-out;
+          &:hover {
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0,0,0,.4);
+          }
+        }
+      }
+    }
+  }
+
+  &__info {
+    display: grid;
+    align-content: flex-start;
+    @include me.pc {
+      padding-block-start: 10px;
+    }
+    @include me.sp {
+      margin-top: 20px;
+      row-gap: 20px;
+    }
+
+    &-inner {
+      display: grid;
+      row-gap: 30px;
+      @include me.sp {
+        row-gap: 20px;
+      }
+
+      &[data-info="office"] {
+        @include me.sp {
+          order: 3;
+        }
+      }
+      &[data-info="sns"] {
+        @include me.pc {
+          margin-top: 15px;
+        }
+        @include me.sp {
+          order: 1;
+        }
+      }
+      &[data-info="lang"] {
+        @include me.pc {
+          margin-top: 20px;
+        }
+        @include me.sp {
+          order: 2;
+        }
+      }
+    }
+  }
+
+  &__section {
+
+    &-heading {
+      display: inline-block;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      @include me.sp {
+        margin-bottom: 8px;
+        font-size: 1.6rem;
+        @at-root [data-section="newyork"] & {
+        margin-bottom: 0;
+      }
+      }
+    }
+
+    p {
+      font-size: 1.2rem;
+      @include me.pc {
+        line-height: 2;
+      }
+      @include me.sp {
+        font-size: 1.1rem;
+      }
+
+      & + p {
+        margin-top: 2px;
+        @include me.sp {
+          margin-top: 6px;
+        }
+      }
+    }
+  }
+
+  &__sns {
+    display: flex;
+    align-items: center;
+    column-gap: 12px;
+
+    &-item {
+      font-size: 0;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+
+      &[data-sns="instagram"] {
+        width: 23px;
+        height: 23px;
+        background-image: url(/common/images/common/icon_instagram.svg);
+        @include me.sp {
+          width: 19px;
+          height: 19px;
+        }
+      }
+      &[data-sns="twitter"] {
+        width: 18px;
+        height: 18px;
+        background-image: url(/common/images/common/icon_x.svg);
+        @include me.sp {
+          width: 16px;
+          height: 19px;
+        }
+      }
+      &[data-sns="note"] {
+        width: 20px;
+        height: 20px;
+        background-image: url(/common/images/common/icon_note.svg);
+        @include me.sp {
+          width: 16px;
+          height: 19px;
+        }
+      }
+      &[data-sns="fb"] {
+        width: 11px;
+        height: 22px;
+        background-image: url(/common/images/common/icon_fb.svg);
+        @include me.sp {
+          width: 10px;
+          height: 19px;
+        }
+      }
+
+      a {
+        display: block;
+        height: 100%;
+      }
+    }
+  }
+
+  &__lang {
+    display: flex;
+    column-gap: 15px;
+
+    &-item {
+
+      a {
+        font-size: 1.4rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    opacity: .17;
+    @include me.sp {
+      display: none;
+    }
+  }
+}
+</style>

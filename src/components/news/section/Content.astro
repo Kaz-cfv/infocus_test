@@ -1,0 +1,232 @@
+---
+import NewsCard from "../parts/NewsCard.astro";
+import Pagination from '../parts/Pagination.astro';
+
+const pickup = [
+  {
+    id: 1,
+    slug: 'detail',
+    title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
+    date: '2025.04.18',
+    category: 'Project',
+    url: '/news/detail',
+    pic: '/common/images/news/01.png',
+    fixed: true,
+  },
+  {
+    id: 2,
+    slug: 'detail',
+    title: '東京オフィス新設のお知らせ',
+    date: '2025.04.15',
+    category: 'Press',
+    url: '/news/detail',
+    pic: '/common/images/news/02.png',
+    fixed: false,
+  },
+  {
+    id: 3,
+    slug: 'detail',
+    title: 'デザインアワード受賞のお知らせ',
+    date: '2025.04.10',
+    category: 'Press',
+    url: '/news/detail',
+    pic: '/common/images/news/03.png',
+    fixed: false,
+  },
+  {
+    id: 4,
+    slug: 'detail',
+    title: 'サステナビリティ推進に関する取り組みについて',
+    date: '2025.04.08',
+    category: 'Project',
+    url: '/news/detail',
+    pic: '/common/images/news/04.png',
+    fixed: false,
+  },
+]
+
+const news = [
+  {
+    id: 5,
+    slug: 'detail',
+    title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
+    date: '2025.04.18',
+    category: 'Project',
+    url: '/news/detail',
+    pic: '/common/images/news/05.png',
+  },
+]
+
+---
+
+<section class="p-news-content">
+  <div class="p-news-pickup__list">
+    <div class="p-news-pickup__list-fixedItem">
+      <div class="p-news-pickup__list-fixedInner">
+        <h2 class="p-news-pickup__list-fixedTitle">
+          PICK UP
+          <span><svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_240_384)"><path d="M11 11.7419V10.0008L9.19249 6.95043L10.6127 0H0.387324L1.81397 6.95043L0 10.0008V11.7419H11Z" fill="white"/><path d="M6.10035 8.13477H4.89964V17.0004H6.10035V8.13477Z" fill="white"/></g><defs><clipPath id="clip0_240_384"><rect width="11" height="17" fill="white"/></clipPath></defs></svg></span>
+        </h2>
+        {pickup.map((item => (
+          item.fixed != false && (
+            <NewsCard
+              id={item.id}
+              title={item.title}
+              date={item.date}
+              category={item.category}
+              url={item.url}
+              pic={item.pic}
+            />
+          )
+        )))}
+      </div>
+    </div>
+    <ul class="p-news-pickup__list-index">
+      {pickup.map((item => (
+          item.fixed == false && (
+            <li class="p-news-pickup__list-item">
+              <NewsCard
+                id={item.id}
+                title={item.title}
+                date={item.date}
+                category={item.category}
+                url={item.url}
+                pic={item.pic}
+              />
+            </li>
+          )
+        )))}
+    </ul>
+  </div>
+
+  <div class="p-news-content__list">
+    <ul class="p-news-content__list-index" data-index="news"></ul>
+  </div>
+
+  <Pagination />
+</section>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-news-content {
+  margin-block-start: calc(114px + 20px);
+  padding-inline: 30px;
+  padding-block-end: 160px;
+  @include me.sp {
+    margin-block-start: 60px;
+    padding-inline: 20px;
+    padding-block-end: 100px;
+  }
+
+  &__list {
+
+    &-index {
+      display: grid;
+      @include me.pc {
+        border-top: solid 1px var(--c-gray);
+      }
+      @include me.sp {
+        row-gap: 45px;
+        margin-block-start: 45px;
+      }
+    }
+
+    &-item {
+      @include me.pc {
+        padding-block: 20px;
+        border-bottom: solid 1px var(--c-gray);
+      }
+    }
+
+  }
+}
+
+.p-news-pickup {
+
+  &__list {
+    @include me.pc {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 30px;
+    }
+
+    &-fixedItem {
+      @include me.pc {
+        padding-block-end: 100px;
+      }
+    }
+
+    &-fixedInner {
+      @include me.pc {
+        position: sticky;
+        top: calc(var(--hd-height-pc-scrolled) + 120px + 20px);
+        left: 0;
+      }
+    }
+
+    &-fixedTitle {
+      display: flex;
+      align-items: center;
+      column-gap: 9px;
+      font-size: 2.4rem;
+      @include me.pc {
+        position: absolute;
+        bottom: calc(100% + 20px);
+        left: 0;
+      }
+      @include me.sp {
+        column-gap: 4px;
+        margin-block-end: 20px;
+        font-size: 1.8rem;
+      }
+
+      span {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(2px);
+        width: 11px;
+        height: 17px;
+        @include me.sp {
+          transform: translateY(1px);
+          width: calc(11px * .8);
+          height: calc(17px * .8);
+        }
+      }
+    }
+
+    &-index {
+      display: grid;
+      @include me.pc {
+        row-gap: 70px;
+        position: relative;
+        padding-block-end: 100px;
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -15px;
+          width: 1px;
+          height: 100%;
+          background-color: var(--c-gray);
+        }
+      }
+      @include me.sp {
+        row-gap: 50px;
+        margin-block-start: 50px;
+        padding-block-start: 40px;
+        border-top: solid 1px var(--c-gray);
+      }
+    }
+
+    .c-news-card {
+      @include me.pc {
+        grid-template-columns: 100%;
+        row-gap: 33px;
+      }
+    }
+  }
+}
+</style>

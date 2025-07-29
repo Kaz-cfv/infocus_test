@@ -1,0 +1,186 @@
+---
+const categories = [
+  {
+    name: 'BRANDING',
+    url: '/',
+    quantity: 10
+  },
+  {
+    name: 'ART DIRECTION',
+    url: '/',
+    quantity: 44
+  },
+  {
+    name: 'WEB',
+    url: '/',
+    quantity: 80
+  },
+  {
+    name: 'FILM',
+    url: '/',
+    quantity: 38
+  },
+  {
+    name: 'EDITORIAL',
+    url: '/',
+    quantity: 23
+  }
+]
+---
+
+<div class="p-home-intro">
+  <div class="p-home-intro-head">
+    <h1 class="p-home-intro-head__caption">We are<br>a digital branding studio</h1>
+    <a href="/about/" class="p-home-intro-head__link">
+      Learn more
+      <span class="p-home-intro-head__icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.54 5.044H7.596C6.684 4.204 5.124 2.68 4.152 1.732L5.052 0.831999L10.032 5.716V5.74L5.052 10.648L4.152 9.7C5.124 8.764 6.684 7.228 7.596 6.388H0.54V5.044Z" fill="white"/></svg></span>
+    </a>
+  </div>
+  <ul class="p-home-intro-category">
+    <li class="p-home-intro-category__item" data-catgory="ALL">
+      <a href="/" class="p-home-intro-category__link">
+        <span class="p-home-intro-category__name">ALL</span>
+        <span class="p-home-intro-category__num">122</span>
+      </a>
+    </li>
+    {categories.map((cat) => (
+      <li class="p-home-intro-category__item" data-catgory={cat.name}>
+        <a href={cat.url} class="p-home-intro-category__link">
+          <span class="p-home-intro-category__name">{cat.name}</span>
+          <span class="p-home-intro-category__num">{cat.quantity}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-home-intro {
+  border-top: solid 2px var(--c-white);
+  border-bottom: solid 2px var(--c-white);
+  @include me.pc {
+    display: grid;
+    grid-template-columns: 956px 1fr;
+    align-items: center;
+    @media screen and (max-width: 1140px) {
+      display: grid;
+      grid-template-columns: 1fr 184px;
+    }
+  }
+
+  &-head {
+    position: relative;
+    @include me.pc {
+      padding-inline: 30px;
+    }
+    @include me.sp {
+      row-gap: 14px;
+      padding-inline: 20px;
+      padding-block: 56px;
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--c-white);
+      }
+    }
+
+    &__caption {
+      font-size: 5.2rem;
+      letter-spacing: -.02rem;
+      @include me.sp {
+        font-size: 3.6rem;
+        letter-spacing: -.05rem;
+      }
+
+      br {
+        @include me.pc {
+          display: none;
+        }
+      }
+    }
+
+    &__link {
+      display: inline-flex;
+      align-items: center;
+      column-gap: 12px;
+      color: var(--c-white);
+      margin-top: 11px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      @include me.sp {
+        margin-top: 14px;
+      }
+    }
+
+    &__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include me.sp {
+        transform: rotate(90deg) translateX(1px);
+      }
+    }
+  }
+
+  &-category {
+    @include me.pc {
+      border-left: solid 1px #828282;
+    }
+
+    &__item {
+      position: relative;
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-gray02);
+      }
+      &:last-child {
+        background-color: transparent;
+      }
+    }
+
+    a {
+      color: var(--c-white);
+    }
+
+    &__link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-inline: 8px 13px;
+      padding-block: 13px;
+      font-weight: 700;
+      @include me.sp {
+        padding-inline: 16px;
+        padding-block: 11px 9px;
+      }
+    }
+
+    &__name {
+      font-size: 1.6rem;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+
+    &__num {
+      color: #B5B5B5;
+      font-size: 1rem;
+      @include me.sp {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+</style>

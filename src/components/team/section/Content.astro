@@ -1,0 +1,339 @@
+---
+import TeamCard from '../parts/TeamCard.astro';
+
+const items = [
+  {
+    id: 1,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/01.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/02.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/03.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/04.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/05.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/06.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/07.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/08.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/09.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: 'Atsushi Kaneishi',
+    pic: '/common/images/team/10.png',
+    url: '/team/detail/',
+    tags: [
+      {
+        name: 'Executive Officer',
+        url: '/team/',
+      },
+      {
+        name: 'Creative Director',
+        url: '/team/',
+      },
+      {
+        name: 'Web Director',
+        url: '/team/',
+      },
+    ],
+  },
+]
+
+---
+
+<div class="p-team-content">
+  <ul class="p-team-content__list">
+    {items.map((item => (
+      <li class="p-team-content__list-item" data-item={item.id}>
+        <TeamCard
+          id={item.id}
+          name={item.name}
+          pic={item.pic}
+          url={item.url}
+          tags={item.tags}
+        />
+      </li>
+    )))}
+  </ul>
+
+  <!-- SP時の2カラムレイアウト用 -->
+  <div class="p-team-content__columns" style="display: none;">
+    <div class="p-team-content__column" data-column="left"></div>
+    <div class="p-team-content__column" data-column="right"></div>
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-team-content {
+  margin-block-start: 90px;
+  padding-inline: 30px;
+  padding-block-end: 107px;
+  @include me.sp {
+    margin-block-start: 60px;
+    padding-inline: 20px;
+    padding-block-end: 80px;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 25px;
+    row-gap: 50px;
+    @include me.sp {
+      display: none;
+    }
+  }
+
+  &__columns {
+    display: none;
+    @include me.sp {
+      display: flex;
+      column-gap: 20px;
+      align-items: flex-start;
+    }
+  }
+
+  &__column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    row-gap: 50px;
+  }
+}
+
+</style>
+
+<script>
+class TeamLayoutManager {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    if (window.innerWidth <= 768) {
+      this.setupMobileLayout();
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 768) {
+        this.setupMobileLayout();
+      } else {
+        this.setupDesktopLayout();
+      }
+    });
+  }
+
+  setupMobileLayout() {
+    const list = document.querySelector('.p-team-content__list');
+    const columns = document.querySelector('.p-team-content__columns');
+    const leftColumn = document.querySelector('[data-column="left"]');
+    const rightColumn = document.querySelector('[data-column="right"]');
+
+    if (!list || !columns) return;
+
+    // リストを非表示にし、カラムを表示
+    list.style.display = 'none';
+    columns.style.display = 'flex';
+
+    // カラムをクリア
+    leftColumn.innerHTML = '';
+    rightColumn.innerHTML = '';
+
+    // アイテムを左右に振り分け
+    const items = list.querySelectorAll('.p-team-content__list-item');
+    items.forEach((item, index) => {
+      const clonedItem = item.cloneNode(true);
+      if (index % 2 === 0) {
+        leftColumn.appendChild(clonedItem);
+      } else {
+        rightColumn.appendChild(clonedItem);
+      }
+    });
+  }
+
+  setupDesktopLayout() {
+    const list = document.querySelector('.p-team-content__list');
+    const columns = document.querySelector('.p-team-content__columns');
+
+    if (!list || !columns) return;
+
+    list.style.display = 'grid';
+    columns.style.display = 'none';
+  }
+}
+
+// ページ読み込み時に実行
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    new TeamLayoutManager();
+  });
+}
+</script>

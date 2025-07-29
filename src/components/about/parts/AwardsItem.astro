@@ -1,0 +1,45 @@
+---
+interface Props {
+  id: number;
+  name: string;
+  slug: string;
+  pic: string;
+  caption: string;
+}
+
+const { id, name, slug, pic, caption } = Astro.props;
+---
+
+<div class="c-awards-item" data-item={id} data-awards={slug}>
+  <figure class="c-awards-item__pic">
+    <picture>
+      <source media="max-width: 959px" srcset={`/common/images/about/awards/${pic}`}>
+      <img src={`/common/images/about/awards/${pic}`} alt={name}>
+    </picture>
+    <figcaption class="c-awards-item__caption" set:html={caption}></figcaption>
+  </figure>
+</div>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-awards-item {
+
+  &__pic {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 12px;
+  }
+
+  &__caption {
+    display: inline-block;
+    color: var(--c-awards-caption);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+}
+</style>

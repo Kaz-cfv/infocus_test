@@ -1,0 +1,241 @@
+---
+import Content from '../parts/Content.astro';
+import Credit from './Credit.astro';
+import Share from '../parts/Share.astro';
+
+const { news } = Astro.props;
+
+const defaultCredit = [
+  {
+    title: 'movie',
+    items: [
+      {
+        caption: 'DIRECTION',
+        content: 'Taiju Nakajima (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'OFFLINE EDIT',
+        content: 'Miho Tanaka (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'MOTION GRAPHICS',
+        content: 'Miho Tanaka (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'GRAPHIC DESIGN',
+        content: 'Anna Senzaki (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'CINEMATOGRAPHY',
+        content: 'Yoshinori Kataoka (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'MUSIC',
+        content: 'Yudai Iwata',
+        link: false,
+        url: '',
+      },
+      {
+        caption: 'SOUND EFFECT',
+        content: 'Fumio Yasue',
+        link: false,
+        url: '',
+      },
+      {
+        caption: 'NARRATION',
+        content: 'Ayana Shimizu',
+        link: false,
+        url: '',
+      },
+    ],
+  },
+  {
+    title: 'Web site',
+    items: [
+      {
+        caption: 'CREATIVE DIRECTION',
+        content: 'Atsushi Kaneishi (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'WEB DIRECTION',
+        content: 'Atsushi Kaneishi (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'WEB DESIGN',
+        content: 'Miho Nagatsuka (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'PROGRAMMING',
+        content: 'Yuta Abe (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+    ],
+  },
+  {
+    title: '3DCG',
+    items: [
+      {
+        caption: 'ART DIRECTION',
+        content: 'Atsushi Kaneishi (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'CG PRODUCTION',
+        content: 'KASSEN',
+        link: false,
+        url: '',
+      },
+    ],
+  },
+  {
+    title: '',
+    items: [
+      {
+        caption: 'PRODUCE',
+        content: 'Kazuki Sekiyama (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+      {
+        caption: 'PRODUCTION MANAGEMENT',
+        content: 'Tomoyuki Ishizaki (IN FOCUS)',
+        link: true,
+        url: '/team/detail/',
+      },
+    ],
+  },
+];
+
+const article = {
+  slug: news.slug,
+  title: news.title || news.acfs?.news_title || 'ニュース記事',
+  date: news.date,
+  category: news.category,
+  pic: news.pic,
+  credit: news.credit || defaultCredit,
+}
+
+console.log('📰 Article component - タイトル確認:', {
+  original: news.title,
+  final: article.title,
+  acfs_title: news.acfs?.news_title
+});
+
+---
+
+<article class="p-news-detial-article">
+  <div class="p-news-detial-article__pic">
+    <figure>
+      <img src={article.pic} alt={article.title}>
+    </figure>
+  </div>
+
+  <section class="p-news-detial-article__about">
+    <h1 class="p-news-detial-article__about-title">{article.title}</h1>
+    <div class="p-news-detial-article__about-info">
+      <time class="p-news-detial-article__about-date">{article.date}</time>
+      <span class="p-news-detial-article__about-category">{article.category}</span>
+    </div>
+  </section>
+
+  <section class="p-news-detial-article__content">
+    <Content newsContent={news.acfs?.news_article || ''} />
+    <Credit creditData={article.credit} />
+  </section>
+
+  <Share
+    slug={article.slug}
+  />
+</article>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-news-detial-article {
+  margin-block-start: 50px;
+  @include me.sp {
+    margin-block-start: 24px;
+    padding-inline: 20px;
+  }
+
+  &__pic {
+    @include me.pc {
+      margin-inline: 148px;
+    }
+  }
+
+  &__about {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 24px;
+    }
+
+    &-title {
+      font-size: 2.2rem;
+      line-height: 1.5;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-info {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      margin-block-start: 22px;
+      color: var(--c-gray);
+      font-size: 1.6rem;
+      font-weight: 500;
+      @include me.sp {
+        margin-block-start: 16px;
+        font-size: 1.4rem;
+      }
+    }
+
+    &-date {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      &::after {
+        content: "-";
+        display: inline-block;
+      }
+    }
+
+  }
+
+  &__content {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+    }
+  }
+}
+</style>

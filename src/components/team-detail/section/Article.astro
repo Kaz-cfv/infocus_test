@@ -1,0 +1,103 @@
+---
+import About from "./About.astro";
+import FixedNavi from "../parts/FixedNavi.astro";
+import Projects from "./Projects.astro";
+import Interview from "./Interview.astro";
+
+const article = {
+  pic: '/common/images/team/02.png',
+  name: 'Sakurako Yamada',
+  position: [
+    {
+      caption: 'Assistant Web Director',
+    },
+    {
+      caption: 'Web Designer',
+    },
+  ],
+  description: '<p>大学で服飾を学んだ後、アパレル会社に入社。<br>ファッションに限らず幅広くデザインに携われる仕事がしたい思い、Webデザインを学び始める。<br>その後2024年にIN FOCUSに入社。<br><a href="#" target="_blank" rel="noopener noreferrer">Midia Interview</a><br><a href="#" target="_blank" rel="noopener noreferrer">CINRA Interview</a></p>',
+  links: [
+    {
+      type: 'icon',
+      caption: 'Instagram',
+      url: '#',
+    },
+    {
+      type: 'text',
+      caption: 'Website',
+      url: '#',
+    },
+    {
+      type: 'text',
+      caption: 'Interview',
+      url: '#',
+    },
+  ],
+  interview: {
+    title: '世界観を捉え、デザインに宿す ─ 槻舘翼（アートディレクター・グラフィックデザイナー）',
+    description: '<p>日経広告賞のアニバーサリー部門最優秀賞を受賞した「相鐵 創業60周年記念広告」のほか、さまざまなアートディレクション・グラフィックに携わる槻舘に、制作背景やデザインに対するこだわりについて話してもらいました。</p>',
+    pic: '/common/images/dummy/team_detail_interview.png',
+    url: '#',
+  },
+}
+---
+
+<article class="p-team-detail-article">
+  <section class="p-team-detail-article__head">
+    <figure class="p-team-detail-article__pic">
+      <img src={article.pic} alt={article.name}>
+    </figure>
+    <About
+      name={article.name}
+      position={article.position}
+      description={article.description}
+      links={article.links}
+    />
+  </section>
+  <Projects />
+  {article.interview && article.interview.title && (
+    <Interview
+      title={article.interview.title}
+      description={article.interview.description}
+      pic={article.interview.pic}
+      url={article.interview.url}
+    />
+  )}
+  <div class="p-team-detail-article__navi">
+    <FixedNavi />
+  </div>
+</article>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-team-detail-article {
+
+  &__head {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    @include me.pc {
+      grid-template-columns: 570px 1fr;
+    }
+  }
+
+  &__pic {
+    aspect-ratio: 1 / 1;
+    @include me.pc {
+      border-right: solid 1px var(--c-gray);
+    }
+  }
+
+  &__navi {
+    background-color: var(--c-black-base);
+    @include me.sp {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      @include mi.z-contents(1);
+    }
+  }
+}
+</style>

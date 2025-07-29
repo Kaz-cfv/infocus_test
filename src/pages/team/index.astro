@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Head from '../../components/team/section/Head.astro'
+import Content from '../../components/team/section/Content.astro';
+import Partners from '../../components/team/section/Partners.astro';
+
+const pageMeta = {
+  title: "TEAM",
+};
+---
+
+<Layout
+  title=""
+  pageName="team"
+  meta={pageMeta}
+>
+
+<Head />
+<Content />
+<Partners />
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+
+</style>

@@ -1,0 +1,182 @@
+---
+interface Service {
+  name: string;
+  url: string;
+}
+
+interface Awards {
+  name: string;
+}
+
+interface Props {
+  website: string;
+  client: string;
+  year: string;
+  service: Service[];
+  awards: Awards[];
+}
+
+const {
+  website,
+  client,
+  year,
+  service,
+  awards
+} = Astro.props;
+
+---
+
+<div class="p-project-detail-article__info-table">
+  <dl>
+    <dt>
+      Website
+    </dt>
+    <dd data-field="website">
+      <a class="--blank" href={website} target="_blank" rel="noopener noreferrer">
+        Launch
+        <span class="icon"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.886085 6.38999L5.72089 1.55518C4.52041 1.60452 2.40724 1.62918 1.09165 1.64563L1.09165 0.412261L7.85051 0.346481L7.86696 0.362926L7.81762 7.13824L6.55136 7.10535C6.57603 5.79797 6.59247 3.67658 6.64181 2.4761L1.807 7.31091L0.886085 6.38999Z" fill="#1A1A1A"/></svg></span>
+      </a>
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      Client
+    </dt>
+    <dd data-field="client">
+      {client}
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      Year
+    </dt>
+    <dd data-field="year">
+      {year}
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      Service
+    </dt>
+    <dd data-field="service">
+      {service.map(service => (
+        <a href={service.url} class="--text">{service.name}</a>
+      ))}
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      Awards
+    </dt>
+    <dd data-field="awards">
+      {awards.map(award => (
+        <span>{award.name}</span>
+      ))}
+    </dd>
+  </dl>
+</div>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-project-detail-article__info-table {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  row-gap: 13px;
+  margin-block-start: 32px;
+  padding-inline: 30px;
+  @include me.sp {
+    row-gap: 20px;
+    margin-block-start: 40px;
+    padding-inline: 20px;
+  }
+
+  dl {
+    display: grid;
+    align-content: flex-start;
+    grid-template-columns: 45px 1fr;
+    column-gap: 38px;
+    @include me.sp {
+      grid-template-columns: 52px 1fr;
+      column-gap: 20px;
+    }
+  }
+
+  dt {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 2.2rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+  }
+
+  dd {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 2.2rem;
+    @include me.sp {
+      font-size: 1.3rem;
+    }
+  }
+
+  a.--text {
+    color: var(--c-white);
+    font-size: 1.2rem;
+    @include me.sp {
+      font-size: 1.3rem;
+    }
+  }
+
+  a.--blank {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 6px;
+    min-width: 112px;
+    padding-inline: 8px;
+    color: var(--c-black-base);
+    font-size: 1.2rem;
+    background-color: var(--c-white);
+    @include me.pc {
+      padding-block: 2px;
+    }
+    @include me.sp {
+      font-size: 1.3rem;
+      line-height: 2.2rem;
+    }
+
+    .icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 9.51px;
+    }
+  }
+
+  [data-field="service"] {
+    a {
+      &::after {
+        content: ",";
+        display: inline-block;
+        margin-inline-end: 8px;
+      }
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  [data-field="awards"] {
+    span {
+      display: block;
+    }
+  }
+}
+
+</style>

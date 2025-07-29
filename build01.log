@@ -1,0 +1,129 @@
+2025-07-29T03:39:01.248547Z	Cloning repository...
+2025-07-29T03:39:03.64807Z	From https://github.com/infocus-web-dev/infocus_web
+2025-07-29T03:39:03.648614Z	 * branch            a78c18053ea6f5a2d18f84292833c385b917e71d -> FETCH_HEAD
+2025-07-29T03:39:03.648719Z
+2025-07-29T03:39:03.778361Z	HEAD is now at a78c180  #2 News詳細をidに変更
+2025-07-29T03:39:03.778859Z
+2025-07-29T03:39:03.856736Z
+2025-07-29T03:39:03.857173Z	Using v2 root directory strategy
+2025-07-29T03:39:03.878148Z	Success: Finished cloning repository files
+2025-07-29T03:39:05.528906Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-07-29T03:39:05.529746Z
+2025-07-29T03:39:05.530651Z	Found wrangler.json file. Reading build configuration...
+2025-07-29T03:39:05.537131Z	pages_build_output_dir: dist
+2025-07-29T03:39:05.537447Z	Build environment variables: (none found)
+2025-07-29T03:39:06.639421Z	Successfully read wrangler.toml file.
+2025-07-29T03:39:07.703535Z	Preparing yarn@3.6.3 for immediate activation...
+2025-07-29T03:39:07.982481Z	Preparing pnpm@8.7.1 for immediate activation...
+2025-07-29T03:39:08.221246Z	Detected the following tools from environment: nodejs@18.20.8, npm@9.6.7, yarn@3.6.3
+2025-07-29T03:39:08.221728Z	Installing nodejs 18.20.8
+2025-07-29T03:39:09.314238Z	Trying to update node-build... ok
+2025-07-29T03:39:09.408566Z	To follow progress, use 'tail -f /tmp/node-build.20250729033909.1102.log' or pass --verbose
+2025-07-29T03:39:09.504121Z	Downloading node-v18.20.8-linux-x64.tar.gz...
+2025-07-29T03:39:09.75137Z	-> https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.gz
+2025-07-29T03:39:11.559782Z
+2025-07-29T03:39:11.560065Z	WARNING: node-v18.20.8-linux-x64 is in LTS Maintenance mode and nearing its end of life.
+2025-07-29T03:39:11.560218Z	It only receives *critical* security updates, *critical* bug fixes and documentation updates.
+2025-07-29T03:39:11.560433Z
+2025-07-29T03:39:11.560643Z	Installing node-v18.20.8-linux-x64...
+2025-07-29T03:39:11.934515Z	Installed node-v18.20.8-linux-x64 to /opt/buildhome/.asdf/installs/nodejs/18.20.8
+2025-07-29T03:39:11.934777Z
+2025-07-29T03:39:13.732191Z	npm warn EBADENGINE Unsupported engine {
+2025-07-29T03:39:13.732535Z	npm warn EBADENGINE   package: 'corepack@0.34.0',
+2025-07-29T03:39:13.732639Z	npm warn EBADENGINE   required: { node: '^20.10.0 || ^22.11.0 || >=24.0.0' },
+2025-07-29T03:39:13.732795Z	npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+2025-07-29T03:39:13.733052Z	npm warn EBADENGINE }
+2025-07-29T03:39:13.838994Z
+2025-07-29T03:39:13.839357Z	changed 1 package in 874ms
+2025-07-29T03:39:13.846179Z	Reshimming asdf nodejs...
+2025-07-29T03:39:17.318424Z	Preparing yarn@3.6.3 for immediate activation...
+2025-07-29T03:39:17.700897Z	Installing project dependencies: yarn
+2025-07-29T03:39:18.303206Z	➤ YN0000: ┌ Resolution step
+2025-07-29T03:39:18.3856Z	➤ YN0002: │ astro@npm:5.11.1 doesn't provide typescript (pa39f2), requested by zod-to-ts
+2025-07-29T03:39:18.38583Z	➤ YN0000: │ Some peer dependencies are incorrectly met; run yarn explain peer-requirements <hash> for details, where <hash> is the six-letter p-prefixed code
+2025-07-29T03:39:18.391236Z	➤ YN0000: └ Completed
+2025-07-29T03:39:18.414411Z	➤ YN0000: ┌ Fetch step
+2025-07-29T03:39:51.617242Z	➤ YN0013: │ 104 packages were already cached, 415 had to be fetched
+2025-07-29T03:39:51.620231Z	➤ YN0000: └ Completed in 33s 206ms
+2025-07-29T03:39:51.646875Z	➤ YN0000: ┌ Link step
+2025-07-29T03:39:56.161636Z	➤ YN0007: │ esbuild@npm:0.25.4 must be built because it never has been before or the last one failed
+2025-07-29T03:39:56.162312Z	➤ YN0007: │ esbuild@npm:0.25.6 must be built because it never has been before or the last one failed
+2025-07-29T03:39:56.162739Z	➤ YN0007: │ sharp@npm:0.33.5 must be built because it never has been before or the last one failed
+2025-07-29T03:39:56.162866Z	➤ YN0007: │ workerd@npm:1.20250709.0 must be built because it never has been before or the last one failed
+2025-07-29T03:39:56.496049Z	➤ YN0000: └ Completed in 4s 849ms
+2025-07-29T03:39:56.530888Z	➤ YN0000: Done with warnings in 38s 235ms
+2025-07-29T03:39:56.695612Z	Executing user command: yarn build
+2025-07-29T03:39:58.851367Z	03:39:58 [content] Syncing content
+2025-07-29T03:39:58.855217Z	03:39:58 [content] Synced content
+2025-07-29T03:39:58.855903Z	03:39:58 [types] Generated 126ms
+2025-07-29T03:39:58.856324Z	03:39:58 [build] output: "static"
+2025-07-29T03:39:58.856717Z	03:39:58 [build] mode: "static"
+2025-07-29T03:39:58.856907Z	03:39:58 [build] directory: /opt/buildhome/repo/dist/
+2025-07-29T03:39:58.857044Z	03:39:58 [build] Collecting build info...
+2025-07-29T03:39:58.857472Z	03:39:58 [build] ✓ Completed in 153ms.
+2025-07-29T03:39:58.858744Z	03:39:58 [build] Building static entrypoints...
+2025-07-29T03:40:00.685495Z	03:40:00 [vite] [32m✓ built in 1.79s[39m
+2025-07-29T03:40:00.685822Z	03:40:00 [build] ✓ Completed in 1.83s.
+2025-07-29T03:40:00.686266Z
+2025-07-29T03:40:00.68653Z	 building client (vite)
+2025-07-29T03:40:00.698616Z	03:40:00 [vite] transforming...
+2025-07-29T03:40:01.355996Z	03:40:01 [vite] [32m✓[39m 59 modules transformed.
+2025-07-29T03:40:01.403369Z	03:40:01 [vite] rendering chunks...
+2025-07-29T03:40:01.491718Z	03:40:01 [vite] computing gzip size...
+2025-07-29T03:40:01.500121Z	03:40:01 [vite] [2mdist/[22m[2m_astro/[22m[35mLayout.BH4JZYC6.css                                      [39m[1m[2m 17.99 kB[22m[1m[22m[2m │ gzip:  4.68 kB[22m
+2025-07-29T03:40:01.500444Z	03:40:01 [vite] [2mdist/[22m[2m_astro/[22m[36mLayout.astro_astro_type_script_index_0_lang.D8CXq3EA.js  [39m[1m[2m245.29 kB[22m[1m[22m[2m │ gzip: 83.46 kB[22m
+2025-07-29T03:40:01.500587Z	03:40:01 [vite] [32m✓ built in 811ms[39m
+2025-07-29T03:40:01.50664Z
+2025-07-29T03:40:01.506802Z	 generating static routes
+2025-07-29T03:40:01.513421Z	03:40:01 ▶ src/pages/about/index.astro
+2025-07-29T03:40:01.527919Z	03:40:01   └─ /about/index.html (+14ms)
+2025-07-29T03:40:01.531061Z	03:40:01 ▶ src/pages/news/detail/index.astro
+2025-07-29T03:40:01.535657Z	03:40:01   └─ /news/detail/index.html (+5ms)
+2025-07-29T03:40:01.537442Z	03:40:01 ▶ src/pages/news/[id].astro
+2025-07-29T03:40:01.538166Z	📡 プロジェクトAPIからデータを取得中...
+2025-07-29T03:40:02.111065Z	💥 収集に失敗: Error: Projects API error: 403
+2025-07-29T03:40:02.111384Z	    at Module.getStaticPaths (file:///opt/buildhome/repo/dist/pages/news/_id_.astro.mjs?time=1753760401535:165:13)
+2025-07-29T03:40:02.11155Z	    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-07-29T03:40:02.111688Z	    at async callGetStaticPaths (file:///opt/buildhome/repo/node_modules/astro/dist/core/render/route-cache.js:29:17)
+2025-07-29T03:40:02.11181Z	    at async getPathsForRoute (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/generate.js:211:25)
+2025-07-29T03:40:02.111933Z	    at async generatePage (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/generate.js:179:19)
+2025-07-29T03:40:02.112157Z	    at async generatePages (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/generate.js:97:7)
+2025-07-29T03:40:02.112507Z	    at async staticBuild (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/static-build.js:84:5)
+2025-07-29T03:40:02.112639Z	    at async AstroBuilder.build (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/index.js:154:5)
+2025-07-29T03:40:02.112736Z	    at async AstroBuilder.run (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/index.js:185:7)
+2025-07-29T03:40:02.11285Z	    at async build (file:///opt/buildhome/repo/node_modules/astro/dist/core/build/index.js:45:3)
+2025-07-29T03:40:02.11298Z	03:40:02 ▶ src/pages/news/index.astro
+2025-07-29T03:40:02.116324Z	03:40:02   └─ /news/index.html (+3ms)
+2025-07-29T03:40:02.118739Z	03:40:02 ▶ src/pages/projects/detail/index.astro
+2025-07-29T03:40:02.123254Z	03:40:02   └─ /projects/detail/index.html (+4ms)
+2025-07-29T03:40:02.124778Z	03:40:02 ▶ src/pages/projects/index.astro
+2025-07-29T03:40:02.128209Z	03:40:02   └─ /projects/index.html (+3ms)
+2025-07-29T03:40:02.130692Z	03:40:02 ▶ src/pages/team/detail/index.astro
+2025-07-29T03:40:02.135493Z	03:40:02   └─ /team/detail/index.html (+5ms)
+2025-07-29T03:40:02.136941Z	03:40:02 ▶ src/pages/team/index.astro
+2025-07-29T03:40:02.140766Z	03:40:02   └─ /team/index.html (+4ms)
+2025-07-29T03:40:02.142221Z	03:40:02 ▶ src/pages/index.astro
+2025-07-29T03:40:02.14624Z	03:40:02   └─ /index.html (+4ms)
+2025-07-29T03:40:02.146445Z	03:40:02 ✓ Completed in 641ms.
+2025-07-29T03:40:02.14673Z
+2025-07-29T03:40:02.154085Z	03:40:02 [build] 8 page(s) built in 3.45s
+2025-07-29T03:40:02.154219Z	03:40:02 [build] Complete!
+2025-07-29T03:40:02.201003Z	Finished
+2025-07-29T03:40:03.078703Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-07-29T03:40:03.079427Z
+2025-07-29T03:40:03.079912Z	Found wrangler.json file. Reading build configuration...
+2025-07-29T03:40:03.086749Z	pages_build_output_dir: dist
+2025-07-29T03:40:03.086959Z	Build environment variables: (none found)
+2025-07-29T03:40:04.20359Z	Successfully read wrangler.toml file.
+2025-07-29T03:40:04.204551Z	Note: No functions dir at /functions found. Skipping.
+2025-07-29T03:40:04.20472Z	Validating asset output directory
+2025-07-29T03:40:10.533873Z	Deploying your site to Cloudflare's global network...
+2025-07-29T03:40:20.60023Z	Uploading... (161/170)
+2025-07-29T03:40:21.463171Z	Uploading... (164/170)
+2025-07-29T03:40:22.29685Z	Uploading... (167/170)
+2025-07-29T03:40:22.589705Z	Uploading... (170/170)
+2025-07-29T03:40:22.590035Z	✨ Success! Uploaded 9 files (161 already uploaded) (2.64 sec)
+2025-07-29T03:40:22.590171Z
+2025-07-29T03:40:24.240071Z	✨ Upload complete!
+2025-07-29T03:40:31.686838Z	Success: Assets published!
+2025-07-29T03:40:33.22063Z	Success: Your site was deployed!

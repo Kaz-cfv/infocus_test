@@ -1,0 +1,51 @@
+$breakpoint-mobile: 959px;
+$breakpoint-pc: 960px;
+
+// PC（960px以上）
+@mixin pc {
+  @media screen and (min-width: $breakpoint-pc) {
+    @content;
+  }
+}
+
+// モバイル（959px以下）
+@mixin sp {
+  @media screen and (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+// 特定の範囲のみに適用するカスタムメディアクエリ
+@mixin custom-media($min, $max) {
+  @media screen and (min-width: $min) and (max-width: $max) {
+    @content;
+  }
+}
+
+// タブレット向け (600px〜959px)
+@mixin tablet {
+  @media screen and (min-width: 600px) and (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+// 横向き/縦向きの対応
+@mixin landscape {
+  @media screen and (orientation: landscape) {
+    @content;
+  }
+}
+
+@mixin portrait {
+  @media screen and (orientation: portrait) {
+    @content;
+  }
+}
+
+// 高解像度ディスプレイ (Retina等) 対応
+@mixin high-dpi {
+  @media (-webkit-min-device-pixel-ratio: 2),
+         (min-resolution: 192dpi) {
+    @content;
+  }
+}

@@ -1,0 +1,311 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Article from '../../components/news-detail/section/Article.astro';
+import Related from '../../components/news-detail/section/Related.astro';
+
+export async function getStaticPaths() {
+  try {
+    // プロジェクトAPIへのアクセスを試行（フォールバック付き）
+    let projects = [];
+
+    try {
+      console.log('📡 プロジェクトAPIからデータを取得中...');
+      const projectResponse = await fetch('https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects', {
+        headers: {
+          'User-Agent': 'Astro-Build/1.0.0',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (projectResponse.ok) {
+        projects = await projectResponse.json();
+        console.log(`✅ ${projects.length}件のプロジェクトを取得`);
+      } else {
+        console.log(`⚠️ プロジェクトAPI接続失敗: ${projectResponse.status}`);
+      }
+    } catch (projectError) {
+      console.log('ℹ️ プロジェクトAPI接続エラー:', projectError.message);
+    }
+
+    // 日本語パラメータ付きでニュースAPIから収集
+    let newsData = [];
+
+    try {
+      console.log('📡 ニュースAPI（日本語）からデータを取得中...');
+      const newsResponse = await fetch('https://infocus.wp.site-prev2.com/wp-json/wp/v2/news?lang=ja&_embed', {
+        headers: {
+          'User-Agent': 'Astro-Build/1.0.0',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      if (newsResponse.ok) {
+        const wpNews = await newsResponse.json();
+        console.log(`✅ ${wpNews.length}件のニュースを取得`);
+
+        // ニュースデータを優先的に処理
+        const processedNews = wpNews.map((item, index) => {
+          const formatDate = (dateString) => {
+            try {
+              const date = new Date(dateString);
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}.${month}.${day}`;
+            } catch (error) {
+              console.warn('⚠️ 日付フォーマットエラー:', dateString);
+              return '----.--.--';
+            }
+          };
+
+          const getThumbnail = (item) => {
+            if (item.acfs?.news_mv?.url) {
+              return item.acfs.news_mv.url;
+            }
+            if (item.acfs?.news_mv?.sizes?.large) {
+              return item.acfs.news_mv.sizes.large;
+            }
+            if (item.featured_media && item._embedded?.['wp:featuredmedia']?.[0]?.source_url) {
+              return item._embedded['wp:featuredmedia'][0].source_url;
+            }
+            return '/common/images/news/default.png';
+          };
+
+          const slug = item.slug;
+
+          // タイトルの様々な形式に対応
+          let title = 'タイトルなし';
+          if (typeof item.title === 'string') {
+            title = item.title;
+          } else if (item.title?.rendered) {
+            title = item.title.rendered;
+          } else if (item.title_plain) {
+            title = item.title_plain;
+          } else if (item.acfs?.news_title) {
+            title = item.acfs.news_title;
+          }
+
+          console.log(`🔍 ニュース${index + 1}: ID=${item.id}, slug="${slug}"`);
+          console.log(`   タイトル取得結果: "${title}"`);
+          console.log(`   元データ構造: ${typeof item.title}, rendered: ${item.title?.rendered}`);
+
+          return {
+            id: item.id,
+            slug: slug,
+            title: title,
+            date: formatDate(item.date),
+            category: item.type?.toUpperCase() || 'NEWS',
+            pic: getThumbnail(item),
+            acfs: item.acfs || {},
+            content: item.content?.rendered || '',
+            link: item.link || '',
+            article: item.acfs?.news_article || '',
+            excerpt: item.excerpt?.rendered || '',
+            // ニュース固有のフィールド
+            tags: item.acfs?.news_tags || [],
+            author: item.acfs?.news_author || '',
+            wordpressId: item.id,
+            lastModified: item.modified || item.date,
+            sourceType: 'news'
+          };
+        });
+
+        newsData.push(...processedNews);
+
+      } else {
+        console.log('⚠️ ニュースAPI（日本語）が利用不可');
+      }
+    } catch (newsError) {
+      console.log('ℹ️ ニュースAPI接続エラー:', newsError.message);
+    }
+
+    // プロジェクトデータも補完として追加（プロジェクトが存在する場合のみ）
+    const processedProjects = projects.length > 0 ? projects.map((project, index) => {
+      const formatDate = (dateString) => {
+        try {
+          const date = new Date(dateString);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          return `${year}.${month}.${day}`;
+        } catch (error) {
+          return '----.--.--';
+        }
+      };
+
+      const getThumbnail = (item) => {
+        if (item.acfs?.project_mv?.url) {
+          return item.acfs.project_mv.url;
+        }
+        return '/common/images/news/default.png';
+      };
+
+      const getCategory = (item) => {
+        if (item.class_list && Array.isArray(item.class_list)) {
+          const categoryClass = item.class_list.find(cls => cls.startsWith('projects-'));
+          if (categoryClass) {
+            return categoryClass.replace('projects-', '').replace('-', ' ').toUpperCase();
+          }
+        }
+        return 'PROJECT';
+      };
+
+      console.log(`🔍 プロジェクト${index + 1}: ID=${project.id}, slug="${project.slug}"`);
+
+      return {
+        id: project.id,
+        slug: project.slug,
+        title: project.title?.rendered || 'タイトルなし',
+        date: formatDate(project.date),
+        category: getCategory(project),
+        pic: getThumbnail(project),
+        acfs: project.acfs || {},
+        content: project.content?.rendered || '',
+        link: project.link || '',
+        article: project.acfs?.project_outline || '',
+        outline: project.acfs?.project_outline || '',
+        credits: project.acfs?.project_credits || '',
+        sourceType: 'project'
+      };
+    }) : [];
+
+    // ニュースが存在しない場合のみプロジェクトを追加
+    if (newsData.length === 0 && processedProjects.length > 0) {
+      console.log('ℹ️ ニュースデータが存在しないため、プロジェクトデータを使用');
+      newsData.push(...processedProjects);
+    }
+
+    const staticPaths = newsData.map((news) => ({
+      params: { id: news.id.toString() },
+      props: { news }
+    }));
+
+    console.log('🛤️ 生成される静的パス一覧:');
+    staticPaths.forEach((path, index) => {
+      console.log(`  ${index + 1}. /news/${path.params.id} (ID: ${path.props.news.id}, Source: ${path.props.news.sourceType})`);
+    });
+
+    console.log(`✨ 合計${staticPaths.length}個の静的パスを生成完了`);
+    return staticPaths;
+
+  } catch (error) {
+    console.error('💥 収集に失敗:', error);
+
+    // データが取得できない場合はダミーデータを返してビルドを継続
+    console.log('🚨 緊急フォールバック: ニュースAPIもプロジェクトAPIも利用不可');
+    return [
+      {
+        params: { id: '1' },
+        props: {
+          news: {
+            id: 1,
+            slug: 'fallback-news',
+            title: 'ニュース読み込み中...',
+            date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+            category: 'NEWS',
+            pic: '/common/images/news/default.png',
+            acfs: {},
+            content: '<p>ニュースデータを読み込み中です...</p>',
+            link: '',
+            article: 'ニュースデータを読み込み中です...',
+            sourceType: 'fallback'
+          }
+        }
+      }
+    ];
+  }
+}
+
+const { news } = Astro.props;
+const { id } = Astro.params;
+
+console.log('🎯 現在の証拠を検証:');
+console.log(`   ID: "${id}"`);
+console.log(`   News ID: ${news?.id}`);
+console.log(`   タイトル: "${news?.title}"`);
+console.log(`   データソース: ${news?.sourceType || 'unknown'}`);
+
+// タイトルが空の場合の緊急対策
+if (!news?.title || news.title === 'タイトルなし') {
+  console.error('🚨 タイトルが見つかりません！');
+  console.log('Available news props:', Object.keys(news || {}));
+}
+
+const pageMeta = {
+  title: `${news?.title || 'ニュース詳細'} | News`,
+  description: news.excerpt ? news.excerpt.replace(/<[^>]*>/g, '').substring(0, 160) : `${news.title}の詳細ページです。`,
+  ogImage: news.pic !== '/common/images/news/default.png' ? news.pic : null,
+  ogType: 'article',
+  publishedTime: news.lastModified,
+  modifiedTime: news.lastModified
+};
+---
+
+<Layout
+  title={news?.title || 'ニュース詳細'}
+  pageName="news-detail"
+  meta={pageMeta}
+>
+
+<!-- 開発時証拠表示パネル -->
+{import.meta.env.DEV && (
+  <div style="position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.95); color: #00ff00; padding: 15px; font-family: 'Courier New', monospace; font-size: 11px; z-index: 9999; border-radius: 8px; max-width: 350px; border: 1px solid #00ff00;">
+    <div style="color: #ffff00; margin-bottom: 8px;">🔍 Detective Panel (SSG + Lang)</div>
+    <div>Case ID: {news.id}</div>
+    <div>ID: "{id}"</div>
+    <div>Title: {news.title?.substring(0, 25)}...</div>
+    <div>Category: {news.category}</div>
+    <div>Date: {news.date}</div>
+    <div>Source: {news.sourceType}</div>
+    <div style="color: #00ff00; margin-top: 5px;">✅ SSG + Japanese API</div>
+  </div>
+)}
+
+<Article news={news} />
+<Related currentId={news.id} />
+
+<script define:vars={{ news, id }}>
+  console.log(`📋 ID: "${id}"`);
+  console.log('📊 データ:', news);
+
+  window.newsData = news;
+  window.NewsArticle = news;
+  window.currentId = id;
+  window.investigationMode = 'SSG_MULTILANG';
+
+  // URL検証
+  const currentPath = window.location.pathname;
+  const expectedPath = `/news/${id}`;
+
+  console.log(`🔗 現在位置: ${currentPath}`);
+  console.log(`🎯 予想位置: ${expectedPath}`);
+
+  if (currentPath === expectedPath) {
+    console.log('✅ IDベースSSGモードで正常動作');
+  } else {
+    console.warn('⚠️ 位置情報に矛盾あり - 追加調査が必要');
+  }
+</script>
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+// クリーンな多言語対応
+.news-detail {
+  transition: opacity 0.3s ease;
+
+  &.loading {
+    opacity: 0.7;
+  }
+
+  // 日本語フォントの最適化
+  &[lang="ja"] {
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+}
+</style>

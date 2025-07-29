@@ -1,0 +1,497 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Content from '../../../components/news-detail/parts/Content.astro';
+import Credit from '../../../components/news-detail/section/Credit.astro';
+import Share from '../../../components/news-detail/parts/Share.astro';
+import Related from '../../../components/news-detail/section/Related.astro';
+
+// URLパラメーターからidを取得
+const url = Astro.url;
+const id = url.searchParams.get('id');
+
+console.log('🔍 URLパラメーター取得:', {
+  fullUrl: url.toString(),
+  id: id,
+  searchParams: Object.fromEntries(url.searchParams.entries())
+});
+
+let article: any = null;
+
+// idが指定されている場合はAPIから記事を取得
+if (id) {
+  try {
+    console.log(`📡 記事ID: ${id} のデータを取得中...`);
+
+    // ニュースAPIから記事詳細を取得
+    const newsUrl = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/news/${id}`;
+    console.log(`🔗 ニュースAPI URL: ${newsUrl}`);
+    
+    const newsResponse = await fetch(newsUrl, {
+      headers: {
+        'User-Agent': 'Astro-Build/1.0.0',
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+
+    console.log(`📊 ニュースAPIレスポンス: ${newsResponse.status} ${newsResponse.statusText}`);
+
+    if (newsResponse.ok) {
+      const newsData: any = await newsResponse.json();
+      console.log('✅ ニュースAPIから記事取得成功:', newsData);
+
+      // データを記事形式に変換
+      article = {
+        id: newsData.id,
+        slug: newsData.slug || `news-${newsData.id}`,
+        title: newsData.title?.rendered || 'タイトルなし',
+        date: new Date(newsData.date).toISOString().split('T')[0].replace(/-/g, '.'),
+        category: 'NEWS',
+        pic: newsData.acfs?.news_mv?.url || '/common/images/news/default.png',
+        content: newsData.content?.rendered || '',
+        article: newsData.acfs?.news_article || '',
+        credit: []
+      };
+    } else {
+      console.log(`⚠️ ニュースAPI失敗 (${newsResponse.status}), プロジェクトAPIを試行...`);
+
+      // プロジェクトAPIから記事詳細を取得
+      const projectUrl = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects/${id}`;
+      console.log(`🔗 プロジェクトAPI URL: ${projectUrl}`);
+      
+      const projectResponse = await fetch(projectUrl, {
+        headers: {
+          'User-Agent': 'Astro-Build/1.0.0',
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
+      });
+
+      console.log(`📊 プロジェクトAPIレスポンス: ${projectResponse.status} ${projectResponse.statusText}`);
+
+      if (projectResponse.ok) {
+        const projectData: any = await projectResponse.json();
+        console.log('✅ プロジェクトAPIから記事取得成功:', projectData);
+
+        article = {
+          id: projectData.id,
+          slug: projectData.slug || `project-${projectData.id}`,
+          title: projectData.title?.rendered || 'タイトルなし',
+          date: new Date(projectData.date).toISOString().split('T')[0].replace(/-/g, '.'),
+          category: 'PROJECT',
+          pic: projectData.acfs?.project_mv?.url || '/common/images/news/default.png',
+          content: projectData.content?.rendered || '',
+          article: projectData.acfs?.project_outline || '',
+          credit: []
+        };
+      } else {
+        console.log(`❌ プロジェクトAPIも失敗 (${projectResponse.status})`);
+        
+        // レスポンステキストも確認
+        try {
+          const errorText = await projectResponse.text();
+          console.log('❌ プロジェクトAPIエラー詳細:', errorText.substring(0, 200));
+        } catch (e) {
+          console.log('❌ プロジェクトAPIエラーテキスト取得失敗');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('💥 記事取得エラー:', error);
+  }
+}
+
+// フォールバック用のダミーデータ
+if (!article) {
+  console.log('🚨 APIから記事が取得できないため、ダミーデータを使用');
+  article = {
+    id: 'fallback',
+    slug: 'detail01',
+    title: 'CHELMICO 鈴木真海子が出演する『散文の記憶 | 街・言葉・時々酒 BY MUDA』がYouTubeにて公開',
+    date: '2025.03.31',
+    category: 'Project',
+    pic: '/common/images/dummy/news_detail_eyecatch.png',
+    credit: [
+      {
+        title: 'movie',
+        items: [
+          {
+            caption: 'DIRECTION',
+            content: 'Taiju Nakajima (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'OFFLINE EDIT',
+            content: 'Miho Tanaka (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'MOTION GRAPHICS',
+            content: 'Miho Tanaka (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'GRAPHIC DESIGN',
+            content: 'Anna Senzaki (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'CINEMATOGRAPHY',
+            content: 'Yoshinori Kataoka (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'MUSIC',
+            content: 'Yudai Iwata',
+            link: false,
+            url: '',
+          },
+          {
+            caption: 'SOUND EFFECT',
+            content: 'Fumio Yasue',
+            link: false,
+            url: '',
+          },
+          {
+            caption: 'NARRATION',
+            content: 'Ayana Shimizu',
+            link: false,
+            url: '',
+          },
+        ],
+      },
+      {
+        title: 'Web site',
+        items: [
+          {
+            caption: 'CREATIVE DIRECTION',
+            content: 'Atsushi Kaneishi (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'WEB DIRECTION',
+            content: 'Atsushi Kaneishi (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'WEB DESIGN',
+            content: 'Miho Nagatsuka (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'PROGRAMMING',
+            content: 'Yuta Abe (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+        ],
+      },
+      {
+        title: '3DCG',
+        items: [
+          {
+            caption: 'ART DIRECTION',
+            content: 'Atsushi Kaneishi (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'CG PRODUCTION',
+            content: 'KASSEN',
+            link: false,
+            url: '',
+          },
+        ],
+      },
+      {
+        title: '',
+        items: [
+          {
+            caption: 'PRODUCE',
+            content: 'Kazuki Sekiyama (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+          {
+            caption: 'PRODUCTION MANAGEMENT',
+            content: 'Tomoyuki Ishizaki (IN FOCUS)',
+            link: true,
+            url: '/team/detail/',
+          },
+        ],
+      },
+    ],
+  };
+}
+
+const pageMeta = {
+  title: "NEWS DETAIL",
+};
+---
+
+<Layout
+  title=""
+  pageName="news-detail"
+  meta={pageMeta}
+>
+
+<article class="p-news-detial-article">
+  <div class="p-news-detial-article__pic">
+    <figure>
+      <img src={article.pic} alt={article.title}>
+    </figure>
+  </div>
+
+  <section class="p-news-detial-article__about">
+    <h1 class="p-news-detial-article__about-title">{article.title}</h1>
+    <div class="p-news-detial-article__about-info">
+      <time class="p-news-detial-article__about-date">{article.date}</time>
+      <span class="p-news-detial-article__about-category">{article.category}</span>
+    </div>
+  </section>
+
+  <section class="p-news-detial-article__content">
+    <div class="c-article">
+      <p>
+        「もっと気軽にもっと楽しくゴルフをしよう」というコンセプトのもと、あらゆる枠組みを超えた新しいゴルフウェアを提案しているPEARLY GATESから2025 SPRING COLLECTIONがローンチ。モデル・女優として活躍する井桁弘恵さんを起用し、今回の新作を手に取ってもらい、体験する映像を制作しました。<br>
+        「PG SMILE」のアイテムや、カラーシューズに出会ったときの「カワイイ」表情にフォーカスし、春らしい新鮮なイメージに仕上げています。
+      </p>
+      <!-- <p>
+        muda Youtube<br>
+        <a href="https://www.youtube.com/@muda-media" target="_blank">https://www.youtube.com/@muda-media</a><br>
+        muda Instagram<br>
+        <a href="https://www.instagram.com/muda_media_jp/" target="_blank">https://www.instagram.com/muda_media_jp/</a><br>
+        muda X<br>
+        <a href="https://x.com/muda_mediajp" target="_blank">https://x.com/muda_mediajp</a><br>
+        muda TikTok<br>
+        <a href="https://www.tiktok.com/@muda_media" target="_blank">https://www.tiktok.com/@muda_media</a><br>
+        muda official site<br>
+        <a href="https://muda-media.com/" target="_blank">https://muda-media.com/</a>
+      </p> -->
+      <p>
+        <figure>
+          <img src="/common/images/dummy/news_detail_01.png" alt="">
+        </figure>
+        <figure>
+          <img src="/common/images/dummy/news_detail_02.png" alt="">
+        </figure>
+        <figure>
+          <img src="/common/images/dummy/news_detail_03.png" alt="">
+        </figure>
+        <figure>
+          <img src="/common/images/dummy/news_detail_04.png" alt="">
+        </figure>
+      </p>
+    </div>
+    <Credit creditData={article.credit} />
+  </section>
+
+  <Share
+    slug={article.slug}
+  />
+</article>
+<Related />
+
+<script define:vars={{ article, id }}>
+  // window変数にNewsArticleとして記事データを保存
+  window.NewsArticle = article;
+  
+  console.log('💾 NewsArticleをwindow変数に保存:', window.NewsArticle);
+  console.log(`📝 記事ID: ${id || 'なし'}`);
+  console.log(`📰 記事タイトル: ${article.title}`);
+  console.log(`📅 記事日付: ${article.date}`);
+  console.log(`🏷️ カテゴリ: ${article.category}`);
+  
+  // デバッグ用の追加情報
+  console.log('🔍 記事の完全なデータ構造:');
+  console.table({
+    ID: article.id,
+    Slug: article.slug,
+    Title: article.title?.substring(0, 50) + '...',
+    Date: article.date,
+    Category: article.category,
+    HasPic: !!article.pic,
+    HasContent: !!article.content,
+    HasArticle: !!article.article,
+    CreditSections: article.credit?.length || 0
+  });
+</script>
+
+</Layout>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-news-detial-article {
+  margin-block-start: 50px;
+  @include me.sp {
+    margin-block-start: 24px;
+    padding-inline: 20px;
+  }
+
+  &__pic {
+    @include me.pc {
+      margin-inline: 148px;
+    }
+  }
+
+  &__about {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 24px;
+    }
+
+    &-title {
+      font-size: 2.2rem;
+      line-height: 1.5;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-info {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      margin-block-start: 22px;
+      color: var(--c-gray);
+      font-size: 1.6rem;
+      font-weight: 500;
+      @include me.sp {
+        margin-block-start: 16px;
+        font-size: 1.4rem;
+      }
+    }
+
+    &-date {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      &::after {
+        content: "-";
+        display: inline-block;
+      }
+    }
+
+  }
+
+  &__content {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+    }
+  }
+}
+
+.c-article {
+  font-family: var(--f-jp);
+  font-size: 1.6rem;
+  line-height: 1.7;
+  @include me.sp {
+    font-size: 1.4rem;
+    line-height: 1.6;
+  }
+
+  h2 {
+    margin-block-end: 12px;
+    font-size: 1.8rem;
+    @include me.sp {
+      font-size: 1.7rem;
+    }
+  }
+
+  h3 {
+    margin-block-end: 12px;
+    font-size: 1.5rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1.4rem;
+    margin-block-end: 12px;
+    font-weight: 400;
+    line-height: 1.8;
+  }
+
+  p {
+    margin-block-end: 50px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+  }
+
+  a {
+    display: inline-block;
+    position: relative;
+    margin-block-end: 4px;
+    color: var(--c-white);
+    @include me.pc {
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+      }
+    }
+    @include me.sp {
+      text-decoration: underline;
+    }
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    position: relative;
+    text-decoration: none;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: var(--c-white);
+    }
+  }
+
+  figure {
+    margin-block-end: 30px;
+  }
+
+  figcaption {
+    display: inline-block;
+    margin-block-start: 20px;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    @include me.sp {
+      margin-block-start: 10px;
+    }
+  }
+}
+</style>

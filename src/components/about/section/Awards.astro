@@ -1,0 +1,503 @@
+---
+import AwardsItem from "../parts/AwardsItem.astro";
+import Summary from "../parts/Summary.astro";
+
+const awards_pc = [
+  {
+    id: 1,
+    slug: 'cannes',
+    name: 'CANNES',
+    pic: 'awd_cannes.png',
+    caption: 'Gold',
+  },
+  {
+    id: 2,
+    slug: 'oneshow',
+    name: 'THE ONE SHOW',
+    pic: 'awd_oneshow.png',
+    caption: 'Gold',
+  },
+  {
+    id: 3,
+    slug: 'clio',
+    name: 'THE CLIO AWARDS',
+    pic: 'awd_clio.png',
+    caption: 'Grand Prix',
+  },
+  {
+    id: 4,
+    slug: 'dad',
+    name: 'D&AD',
+    pic: 'awd_dad.png',
+    caption: 'Yellow Pencil',
+  },
+  {
+    id: 5,
+    slug: 'ny_festival',
+    name: 'NEWYORK FESTIVALS',
+    pic: 'awd_ny_festival.png',
+    caption: 'BEST of SHOW',
+  },
+  {
+    id: 6,
+    slug: 'lia',
+    name: 'Lia',
+    pic: 'awd_lia.png',
+    caption: 'Silver',
+  },
+  {
+    id: 7,
+    slug: 'spikes',
+    name: 'Spikes Asia',
+    pic: 'awd_spikes.png',
+    caption: 'Gold',
+  },
+  {
+    id: 8,
+    slug: 'adfest',
+    name: 'ADFEST',
+    pic: 'awd_adfest.png',
+    caption: 'Silver',
+  },
+  {
+    id: 9,
+    slug: 'oneasia',
+    name: 'ONE ASIA',
+    pic: 'awd_oneasia.png',
+    caption: 'Grand prix',
+  },
+  {
+    id: 10,
+    slug: 'mad',
+    name: 'MAD STARS',
+    pic: 'awd_mad.png',
+    caption: 'Silver',
+  },
+  {
+    id: 11,
+    slug: 'acc',
+    name: 'ACC',
+    pic: 'awd_acc.png',
+    caption: 'Gold',
+  },
+  {
+    id: 12,
+    slug: 'webby',
+    name: 'THE WEBBY AWARDS',
+    pic: 'awd_webby.png',
+    caption: 'Nominated × 3',
+  },
+  {
+    id: 13,
+    slug: 'fwa',
+    name: 'FWA',
+    pic: 'awd_fwa.png',
+    caption: 'FWA OF THE DAY × 6',
+  },
+  {
+    id: 14,
+    slug: 'awwwards',
+    name: 'AWWWARDS',
+    pic: 'awd_awwwards.png',
+    caption: 'Nominated for<br> AGENCY OF THE YEAR 2017',
+  },
+  {
+    id: 15,
+    slug: 'cssda',
+    name: 'CSS Design Awards',
+    pic: 'awd_cssda.png',
+    caption: 'Designer of the year<br> 2018 -<br> Top 10 Studios',
+  },
+]
+
+const awards_sp = [
+  {
+    id: 1,
+    slug: 'cannes',
+    name: 'CANNES',
+    pic: 'awd_cannes.png',
+    caption: 'Gold',
+  },
+  {
+    id: 2,
+    slug: 'clio',
+    name: 'THE CLIO AWARDS',
+    pic: 'awd_clio.png',
+    caption: 'Grand Prix',
+  },
+  {
+    id: 3,
+    slug: 'oneshow',
+    name: 'THE ONE SHOW',
+    pic: 'awd_oneshow.png',
+    caption: 'Gold',
+  },
+  {
+    id: 4,
+    slug: 'dad',
+    name: 'D&AD',
+    pic: 'awd_dad.png',
+    caption: 'Yellow Pencil',
+  },
+  {
+    id: 5,
+    slug: 'ny_festival',
+    name: 'NEWYORK FESTIVALS',
+    pic: 'awd_ny_festival.png',
+    caption: 'BEST of SHOW',
+  },
+  {
+    id: 6,
+    slug: 'lia',
+    name: 'Lia',
+    pic: 'awd_lia.png',
+    caption: 'Silver',
+  },
+  {
+    id: 7,
+    slug: 'oneasia',
+    name: 'ONE ASIA',
+    pic: 'awd_oneasia.png',
+    caption: 'Grand prix',
+  },
+  {
+    id: 8,
+    slug: 'spikes',
+    name: 'Spikes Asia',
+    pic: 'awd_spikes.png',
+    caption: 'Gold',
+  },
+  {
+    id: 9,
+    slug: 'adfest',
+    name: 'ADFEST',
+    pic: 'awd_adfest.png',
+    caption: 'Silver',
+  },
+  {
+    id: 10,
+    slug: 'acc',
+    name: 'ACC',
+    pic: 'awd_acc.png',
+    caption: 'Gold',
+  },
+  {
+    id: 11,
+    slug: 'mad',
+    name: 'MAD STARS',
+    pic: 'awd_mad.png',
+    caption: 'Silver',
+  },
+  {
+    id: 12,
+    slug: 'webby',
+    name: 'THE WEBBY AWARDS',
+    pic: 'awd_webby.png',
+    caption: 'Nominated × 3',
+  },
+  {
+    id: 13,
+    slug: 'awwwards',
+    name: 'AWWWARDS',
+    pic: 'awd_awwwards.png',
+    caption: 'Nominated for AGENCY OF THE YEAR 2017',
+  },
+  {
+    id: 14,
+    slug: 'fwa',
+    name: 'FWA',
+    pic: 'awd_fwa.png',
+    caption: 'FWA OF THE DAY × 6',
+  },
+  {
+    id: 15,
+    slug: 'cssda',
+    name: 'CSS Design Awards',
+    pic: 'awd_cssda.png',
+    caption: 'Designer of the year 2018 - Top 10 Studios',
+  },
+]
+
+const summary = [
+  {
+    id: 1,
+    slug: 'human_made',
+    name: 'HUMAN MADE Inc.',
+    year: '2024',
+    awards: [
+      {
+        caption: 'HUMAN  MADE',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: '相鐵60周年',
+        content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
+      },
+    ],
+    pic: '/common/images/dummy/dummy_about_summary.png',
+  },
+  {
+    id: 2,
+    slug: 'human_made',
+    name: 'HUMAN MADE Inc.',
+    year: '2023',
+    awards: [
+      {
+        caption: 'HUMAN  MADE',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: '相鐵60周年',
+        content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
+      },
+    ],
+    pic: '/common/images/dummy/dummy_about_summary.png',
+  },
+  {
+    id: 3,
+    slug: 'human_made',
+    name: 'HUMAN MADE Inc.',
+    year: '2022',
+    awards: [
+      {
+        caption: 'HUMAN  MADE',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+      },
+      {
+        caption: '相鐵60周年',
+        content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
+      },
+    ],
+    pic: '/common/images/dummy/dummy_about_summary.png',
+  },
+]
+---
+
+<section class="p-about-awards">
+  <h2 class="p-about-awards__title">(AWARDS)</h2>
+
+  <div class="p-about-awards__content">
+    <!-- PC -->
+    <ul class="p-about-awards__content-list" data-display="pc">
+      {awards_pc.map((item => (
+        <li class="p-about-awards__content-item">
+          <AwardsItem
+            id={item.id}
+            name={item.name}
+            slug={item.slug}
+            pic={item.pic}
+            caption={item.caption}
+          />
+        </li>
+      )))}
+    </ul>
+
+    <!-- SP -->
+     <ul class="p-about-awards__content-list" data-display="sp">
+      {awards_sp.map((item => (
+        <li class="p-about-awards__content-item">
+          <AwardsItem
+            id={item.id}
+            name={item.name}
+            slug={item.slug}
+            pic={item.pic}
+            caption={item.caption}
+          />
+        </li>
+      )))}
+    </ul>
+  </div>
+
+  <div class="p-about-awards__summary js-awards-summary-content">
+    {summary.map((summary, index) => (
+      <div class={`p-about-awards__summary-item ${index > 0 ? 'js-awards-hidden' : ''}`}>
+        <Summary
+          id={summary.id}
+          slug={summary.slug}
+          name={summary.name}
+          head={summary.year}
+          awards={summary.awards}
+          pic={summary.pic}
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="p-about-awards__more js-awards-more">
+    <button class="p-about-awards__more-btn js-awards-more-btn">
+      <span class="p-about-awards__more-text">VIEW ALL</span>
+      <span class="p-about-awards__more-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.52691 0.114V10.705C9.71691 9.413 11.5019 7.441 12.8279 6.047L14.1199 7.373L7.54091 14.241H7.48991L0.893906 7.373L2.23691 6.047C3.54591 7.441 5.33091 9.413 6.52091 10.705V0.114H8.52691Z" fill="white"/></svg></span>
+    </button>
+  </div>
+</section>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-about-awards {
+  padding-block-end: 149px;
+  @include me.sp {
+    padding-inline: 20px;
+    padding-block-end: 100px;
+  }
+
+  &__title {
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    text-align: center;
+    @include me.sp {
+      font-size: 2.4rem;
+      letter-spacing: -.02rem;
+    }
+  }
+
+  &__content {
+    margin-block-start: 60px;
+
+    &-list {
+      @include me.pc {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        column-gap: 36.7px;
+        row-gap: 40px;
+        &[data-display="sp"] {
+          display: none;
+        }
+      }
+      @include me.sp {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 8px;
+        row-gap: 20px;
+
+        &[data-display="pc"] {
+          display: none;
+        }
+      }
+    }
+
+    &-item {
+      @include me.pc {
+        max-width: 146px;
+      }
+    }
+  }
+
+  &__summary {
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.6s ease-in-out;
+    display: grid;
+    row-gap: 40px;
+    margin-block-start: 60px;
+    padding-block-start: 40px;
+    border-top: solid 1px var(--c-gray02);
+    @include me.pc {
+      margin-inline: 30px;
+    }
+    @include me.sp {
+      margin-block-start: 66px;
+    }
+
+    &.is-collapsed {
+      max-height: var(--collapsed-awards-height);
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 150px;
+        background: linear-gradient(to bottom,
+          rgba(26, 26, 26, 0) 0%,
+          rgba(26, 26, 26, 0.1) 20%,
+          rgba(26, 26, 26, 0.3) 40%,
+          rgba(26, 26, 26, 0.6) 70%,
+          rgba(26, 26, 26, 1) 100%
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+    }
+
+    &:not(.is-collapsed) {
+      max-height: none;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    &-item {
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+      &.js-awards-hidden {
+        opacity: 0.1;
+        pointer-events: none;
+      }
+    }
+  }
+
+  &__more {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 70px;
+    @include me.sp {
+      margin-block-start: 50px;
+    }
+
+    &.is-hidden {
+      display: none;
+    }
+
+    &-btn {
+      display: flex;
+      align-items: center;
+      column-gap: 11px;
+      height: 34px;
+      color: var(--c-white);
+      font-size: 2.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.3s ease-in-out;
+      background: transparent;
+      border: none;
+      padding: 0;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    &-text {
+      display: block;
+      line-height: 1;
+    }
+
+    &-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 15px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+  }
+}
+</style>

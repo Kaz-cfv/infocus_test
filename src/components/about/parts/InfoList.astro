@@ -1,0 +1,54 @@
+---
+interface List {
+  text: string;
+}
+
+interface Props {
+  caption: string;
+  list: List[];
+}
+
+const { caption, list } = Astro.props;
+---
+
+<dl class="c-infoList">
+  <dt class="c-infoList__caption">{caption}</dt>
+  <dd class="c-infoList__content">
+    {list.map((item => (
+      <span>{item.text}</span>
+    )))}
+  </dd>
+</dl>
+
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-infoList {
+  display: grid;
+  grid-template-columns: 100%;
+  row-gap: 8px;
+
+  &__caption {
+    color: var(--c-gray);
+    font-size: 1.2rem;
+    line-height: 2.5rem;
+    letter-spacing: -.02rem;
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: 100%;
+    font-family: var(--f-jp);
+    font-size: 1.5rem;
+    line-height: 3rem;
+    letter-spacing: -.02rem;
+    @include me.sp {
+      line-height: 2.5rem;
+    }
+  }
+
+}
+
+</style>

@@ -1,0 +1,311 @@
+---
+import Menu from '../components/Menu.astro';
+
+const navigationItems = [
+  {
+    title: 'PROJECTS',
+    url: '/projects/',
+    isActive: false,
+    navi: 'projects',
+    isBlank: false
+  },
+  {
+    title: 'NEWS',
+    url: '/news/',
+    isActive: false,
+    navi: 'news',
+    isBlank: false
+  },
+  {
+    title: 'ABOUT',
+    url: '/about/',
+    isActive: false,
+    navi: 'about',
+    isBlank: false
+  },
+  {
+    title: 'TEAM',
+    url: '/team/',
+    isActive: false,
+    navi: 'team',
+    isBlank: false
+  },
+  {
+    title: 'CAREERS',
+    url: '/careers/',
+    isActive: false,
+    navi: 'careers',
+    isBlank: false
+  },
+  {
+    title: 'CONTACT',
+    url: '/contact/',
+    isActive: false,
+    navi: 'contact',
+    isBlank: false
+  },
+  // 区切り線用の特殊アイテム
+  {
+    title: '',
+    url: '',
+    isDivider: true,
+    navi: '',
+    isBlank: false
+  },
+  {
+    title: 'IFFD',
+    url: 'https://iffd.in-focus.co.jp/',
+    isActive: false,
+    navi: 'iffd',
+    isBlank: true
+  },
+  {
+    title: 'STORE',
+    url: '/store/',
+    isActive: false,
+    navi: 'store',
+    isBlank: false
+  }
+];
+
+const currentPath = Astro.url.pathname;
+navigationItems.forEach(item => {
+  if (item.url && currentPath.startsWith(item.url)) {
+    item.isActive = true;
+  }
+});
+---
+
+<header class="l-header js-header">
+  <div class="l-header__inner">
+    <div class="l-header__inner-left">
+      <!-- ロゴ -->
+      <a href="/" class="l-header__logo">
+         <svg width="80" height="31" viewBox="0 0 80 31" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.27973 0H0V23.2832H3.27973V0Z" fill="white"/><path d="M13.7736 13.2592L9.17906 0H5.90414V23.2832H9.17906V10.0097L13.7736 23.2832H13.7784H17.0485V0H13.7736V13.2592Z" fill="white"/><path d="M22.9533 10.3518H27.543V7.12606H22.9533V3.23523H28.853V0H22.9533C22.5226 0 22.0961 0.0836817 21.6982 0.246267C21.3003 0.408853 20.9387 0.647158 20.6342 0.947577C20.3296 1.248 20.0881 1.60464 19.9232 1.99716C19.7584 2.38968 19.6736 2.81037 19.6736 3.23523V23.2784H22.9533V10.3518Z" fill="white"/><path d="M48.5265 23.2784H54.4213V20.048H48.5265V3.23523H54.4213V0H48.5265C47.6604 0.00502445 46.8316 0.348246 46.2215 0.954561C45.6114 1.56088 45.2695 2.38091 45.2708 3.23523V20.048C45.2708 20.9015 45.6132 21.7203 46.2232 22.3256C46.8332 22.9309 47.6612 23.2734 48.5265 23.2784Z" fill="white"/><path d="M80 20.2855V13.4825C79.9975 12.6266 79.6506 11.8066 79.0357 11.2027C78.4208 10.5988 77.588 10.2603 76.7203 10.2615H73.4406V3.47278H79.3402V0.237549H73.4406C72.5707 0.237549 71.7365 0.578402 71.1214 1.18513C70.5064 1.79185 70.1608 2.61474 70.1608 3.47278V10.2615C70.1608 11.1158 70.5039 11.9354 71.1149 12.5408C71.726 13.1462 72.5552 13.4882 73.4213 13.492H76.7155V20.2855H70.1656V23.5208H76.7203C77.5901 23.5208 78.4243 23.1799 79.0394 22.5732C79.6545 21.9665 80 21.1436 80 20.2855Z" fill="white"/><path d="M60.3262 23.2784H64.2609C65.1307 23.2784 65.9649 22.9376 66.58 22.3309C67.1951 21.7241 67.5406 20.9013 67.5406 20.0432V0H64.2609V20.048H60.3262V0H57.0513V20.048C57.0513 20.9047 57.3963 21.7264 58.0105 22.3323C58.6246 22.9381 59.4576 23.2784 60.3262 23.2784Z" fill="white"/><path d="M34.0982 23.2784H39.3477C40.2159 23.2772 41.0481 22.9364 41.662 22.3309C42.2759 21.7253 42.6213 20.9044 42.6226 20.048V3.23523C42.6226 2.37719 42.2771 1.5543 41.662 0.947577C41.0469 0.340854 40.2127 0 39.3429 0L34.0982 0C33.2292 0.00125876 32.3962 0.342668 31.7822 0.949255C31.1682 1.55584 30.8233 2.37802 30.8233 3.23523V20.048C30.8246 20.9044 31.17 21.7253 31.7839 22.3309C32.3978 22.9364 33.23 23.2772 34.0982 23.2784ZM34.0982 3.23048H39.3429V20.048H34.0982V3.23048Z" fill="white"/><path d="M17.0488 27.1646H0V30.3998H17.0488V27.1646Z" fill="white"/><path d="M79.9994 27.1646H19.6736V30.3998H79.9994V27.1646Z" fill="white"/></svg>
+      </a>
+
+      <!-- ナビゲーション -->
+      <nav class="l-header__nav">
+        <ul class="l-header__nav-list">
+          {navigationItems.map((item) => (
+            item.isDivider ? (
+              <li class="l-header__nav-item l-header__nav-item--divider"></li>
+            ) : (
+              <li class="l-header__nav-item" data-navi={item.navi}>
+                <a href={item.url}>{item.title}</a>
+              </li>
+            )
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="l-header__inner-right">
+      <!-- 言語切り替え -->
+      <div class="l-header__lang">
+        <a href="#" class="l-header__lang-link">EN</a>
+        <span>/</span>
+        <a href="#" class="l-header__lang-link">JP</a>
+      </div>
+
+      <!-- ハンバーガーメニューボタン -->
+      <button class="l-header__hamburger">
+        <span class="l-header__hamburger-line"></span>
+        <span class="l-header__hamburger-line"></span>
+      </button>
+    </div>
+  </div>
+  <Menu />
+</header>
+
+<style lang="scss">
+@use '../assets/scss/mediaquery' as me;
+@use '../assets/scss/mixin' as mi;
+
+.l-header {
+  display: grid;
+  position: sticky;
+  top: -1px;
+  left: 0;
+  @include mi.z-header(1);
+  width: 100%;
+
+  &__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    height: 80px;
+    padding-inline: 40px;
+    border-bottom: 2px solid var(--c-white);
+    background-color: var(--c-black-base);
+    transition: background-color .3s ease-out, border-bottom-color .3s ease-out;
+    @include me.sp {
+      column-gap: 16px;
+      height: 72px;
+      padding-inline: 17px;
+    }
+    @at-root .is-opened & {
+      background-color: var(--cp-menu-bg);
+      border-bottom-color: var(--cp-menu-bg);
+    }
+    @at-root .is-scrolled & {
+      @include me.pc {
+        height: 53.42px;
+      }
+    }
+
+    &-left {
+      display: flex;
+      align-items: center;
+      @include me.pc {
+        column-gap: 152px;
+      }
+      @include me.sp {
+        justify-content: space-between;
+        width: 100%;
+      }
+    }
+
+    &-right {
+      @include me.pc {
+        display: flex;
+        align-items: center;
+        column-gap: 16px;
+      }
+      @include me.sp {
+      }
+    }
+  }
+
+  &__logo {
+    display: block;
+    width: 80px;
+    height: 30px;
+    @include me.sp {
+      width: 61px;
+      height: 23px;
+    }
+    @at-root .is-scrolled & {
+      @include me.pc {
+        width: 49px;
+        height: 19px;
+      }
+    }
+
+    svg path {
+      @at-root .is-opened & {
+        fill: var(--c-black);
+      }
+    }
+  }
+
+  &__nav {
+    display: flex;
+
+    &-list {
+      display: flex;
+      align-items: center;
+      column-gap: 30px;
+    }
+
+    &-item {
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--c-white);
+      @include me.sp {
+        display: none;
+        font-size: 1.2rem;
+        &[data-navi="projects"] {
+          display: block;
+        }
+      }
+
+      a {
+        color: var(--c-white);
+        @at-root .is-opened & {
+          color: var(--c-black);
+        }
+      }
+
+      &--divider {
+        position: relative;
+        width: 1px;
+        height: 16px;
+        background-color: #606060;
+      }
+    }
+  }
+
+  &__lang {
+    color: var(--c-white);
+    font-size: 1.4rem;
+    @include me.sp {
+      display: none;
+    }
+    @at-root .is-opened & {
+      color: var(--c-black);
+    }
+
+    &-link {
+      font-family: var(--f-en);
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: var(--c-white);
+      @at-root .is-opened & {
+        color: var(--c-black);
+      }
+    }
+  }
+
+  &__hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 2px solid var(--c-white);
+    border-radius: 100%;
+    @at-root .is-opened & {
+      border-color: var(--c-black);
+    }
+    @at-root .is-scrolled & {
+      @include me.pc {
+        width: 25px;
+        height: 25px;
+      }
+    }
+
+    &-line {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background-color: var(--c-white);
+      @at-root .is-opened & {
+        background-color: var(--c-black);
+      }
+      @at-root .is-scrolled & {
+        @include me.pc {
+          width: 11px;
+        }
+      }
+
+      &:first-child {
+        margin-bottom: 4px;
+        @at-root .is-opened & {
+          transform: rotate(45deg) translate(1px, 0);
+          margin-bottom: 0;
+        }
+      }
+      &:nth-child(2) {
+        @at-root .is-opened & {
+          transform: rotate(-45deg) translate(1px, -1px);
+        }
+      }
+    }
+  }
+}
+</style>

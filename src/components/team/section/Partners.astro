@@ -1,0 +1,126 @@
+---
+const partners = [
+  {
+    id: 'actuel_img',
+    name: 'Actuel img.',
+    pic: '/common/images/common/logo_actuelimg.png',
+    url: '#'
+  },
+  {
+    id: 'cfv',
+    name: 'CREBAR FLAVOR.',
+    pic: '/common/images/common/logo_cfv.png',
+    url: '#'
+  },
+  {
+    id: 'the_saime_inc',
+    name: 'THE SAIME. INC',
+    pic: '/common/images/common/logo_thesaime_inc.png',
+    url: '#'
+  },
+  {
+    id: 'shootinglife',
+    name: 'shootinglife',
+    pic: '/common/images/common/logo_shootinglife.png',
+    url: '#'
+  },
+]
+
+---
+
+<div class="p-team-partner">
+  <div class="p-team-partner__title">(CREATIVE PARTNERS)</div>
+  <div class="p-team-partner__list">
+    {partners.map((partner => (
+      <figure class="p-team-partner__list-item" data-item={partner.id}>
+        <img src={partner.pic} alt={partner.name} />
+      </figure>
+    )))}
+  </div>
+</div>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-team-partner {
+  padding-block: 100px;
+  border-top: solid 2px var(--c-white);
+  @include me.sp {
+    padding-inline: 30px;
+    padding-block: 60px 50px;
+  }
+
+  &__title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -.02rem;
+    text-align: center;
+    @include me.sp {
+      font-size: 2.2rem;
+    }
+  }
+
+  &__list {
+    @include me.pc {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      grid-template-columns: repeat(4, max-content);
+      column-gap: 35px;
+      margin-block-start: 50px;
+    }
+    @include me.sp {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 28px;
+      margin-block-start: 30px;
+    }
+
+    &-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include me.pc {
+        width: 200px;
+        height: 100px;
+      }
+      @include me.sp {
+        height: 72px;
+      }
+
+      &[data-item="actuel_img"] img {
+        max-width: 138px;
+        @include me.sp {
+          max-width: 108px;
+        }
+      }
+      &[data-item="cfv"] img {
+        max-width: 178px;
+        @include me.sp {
+          max-width: 139px;
+        }
+      }
+      &[data-item="the_saime_inc"] img {
+        max-width: 166px;
+        @include me.sp {
+          max-width: 129px;
+        }
+      }
+      &[data-item="shootinglife"] img {
+        max-width: 71px;
+        @include me.sp {
+          max-width: 46px;
+        }
+      }
+    }
+
+  }
+
+}
+
+
+</style>

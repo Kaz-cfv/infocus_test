@@ -1,0 +1,98 @@
+
+/**
+ * text ellipsis for block multiline
+ */
+/*
+ unsupport IE, Edge, Fx
+
+@mixin text-ellipsis-block($rows) {
+  display: box;
+  box-orient: vertical;
+  line-clamp: $rows;
+  overflow: hidden;
+}
+*/
+
+@mixin z-loading($num){
+  z-index: $num + 5000;
+}
+
+@mixin z-modal($num){
+  z-index: $num + 4000;
+}
+
+@mixin z-header($num){
+  z-index: $num + 3000;
+}
+
+@mixin z-footer($num){
+  z-index: $num + 2000;
+}
+
+@mixin z-contents($num){
+  z-index: $num + 1000;
+}
+
+@mixin text-overflow() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+@mixin hide-text() {
+  overflow: hidden;
+  text-indent: 101%;
+  white-space: nowrap;
+}
+
+/**
+ * element size
+ */
+@mixin size($width: auto, $height: auto) {
+  width: $width;
+  height: $height;
+}
+
+/**
+ * position layout
+ */
+@mixin absolute-top-left($top: 0, $left: 0) {
+  position: absolute;
+  top: $top;
+  left: $left;
+}
+
+@mixin absolute-top-right($top: 0, $right: 0) {
+  position: absolute;
+  top: $top;
+  right: $right;
+}
+
+@mixin absolute-bottom-left($bottom: 0, $left: 0) {
+  position: absolute;
+  bottom: $bottom;
+  left: $left;
+}
+
+@mixin absolute-bottom-right($bottom: 0, $right: 0) {
+  position: absolute;
+  bottom: $bottom;
+  right: $right;
+}
+
+@mixin absolute-all($top: 0, $right: 0, $bottom: 0, $left: 0) {
+  position: absolute;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+/**
+ * images
+ */
+@mixin cover($img, $position: 0% 0%) {
+  background: $img no-repeat $position;
+  background-size: cover;
+}

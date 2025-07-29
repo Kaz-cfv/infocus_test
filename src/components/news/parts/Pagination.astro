@@ -1,0 +1,133 @@
+---
+
+---
+
+<nav class="c-pagination">
+  <ul class="c-pagination__index">
+    <li data-pagination="prev">
+      <a href="#">Prev</a>
+    </li>
+    <li data-pagination="current">
+      <span>1</span>
+    </li>
+    <li>
+      <a href="#">2</a>
+    </li>
+    <li>
+      <a href="#">3</a>
+    </li>
+    <li>
+      <a href="#">4</a>
+    </li>
+    <li>
+      <a href="#">5</a>
+    </li>
+    <li data-pagination="dotted">
+      <span>...</span>
+    </li>
+    <li>
+      <a href="#">22</a>
+    </li>
+    <li data-pagination="next">
+      <a href="#">Next</a>
+    </li>
+  </ul>
+</nav>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-pagination {
+  margin-block-start: 150px;
+  @include me.sp {
+    margin-block-start: 50px;
+  }
+
+  &__index {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 40px;
+    @include me.sp {
+      column-gap: 26px;
+    }
+
+    li {
+      &[data-pagination="prev"] a {
+        font-size: 0;
+        &::before {
+          content: "<";
+          font-size: 2.4rem;
+          @include me.sp {
+            font-size: 1.8rem;
+          }
+        }
+        &::after {
+          display: none;
+        }
+      }
+      &[data-pagination="next"] a {
+        font-size: 0;
+        &::before {
+          content: ">";
+          font-size: 2.4rem;
+          @include me.sp {
+            font-size: 1.8rem;
+          }
+        }
+        &::after {
+          display: none;
+        }
+      }
+      &[data-pagination="current"] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 44px;
+        height: 44px;
+        border: solid 2px var(--c-white);
+        border-radius: 100%;
+        @include me.sp {
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      span {
+        display: inline-block;
+        font-size: 2.4rem;
+        font-weight: 600;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
+      }
+
+      a {
+        display: inline-block;
+        position: relative;
+        color: var(--c-white);
+        font-size: 2.4rem;
+        font-weight: 600;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background-color: var(--c-white);
+        }
+      }
+
+    }
+
+  }
+
+}
+
+</style>

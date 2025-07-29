@@ -1,0 +1,320 @@
+---
+import FixedNavi from "../parts/FixedNavi.astro";
+import Table from "../parts/Table.astro";
+import Lead from "../section/Lead.astro";
+import Content from "../section/Content.astro";
+import Credit from "./Credit.astro";
+
+const article = {
+  eyecatch: {
+    type: 'image',
+    url: '/common/images/dummy/project_detail_thumb.png',
+    caption: 'caption',
+  },
+  title: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+  website: '#',
+  client: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+  year: '2024',
+  service: [
+    {
+      name: 'ART DIRECTION',
+      url: '#'
+    },
+    {
+      name: 'WEB',
+      url: '#'
+    },
+    {
+      name: 'FILM',
+      url: '#'
+    },
+    {
+      name: 'Graphic',
+      url: '#'
+    },
+  ],
+  awards: [
+    {
+      name: 'FWA OF THE DAY (FWA)'
+    },
+    {
+      name: 'WEBSITE OF THE DAY (CSS Design Awards)'
+    },
+    {
+      name: 'HONORABLE MENTION (Awwwards)'
+    },
+  ],
+  lead: {
+    title: '心躍る工場見学体験をWebサイトと映像で表現',
+    text: '<p>ハーゲンダッツ ジャパン創業40周年に合わせ、ハーゲンダッツアイスクリームができるまでの工程やこだわり、秘密を3DCGや実写、アニメーションなどを通じて、バーチャル上で工場見学できるWEBサイトと映像を公開。</p><p>IN FOCUSは、映像とWebサイトの企画、ディレクション、制作を担当しました。大人も子供も最後まで楽しく学べるアトラクションのようなコンテンツになっています。</p>'
+  },
+  credit: [
+    {
+      title: 'movie',
+      items: [
+        {
+          caption: 'DIRECTION',
+          content: 'Taiju Nakajima (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'OFFLINE EDIT',
+          content: 'Miho Tanaka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'MOTION GRAPHICS',
+          content: 'Miho Tanaka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'GRAPHIC DESIGN',
+          content: 'Anna Senzaki (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'CINEMATOGRAPHY',
+          content: 'Yoshinori Kataoka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'MUSIC',
+          content: 'Yudai Iwata',
+          link: false,
+          url: '',
+        },
+        {
+          caption: 'SOUND EFFECT',
+          content: 'Fumio Yasue',
+          link: false,
+          url: '',
+        },
+        {
+          caption: 'NARRATION',
+          content: 'Ayana Shimizu',
+          link: false,
+          url: '',
+        },
+      ],
+    },
+    {
+      title: 'Web site',
+      items: [
+        {
+          caption: 'CREATIVE DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'WEB DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'WEB DESIGN',
+          content: 'Miho Nagatsuka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'PROGRAMMING',
+          content: 'Yuta Abe (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+      ],
+    },
+    {
+      title: '3DCG',
+      items: [
+        {
+          caption: 'ART DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'CG PRODUCTION',
+          content: 'KASSEN',
+          link: false,
+          url: '',
+        },
+      ],
+    },
+    {
+      title: '',
+      items: [
+        {
+          caption: 'PRODUCE',
+          content: 'Kazuki Sekiyama (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'PRODUCTION MANAGEMENT',
+          content: 'Tomoyuki Ishizaki (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+      ],
+    },
+  ],
+}
+---
+
+<article class="p-project-detail-article">
+  <div class="p-project-detail__fixedNavi--sp">
+    <FixedNavi />
+  </div>
+  <div class="p-project-detail-article__info">
+    <div class="p-project-detail-article__info-inner">
+      <div class="p-project-detail-article__info-thumb">
+        {article.eyecatch.type === 'video' ? (
+          <video src={article.eyecatch.url} muted autoplay playsinline></video>
+        ) : (
+          <figure><img src={article.eyecatch.url} alt={article.eyecatch.caption} /></figure>
+        )}
+      </div>
+      <h1 class="p-project-detail-article__info-title">{article.title}</h1>
+      <Table
+        website={article.website}
+        client={article.client}
+        year={article.year}
+        service={article.service}
+        awards={article.awards}
+      />
+      <div class="p-project-detail__fixedNavi--pc">
+        <FixedNavi />
+      </div>
+    </div>
+  </div>
+
+  <div class="p-project-detail-article__content">
+    <div class="p-project-detail-article__eyecatch">
+      {article.eyecatch.type === 'video' ? (
+        <video src={article.eyecatch.url} muted autoplay playsinline></video>
+      ) : (
+        <figure>
+          <img src={article.eyecatch.url} alt={article.eyecatch.caption} />
+        </figure>
+      )}
+    </div>
+    <Lead
+      title={article.lead.title}
+      text={article.lead.text}
+    />
+    <Content />
+    <Credit creditData={article.credit} />
+  </div>
+
+</article>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-project-detail-article {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  @include me.pc {
+    grid-template-columns: 608px 1fr;
+  }
+}
+
+.p-project-detail__fixedNavi {
+  &--pc {
+    // margin-block-start: 125px;
+    margin-block-start: auto;
+    @include me.sp {
+      display: none;
+    }
+  }
+  &--sp {
+    position: sticky;
+    top: calc(var(--hd-height-sp) - 1px);
+    // top: calc(100% - var(--hd-height-sp) - 1px);
+    left: 0;
+    @include mi.z-contents(1);
+    background-color: var(--c-black-base);
+    @include me.pc {
+      display: none;
+    }
+  }
+}
+
+.p-project-detail-article__info {
+  @include me.pc {
+    height: 100%;
+    border-right: solid 1px var(--c-gray);
+  }
+  @include me.sp {
+    padding-block-end: 60px;
+    border-bottom: solid 1px var(--c-gray);
+  }
+
+  &-inner {
+    @include me.pc {
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      padding-block-start: 114px;
+      border-bottom: solid 1px var(--c-gray);
+    }
+  }
+
+  &-thumb {
+    @include me.pc {
+      display: none;
+    }
+
+    video {
+      max-width: 100%;
+    }
+  }
+
+  &-title {
+    font-size: 3.8rem;
+    @include me.pc {
+      padding-inline: 30px;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+      padding-inline: 20px;
+      font-size: 2.9rem;
+      font-weight: 600;
+    }
+  }
+
+}
+
+.p-project-detail-article__content {
+  padding-block-end: 180px;
+  @include me.sp {
+    padding-inline: 20px;
+    padding-block: 60px 80px;
+  }
+}
+
+.p-project-detail-article__eyecatch {
+  @include me.sp {
+    display: none;
+  }
+
+  video {
+    max-width: 100%;
+  }
+}
+
+</style>

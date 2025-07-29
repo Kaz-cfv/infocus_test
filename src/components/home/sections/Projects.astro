@@ -1,0 +1,334 @@
+---
+import ProjectCard from "../parts/ProjectCard.astro";
+
+const pickup = [
+  {
+    id: 1,
+    title: 'LAMBDA',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/pickup01.jpg',
+    type: 'pickup',
+    url: '/projects/detail/'
+  },
+  {
+    id: 2,
+    title: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+    tags: [
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/pickup02.jpg',
+    type: 'pickup',
+    url: '/projects/detail/'
+  },
+];
+
+const projects = [
+  {
+    id: 1,
+    title: 'LOEWE x GR8L',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/01.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 2,
+    title: 'HUMAN MADE',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/02.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 3,
+    title: 'Adobe Photoshop',
+    tags: [
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/03.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 4,
+    title: 'KEI Collection PARIS',
+    tags: [
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/04.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 5,
+    title: 'uka Regenerative Good',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/05.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 6,
+    title: 'TOGA ARCHIVES',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/06.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 7,
+    title: 'CANADA GOOSE',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/07.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 8,
+    title: 'BLUE NOTE PLACE',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' },
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/08.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 9,
+    title: 'Lyquor Labs',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/09.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 10,
+    title: 'FRAGMENT UNIVERSITY',
+    tags: [
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/10.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 11,
+    title: 'NOW HIRING',
+    tags: [
+      { name: '', url: '/category/' }
+    ],
+    imageSrc: '/common/images/home/projects/11.jpg',
+    videoSrc: 'https://infocus.wp.site-prev2.com/wp-content/themes/infocus/astro/movies/now_hiring_14sec.mp4',
+    url: '/projects/detail/',
+    type: 'cover'
+  },
+  {
+    id: 12,
+    title: 'HUGO BOSS',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/12.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 13,
+    title: 'CLINIQUE',
+    tags: [
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/13.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 14,
+    title: 'LOEWE x Studio Ghibli',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/14.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 15,
+    title: 'エリエール ロイヤルタッチ',
+    tags: [
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/15.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 16,
+    title: 'NETFLIX',
+    tags: [
+      { name: 'Edit', url: '/category/edit' }
+    ],
+    imageSrc: '/common/images/home/projects/16.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 17,
+    title: '',
+    tags: [
+      { name: '', url: '/category/' }
+    ],
+    imageSrc: '/common/images/home/projects/17.jpg',
+    url: '/projects/detail/',
+    type: 'cover'
+  },
+  {
+    id: 18,
+    title: 'NEWoMan',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/18.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 19,
+    title: 'BLUE YARD',
+    tags: [
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/19.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 20,
+    title: 'adiCLUB',
+    tags: [
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/20.jpg',
+    url: '/projects/detail/'
+  }
+];
+---
+<section class="p-home-projects">
+  <ul class="p-home-projects__list --pickup">
+    {pickup.map((project) => (
+      <li class="p-home-projects__card">
+        <ProjectCard
+          id={project.id}
+          title={project.title}
+          tags={project.tags}
+          imageSrc={project.imageSrc}
+          type={project.type}
+          url={project.url}
+        />
+      </li>
+    ))}
+  </ul>
+  <ul class="p-home-projects__list">
+    {projects.map((project) => (
+      <li class="p-home-projects__card">
+        <ProjectCard
+          id={project.id}
+          title={project.title}
+          tags={project.tags}
+          imageSrc={project.imageSrc}
+          videoSrc={project.videoSrc}
+          url={project.url}
+          type={project.type}
+        />
+      </li>
+    ))}
+  </ul>
+  <div class="p-home-projects__link">
+    <a href="/">
+      ALL PROJECTS
+      <span><svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 14.1601L23.7876 14.1601C20.713 11.3362 15.4539 6.21272 12.177 3.02567L15.2111 0L32 16.4193V16.5L15.2111 33L12.177 29.813C15.4539 26.6663 20.713 21.5024 23.7876 18.6785H0L0 14.1601Z" fill="white"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-home-projects {
+  overflow: hidden;
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    @include me.sp {
+      grid-template-columns: 50% 50%;
+    }
+    &.--pickup {
+      @include me.pc {
+        grid-template-columns: 50% 50%;
+      }
+      @include me.sp {
+        grid-template-columns: 100%;
+      }
+    }
+  }
+
+  &__card {
+    border-right: solid 1px var(--c-gray02);
+    border-bottom: solid 1px var(--c-gray02);
+    border-left: solid 1px var(--c-gray02);
+
+    &:nth-child(4n) {
+      @include me.pc {
+        border-right-color: transparent;
+      }
+    }
+    &:nth-child(2n) {
+      @include me.sp {
+        border-right-color: transparent;
+      }
+    }
+  }
+
+  &__link {
+    border-top: solid 2px var(--c-white);
+
+    a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      column-gap: 27px;
+      padding-block: 72px;
+      color: var(--c-white);
+      font-size: 5.8rem;
+      font-weight: 700;
+      @include me.sp {
+        column-gap: 14px;
+        padding-block: 35px;
+        font-size: 2.6rem;
+      }
+    }
+
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 32px;
+      height: 33px;
+      @include me.sp {
+        width: 15px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+</style>

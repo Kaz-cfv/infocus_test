@@ -1,0 +1,121 @@
+---
+import NewsCard from "../../news/parts/NewsCard.astro";
+
+const { currentId } = Astro.props;
+
+const allNews = [
+  {
+    id: 1,
+    slug: 'detail',
+    title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
+    date: '2025.04.18',
+    category: 'Project',
+    pic: '/common/images/news/01.png',
+  },
+  {
+    id: 2,
+    slug: 'detail',
+    title: '東京オフィス新設のお知らせ',
+    date: '2025.04.15',
+    category: 'Press',
+    pic: '/common/images/news/02.png',
+  },
+  {
+    id: 3,
+    slug: 'detail',
+    title: 'デザインアワード受賞のお知らせ',
+    date: '2025.04.10',
+    category: 'Press',
+    pic: '/common/images/news/03.png',
+  },
+];
+
+const related = allNews.filter(item => item.id !== currentId).slice(0, 3);
+---
+
+<aside class="p-news-detail-related">
+  <ul class="p-news-detail-related__list">
+    {related.map((item => (
+      <li class="p-news-detail-related__item">
+        <NewsCard
+          id={item.id}
+          title={item.title}
+          date={item.date}
+          category={item.category}
+          url={`/news/${item.slug}`}
+          pic={item.pic}
+        />
+      </li>
+    )))}
+  </ul>
+
+  <div class="p-news-detail-related__link">
+    <a href="/news/">ALL NEWS</a>
+  </div>
+</aside>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-news-detail-related {
+  margin-block-start: 100px;
+  padding-block-end: 130px;
+  border-top: solid 2px var(--c-white);
+  @include me.sp {
+    margin-block-start: 70px;
+    padding-block-end: 100px;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: 100%;
+    @include me.pc {
+      margin-inline: auto;
+      padding-inline: 30px;
+      padding-block-start: 20px;
+    }
+    @include me.sp {
+      row-gap: 50px;
+      padding-inline: 20px;
+      padding-block: 30px 50px;
+    }
+  }
+
+  &__item {
+    @include me.pc {
+      padding-block: 20px;
+      border-bottom: solid 2px var(--c-gray02);
+    }
+  }
+
+  &__link {
+    text-align: center;
+    @include me.pc {
+      margin-block-start: 130px;
+    }
+
+    a {
+      display: inline-block;
+      position: relative;
+      color: var(--c-white);
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.4;
+      letter-spacing: -.02rem;
+      @include me.sp {
+        font-size: 2rem;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 4px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+      }
+    }
+  }
+}
+</style>

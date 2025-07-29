@@ -1,0 +1,185 @@
+---
+import ProjectCard from "../../ProjectCard.astro";
+
+const projects = [
+  {
+    id: 1,
+    title: 'LOEWE x GR8L',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/pickup01.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 2,
+    title: 'HUMAN MADE',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/pickup02.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 2,
+    title: 'LOEWE x GR8L',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/01.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 4,
+    title: 'HUMAN MADE',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/02.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 5,
+    title: 'uka Regenerative Good',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/05.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 6,
+    title: 'TOGA ARCHIVES',
+    tags: [
+      { name: 'Web', url: '/category/web' }
+    ],
+    imageSrc: '/common/images/home/projects/06.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 7,
+    title: 'CANADA GOOSE',
+    tags: [
+      { name: 'Movie', url: '/category/movie' },
+      { name: 'Graphic', url: '/category/graphic' }
+    ],
+    imageSrc: '/common/images/home/projects/07.jpg',
+    url: '/projects/detail/'
+  },
+  {
+    id: 8,
+    title: 'BLUE NOTE PLACE',
+    tags: [
+      { name: 'Graphic', url: '/category/graphic' },
+      { name: 'Web', url: '/category/web' },
+      { name: 'Movie', url: '/category/movie' }
+    ],
+    imageSrc: '/common/images/home/projects/08.jpg',
+    url: '/projects/detail/'
+  },
+]
+
+---
+<div class="p-project-layout l-content" data-columns="5">
+  <ul class="p-project-list">
+    {projects.map((project) => (
+      <li class="p-project-list__item">
+        <ProjectCard
+          id={project.id}
+          title={project.title}
+          tags={project.tags}
+          imageSrc={project.imageSrc}
+          url={project.url}
+        />
+      </li>
+    ))}
+  </ul>
+
+  <div class="p-project-list__btn">
+    <button class="js-more-btn">ARCHIVED PROJECTS</button>
+  </div>
+</div>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-project-layout {
+  margin-block-start: 22px;
+  @include me.sp {
+    margin-block-start: 20px;
+  }
+}
+
+.p-project-list {
+  display: grid;
+  grid-template-columns: 100%;
+  @include me.pc {
+    column-gap: 30px;
+    row-gap: 70px;
+    @at-root [data-columns="default"] & {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @at-root [data-columns="2"] & {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @at-root [data-columns="3"] & {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @at-root [data-columns="5"] & {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+  @include me.sp {
+    row-gap: 46px;
+  }
+
+  .c-project-card {
+
+    &__title {
+      @include me.pc {
+        @at-root [data-columns="2"] & {
+          font-size: 1.8rem;
+        }
+        @at-root [data-columns="3"] & {
+          font-size: 1.6rem;
+        }
+      }
+    }
+
+    &__tags {
+      @include me.pc {
+        @at-root [data-columns="2"] & {
+          font-size: 1.4rem;
+        }
+        @at-root [data-columns="3"] & {
+          font-size: 1.4rem;
+        }
+      }
+    }
+  }
+
+  &__btn {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 150px;
+    @include me.sp {
+      margin-block-start: 120px;
+    }
+
+    button {
+      color: var(--c-white);
+      font-size: 2.4rem;
+      font-weight: 600;
+      line-height: 140%;
+      letter-spacing: -.02rem;
+      text-decoration: underline;
+      @include me.sp {
+        font-size: 2rem;
+      }
+    }
+  }
+
+}
+</style>

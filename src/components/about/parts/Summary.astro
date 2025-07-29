@@ -1,0 +1,115 @@
+---
+interface Awards {
+  caption: string;
+  content: string;
+}
+
+interface Props {
+  id: number;
+  slug: string;
+  name: string;
+  head: string;
+  awards: Awards[];
+  pic: string;
+}
+
+const { id, slug, name, head, awards, pic } = Astro.props;
+---
+
+<div class="c-summary" data-item={id} data-summary={slug}>
+  <h3 class="c-summary__year">{head}</h3>
+  <figure class="c-summary__pic">
+    <img src={pic} alt={name}>
+  </figure>
+  <div class="c-summary__info">
+    {awards.map((award => (
+      <dl class="c-summary__info-item">
+        <dt class="c-summary__info-caption">{award.caption}</dt>
+        <dd class="c-summary__info-content" set:html={award.content}></dd>
+      </dl>
+    )))}
+  </div>
+
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-summary {
+  position: relative;
+  border-bottom: solid 1px var(--c-gray02);
+  @include me.pc {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 88px;
+    padding-block-end: 40px;
+  }
+  @include me.sp {
+    padding-block-end: 59px;
+  }
+
+  &__year {
+    color: var(--c-gray02);
+    font-size: 4rem;
+    font-weight: 700;
+    @include me.pc {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    @include me.sp {
+      font-size: 3.2rem;
+    }
+  }
+
+  &__pic {
+    @include me.sp {
+      display: none;
+    }
+  }
+
+  &__info {
+    display: grid;
+    row-gap: 40px;
+    @include me.pc {
+      width: calc(100% - 440px);
+    }
+    @include me.sp {
+      margin-block-start: 33px;
+    }
+
+    &-item {
+      @include me.pc {
+        padding-block-end: 24px;
+        border-bottom: solid 1px var(--c-gray02);
+        &:last-child {
+          padding-block-end: 0;
+          border-bottom: unset;
+        }
+      }
+    }
+
+    &-caption {
+      color: var(--c-gray02);
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    &-content {
+      display: grid;
+      row-gap: 20px;
+      margin-block-start: 24px;
+      font-size: 1.4rem;
+      line-height: 1.2;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+}
+
+
+</style>

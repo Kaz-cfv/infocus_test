@@ -1,0 +1,28 @@
+---
+interface Props {
+  id: number;
+  slug: string;
+  name: string;
+  pic: string;
+}
+
+const { id, slug, name, pic } = Astro.props;
+---
+<div class="c-client" data-id={id} data-client={slug}>
+  <figure>
+    <picture>
+      <source media="max-width: 959px" srcset={`/common/images/about/clients/${pic}`}>
+      <img src={`/common/images/about/clients/${pic}`} alt={name}>
+    </picture>
+  </figure>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+picture {
+  display: flex;
+}
+
+</style>

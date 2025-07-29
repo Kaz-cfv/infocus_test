@@ -1,0 +1,94 @@
+---
+interface Props {
+  id: number;
+  title: string;
+  date: string;
+  category: string;
+  url: string;
+  pic: string;
+}
+
+const { id, title, date, category, url, pic } = Astro.props;
+---
+
+<a href={url} class="c-news-card" data-card={id}>
+  <figure class="c-news-card__pic">
+    <img src={pic} alt={title}>
+  </figure>
+  <div class="c-news-card__info">
+    <p class="c-news-card__info-title">{title}</p>
+    <div class="c-news-card__info-sub">
+      <time class="c-news-card__info-date">{date}</time>
+      <span class="c-news-card__info-category">{category}</span>
+    </div>
+  </div>
+</a>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-news-card {
+  display: grid;
+  color: var(--c-white);
+  @include me.pc {
+    grid-template-columns: 389px 1fr;
+    column-gap: 40px;
+  }
+  @include me.sp {
+    grid-template-columns: 100%;
+    row-gap: 14px;
+  }
+
+  &__pic {
+    aspect-ratio: 389 / 218.64;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    row-gap: 10px;
+    @include me.pc {
+      padding-block-start: 10px;
+    }
+    @include me.sp {
+      row-gap: 8px;
+    }
+
+    &-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-sub {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--c-gray);
+      font-size: 1.6rem;
+      font-weight: 500;
+      @include me.sp {
+        font-size: 1.4rem;
+      }
+    }
+
+    &-date {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      &::after {
+        content: "-";
+        display: inline-block;
+      }
+    }
+
+  }
+
+}
+
+</style>

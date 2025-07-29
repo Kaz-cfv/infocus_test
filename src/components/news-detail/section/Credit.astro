@@ -1,0 +1,66 @@
+---
+import CreditTable from "../parts/CreditTable.astro"
+
+interface CreditItem {
+  caption: string;
+  content: string;
+  link: boolean;
+  url: string;
+}
+
+interface Credit {
+  title: string;
+  items: CreditItem[];
+}
+
+interface Props {
+  creditData: Credit[];
+}
+
+const { creditData } = Astro.props;
+---
+
+<div class="p-news-detail__credit">
+  <h2 class="p-news-detail__credit-title">CREDITS</h2>
+  <div class="p-news-detail__credit-list">
+    {creditData.map((credit) => (
+      <CreditTable
+        heading={credit.title}
+        items={credit.items}
+      />
+    ))}
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-news-detail__credit {
+  @include me.pc {
+    max-width: 428px;
+    margin-inline: auto;
+    margin-block-start: 70px;
+  }
+  @include me.sp {
+    margin-block-start: 50px;
+  }
+
+  &-title {
+    margin-block-end: 40px;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  &-list {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    row-gap: 50px;
+    @include me.sp {
+      row-gap: 40px;
+    }
+  }
+}
+
+</style>

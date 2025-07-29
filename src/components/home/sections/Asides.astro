@@ -1,0 +1,335 @@
+---
+const slides = [
+  {
+    id: 1,
+    imageAlt: 'CONTRAST',
+    src: '/common/images/home/slide/slide01.png'
+  },
+  {
+    id: 2,
+    imageAlt: 'CONTRAST',
+    src: '/common/images/home/slide/slide02.png'
+  },
+  {
+    id: 3,
+    imageAlt: 'CONTRAST',
+    src: '/common/images/home/slide/slide03.png'
+  }
+]
+---
+
+<aside class="p-home-aside">
+  <div class="p-home-aside__head">
+    <div class="p-home-aside__head-info">
+      <div class="p-home-aside__head-logo"><img src="/common/images/home/logo_contrast.svg" alt="CONTRAST"></div>
+      <span class="p-home-aside__head-caption">A CREATIVE SPACE  operated by IN FOCUS</span>
+      <div class="p-home-aside__head-desc">
+        <address>1-49-4-1F & B1F Tomigaya, Shibuya-ku,<br>Tokyo 151-0063, Japan</address>
+        <a href="mailto:contrast-tokyo.com">contrast-tokyo.com</a>
+      </div>
+      <a href="#" target="_blank" class="p-home-aside__head-link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.323671 13.3237L10.9172 2.73017C8.28681 2.83827 3.65666 2.89232 0.774076 2.92835L0.774073 0.225927L15.5834 0.0817972L15.6194 0.117829L15.5113 14.9631L12.7368 14.8911C12.7909 12.0265 12.8269 7.37834 12.935 4.74798L2.34148 15.3415L0.323671 13.3237Z" fill="white"/></svg></a>
+    </div>
+    <div class="p-home-aside__head-slide" data-slider="layer-slider">
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          {slides.map((slide) => (
+            <div class="swiper-slide"><img src={slide.src} alt={slide.imageAlt} /></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" target="_blank" class="p-home-aside__elm" data-aside="iffd">
+    <div class="p-home-aside__elm-logo">
+      <img src="/common/images/home/logo_iffd.png" alt="IFFD">
+      <span class="p-home-aside__elm-caption">The film department</span>
+    </div>
+    <span class="p-home-aside__elm-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.323671 13.3237L10.9172 2.73023C8.28681 2.83833 3.65666 2.89238 0.774076 2.92841L0.774073 0.225988L15.5834 0.0818583L15.6194 0.11789L15.5113 14.9632L12.7368 14.8911C12.7909 12.0266 12.8269 7.3784 12.935 4.74804L2.34148 15.3415L0.323671 13.3237Z" fill="#1A1A1A"/></svg></span>
+  </a>
+  <a href="#" target="_blank" class="p-home-aside__elm" data-aside="infocus_ny">
+    <div class="p-home-aside__elm-logo">
+      <img src="/common/images/home/logo_infocus_ny.png" alt="INFOCUS NEW YORK">
+      <img src="/common/images/home/logo_infocus_ny@sp.png" alt="INFOCUS NEW YORK">
+    </div>
+    <span class="p-home-aside__elm-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.323671 13.3237L10.9172 2.73023C8.28681 2.83833 3.65666 2.89238 0.774076 2.92841L0.774073 0.225988L15.5834 0.0818583L15.6194 0.11789L15.5113 14.9632L12.7368 14.8911C12.7909 12.0266 12.8269 7.3784 12.935 4.74804L2.34148 15.3415L0.323671 13.3237Z" fill="#1A1A1A"/></svg></span>
+  </a>
+  <a href="#" target="_blank" class="p-home-aside__elm" data-aside="new_framing">
+    <div class="p-home-aside__elm-logo">
+      <img src="/common/images/home/logo_new_framing.png" alt="New Framing(TM)">
+      <span class="p-home-aside__elm-caption">ONLINE STORE</span>
+    </div>
+    <span class="p-home-aside__elm-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.323671 13.3237L10.9172 2.73023C8.28681 2.83833 3.65666 2.89238 0.774076 2.92841L0.774073 0.225988L15.5834 0.0818583L15.6194 0.11789L15.5113 14.9632L12.7368 14.8911C12.7909 12.0266 12.8269 7.3784 12.935 4.74804L2.34148 15.3415L0.323671 13.3237Z" fill="#1A1A1A"/></svg></span>
+  </a>
+</aside>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-home-aside {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  @include me.pc {
+    border-top: solid 2px var(--c-white);
+    border-bottom: solid 2px var(--c-white);
+  }
+
+  > a {
+    color: var(--c-white);
+  }
+
+  &__head {
+    grid-column: 1 / 4;
+    position: relative;
+    @include me.pc {
+      display: grid;
+      grid-template-columns: 1fr 600px;
+      border-bottom: solid 2px var(--c-white);
+    }
+    @include me.sp {
+      padding-inline: 16px;
+      padding-block: 56px;
+      background-image: url(/common/images/home/bg_texture.png);
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    &-info {
+      @include me.pc {
+        position: relative;
+        padding-inline: 24px;
+        padding-block: 189px 32px;
+        background-image: url(/common/images/home/bg_texture.png);
+        background-position: center right;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+    }
+
+    &-logo {
+      width: 574px;
+      margin-bottom: 30px;
+      @include me.sp {
+        width: calc(100% - 60px);
+        margin-bottom: 16px;
+      }
+    }
+
+    &-caption {
+      color: var(--c-black-base);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.4rem;
+      @include me.sp {
+        font-size: 1.4rem;
+      }
+    }
+
+    &-desc {
+      display: flex;
+      @include me.pc {
+        column-gap: 94px;
+        margin-top: 90px;
+      }
+      @include me.sp {
+        flex-direction: column;
+        row-gap: 13px;
+        margin-top: 30px;
+      }
+
+      address {
+        color: var(--c-black-base);
+        font-style: normal;
+        font-size: 1.4rem;
+        font-weight: 700;
+        line-height: 2.2rem;
+        @include me.sp {
+          font-size: 1.2rem;
+        }
+      }
+
+      a {
+        position: relative;
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 2.2rem;
+        letter-spacing: -.05rem;
+        @include me.sp {
+          font-size: 1.3rem;
+        }
+      }
+    }
+
+    &-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      right: 126px;
+      bottom: 26px;
+      width: 64px;
+      height: 64px;
+      border-radius: 100%;
+      background-color: var(--c-black-base);
+      @include me.sp {
+        right: 56px;
+        bottom: 94px;
+      }
+
+      svg {
+        width: 20.15px;
+      }
+    }
+
+    &-slide {
+      @include me.sp {
+        max-width: 194px;
+        margin-top: 32px;
+      }
+    }
+  }
+
+  &__elm {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    min-height: 360px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background-color: var(--c-white);
+    }
+    &:last-child {
+      &::after {
+        background-color: transparent;
+      }
+    }
+    &[data-aside="iffd"] {
+      background-image: url(/common/images/home/aside_pic01.png);
+      @include me.sp {
+        padding-top: 29px;
+      }
+    }
+    &[data-aside="infocus_ny"] {
+      background-image: url(/common/images/home/aside_pic02.png);
+      @include me.sp {
+        background-image: unset;
+        padding-top: 35px;
+      }
+    }
+    &[data-aside="new_framing"] {
+      background-image: url(/common/images/home/aside_pic03.png);
+      @include me.sp {
+        padding-top: 36px;
+        background-image: url(/common/images/home/aside_pic03@sp.png);
+        background-size: contain;
+      }
+    }
+    @include me.pc {
+      align-items: center;
+    }
+    @include me.sp {
+      align-items: flex-start;
+      min-height: 140px;
+    }
+
+    &-logo {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      img {
+        display: block;
+        margin-inline: auto;
+        @at-root [data-aside="iffd"] & {
+          width: 131px;
+          @include me.sp {
+            width: 56.62px;
+            background-color: var(--c-black);
+          }
+        }
+        @at-root [data-aside="infocus_ny"] & {
+          width: 266.21px;
+          @include me.sp {
+            width: 75.6px;
+          }
+          &:first-child {
+            @include me.sp {
+              display: none;
+            }
+          }
+          &:nth-child(2) {
+            @include me.pc {
+              display: none;
+            }
+          }
+        }
+        @at-root [data-aside="new_framing"] & {
+          width: 315px;
+          @include me.sp {
+            width: 106.98px;
+          }
+        }
+      }
+    }
+
+    &-caption {
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 2.2rem;
+      text-align: center;
+      @include me.sp {
+        font-size: 1rem;
+      }
+
+      @at-root [data-aside="iffd"] & {
+        margin-top: 16px;
+        @include me.sp {
+          margin-top: 0;
+        }
+      }
+      @at-root [data-aside="new_framing"] & {
+        margin-top: 24px;
+        @include me.sp {
+          margin-top: 8px;
+        }
+      }
+    }
+
+    &-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 64px;
+      height: 64px;
+      border-radius: 100%;
+      background-color: var(--c-white);
+      @include me.sp {
+        bottom: 13px;
+        width: 27.38px;
+        height: 27.38px;
+      }
+
+      svg {
+        width: 20.15px;
+        @include me.sp {
+          width: 9px;
+        }
+      }
+    }
+  }
+}
+</style>

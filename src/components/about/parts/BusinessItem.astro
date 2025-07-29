@@ -1,0 +1,153 @@
+---
+interface Link {
+  type: string;
+  caption: string;
+  url: string;
+}
+
+interface Props {
+  id: number;
+  name: string;
+  address: string;
+  link: Link[];
+  description: string;
+  pic: string;
+}
+
+const { id, name, address, link, description, pic } = Astro.props;
+---
+
+<div class="c-business-item" data-item={id}>
+  <figure class="c-business-item__pic">
+    <img src={`/common/images/about/${pic}`} alt={name}>
+  </figure>
+  <div class="c-business-item__info">
+    <h3 class="c-business-item__name">{name}</h3>
+    <p class="c-business-item__address" set:html={address}></p>
+    <div class="c-business-item__link">
+      {link.map((linkItem) => (
+        linkItem.type === 'email' ? (
+          <a href={`mailto:${linkItem.url}`}>{linkItem.caption}</a>
+        ) : (
+          <a href={linkItem.url} target="_blank" rel="noopener noreferrer">{linkItem.caption}</a>
+        )
+      ))}
+    </div>
+    <div class="c-business-item__description">
+      <p>{description}</p>
+    </div>
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-business-item {
+  border-bottom: solid 1px var(--c-gray02);
+  @include me.pc {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: flex-start;
+    column-gap: 40px;
+    padding-block: 40px;
+  }
+  @include me.sp {
+    padding-block-end: 63px;
+  }
+
+  &__pic {
+    @include me.pc {
+      max-width: 557px;
+    }
+  }
+
+  &__info {
+    display: grid;
+    @include me.pc {
+      max-width: 560px;
+    }
+    @include me.sp {
+      margin-block-start: 15px;
+    }
+  }
+
+  &__name {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -.02rem;
+    @include me.pc {
+      grid-row: 1;
+    }
+    @include me.sp {
+      font-size: 1.8rem;
+      line-height: 1.6;
+    }
+  }
+
+  &__address {
+    color: var(--c-gray);
+    font-size: 1.4rem;
+    line-height: 1.6;
+    @include me.pc {
+      grid-row: 3;
+      margin-block-start: 24px;
+    }
+    @include me.sp {
+      margin-block-start: 8px;
+    }
+  }
+
+  &__link {
+    font-size: 1.4rem;
+    line-height: 0.6363;
+    @include me.pc {
+      grid-row: 4;
+      margin-block-start: 16px;
+    }
+    @include me.sp {
+      margin-block-start: 16px;
+      line-height: 1.8;
+    }
+
+    a {
+      display: inline-block;
+      position: relative;
+      color: var(--c-white);
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+        @include me.sp {
+          bottom: 4px;
+        }
+      }
+    }
+  }
+
+  &__description {
+    display: grid;
+    row-gap: 16px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+    @include me.pc {
+      grid-row: 2;
+      margin-block-start: 26px;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+    }
+
+    p {
+
+    }
+  }
+
+}
+</style>

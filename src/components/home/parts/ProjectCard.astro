@@ -1,0 +1,197 @@
+---
+interface Tag {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  id: number;
+  title: string;
+  tags: Tag[];
+  imageSrc: string;
+  videoSrc?: string;
+  imageAlt?: string;
+  url?: string;
+  type?: string;
+}
+
+const {
+  id = '',
+  title,
+  tags,
+  imageSrc,
+  videoSrc,
+  imageAlt = "Projects Image",
+  url = "#",
+  type = ""
+} = Astro.props;
+---
+
+<div class="c-project-card" data-id={id} data-type={type}>
+  <a href={url} class="c-project-card__image-wrapper">
+    <img src={imageSrc} alt={imageAlt} class="c-project-card__image">
+    {videoSrc && (
+      <video
+        src={videoSrc}
+        class="c-project-card__video"
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      ></video>
+    )}
+  </a>
+  <div class="c-project-card__content">
+    <h3 class="c-project-card__title">{title}</h3>
+    <div class="c-project-card__tags">
+      {tags.map((tag, index) => (
+        <>
+          <a href={tag.url} class="c-project-card__category">{tag.name}</a>
+          {index < tags.length - 1 && <span class="c-project-card__separator">,</span>}
+        </>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/_mediaquery' as me;
+@use '../../../assets/scss/_mixin' as mi;
+
+.c-project-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: opacity 0.3s ease-out;
+  height: 100%;
+
+  &[data-type="cover"] {
+    height: 100%;
+  }
+  &:not([data-type="cover"]) {
+    @include me.pc {
+      padding-bottom: 78px;
+    }
+    @include me.sp {
+      padding-bottom: 7.701vw;
+    }
+    &[data-type="pickup"] {
+      @include me.pc {
+        padding-bottom: 50px;
+      }
+      @include me.sp {
+        padding-bottom: 25px;
+      }
+    }
+  }
+
+  &__image-wrapper {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    flex: 1;
+    @include me.sp {
+      height: 56.1904%;
+    }
+    @at-root [data-type="pickup"] & {
+      @include me.pc {
+        margin-top: 30px;
+        margin-inline: 30px;
+      }
+    }
+    @at-root [data-type="cover"] & {
+      aspect-ratio: 1 / 1;
+      flex: 1;
+      @include me.sp {
+        aspect-ratio: unset;
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+  }
+
+  &__image {
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+  }
+
+  &__video {
+    opacity: 0;
+    visibility: hidden;
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+    z-index: 2;
+    @at-root .c-project-card.is-play & {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    margin-top: 16px;
+    padding-inline: 30px;
+    @include me.sp {
+      row-gap: 0;
+      margin-top: 8px;
+      padding-inline: 16px;
+    }
+    @at-root [data-type="cover"] & {
+      display: none;
+    }
+  }
+
+  &__title {
+    color: var(--c-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 2.32rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+    @at-root [data-type="pickup"] & {
+      font-size: 2rem;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+  }
+
+  &__tags {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 2.32rem;
+    @at-root [data-type="pickup"] & {
+      font-size: 1.4rem;
+      @include me.sp {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__category {
+    display: inline-block;
+    color: var(--c-gray);
+  }
+
+  &__separator {
+    color: var(--c-gray);
+    margin-inline-end: 4px;
+  }
+}
+</style>

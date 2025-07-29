@@ -1,0 +1,140 @@
+---
+// チームカテゴリーのデータ
+const categories = [
+  { name: "Producer", url: "#" },
+  { name: "Art Director", url: "#" },
+  { name: "Graphic Designer", url: "#" },
+  { name: "Web Director", url: "#" },
+  { name: "Web Designer", url: "#" },
+  { name: "Front-end Engineer", url: "#" },
+  { name: "Editor", url: "#" },
+  { name: "Film Director", url: "#" },
+  { name: "Film Editor", url: "#" },
+  { name: "Production Manager", url: "#" },
+  { name: "Project Manager", url: "#" },
+  { name: "Account Manager", url: "#" }
+];
+
+---
+
+<div class="p-team-head">
+  <h2 class="p-team-head__title">TEAM</h2>
+
+  <ul class="p-team-head__category">
+    <li class="p-team-head__category-item" data-filter="">
+      <a href="#">Creative Director</a>
+    </li>
+    {categories.map((category => (
+      <li class="p-team-head__category-item">
+        <a href={category.url}>{category.name}</a>
+      </li>
+    )))}
+  </ul>
+
+  <div class="p-team-head__btn" data-filter="current">
+    <button>ALL</button>
+  </div>
+</div>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-team-head {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  margin-block-start: 50px;
+  padding-inline: 30px;
+  @include me.pc {
+    grid-template-columns: max-content 453px;
+    align-content: flex-start;
+    column-gap: 122px;
+    row-gap: 26px;
+  }
+  @include me.sp {
+    padding-inline: 20px;
+  }
+
+  &__title {
+    font-size: 4rem;
+    letter-spacing: -.02rem;
+    @include me.sp {
+      font-size: 3.2rem;
+    }
+  }
+
+  &__category {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    column-gap: 9px;
+    row-gap: 10px;
+    @include me.pc {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      padding-block-start: 10px;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+    }
+
+    &-item {
+      display: flex;
+      align-items: center;
+      column-gap: 9px;
+      &::after {
+        content: "/";
+      }
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
+      &[data-filter="current"] {
+        pointer-events: none;
+        a {
+          color: var(--c-white);
+        }
+      }
+
+      a {
+        color: var(--c-white);
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+    }
+
+  }
+
+  &__btn {
+    @include me.pc {
+      align-self: flex-end;
+    }
+    @include me.sp {
+      margin-block-start: 30px;
+    }
+    &[data-filter="current"] button {
+      pointer-events: none;
+      background-color: var(--c-white);
+      color: var(--c-black-base);
+    }
+
+    button {
+      width: 60.18px;
+      height: 25px;
+      border: solid 1px var(--c-white);
+      border-radius: 94px;
+      color: var(--cwhite);
+      font-size: 1.4rem;
+      font-weight: 700;
+      @include me.pc {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+}
+
+</style>

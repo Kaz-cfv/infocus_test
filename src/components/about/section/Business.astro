@@ -1,0 +1,100 @@
+---
+import BusinessItem from "../parts/BusinessItem.astro";
+
+const data = [
+  {
+    id: 1,
+    name: 'IN FOCUS NEW YORK',
+    address: '161Water Street, 20th Floor #2038, New York, NY 10038, USA Map',
+    link: [
+      {
+        type: 'email',
+        caption: 'ny@infocusinc.com',
+        url: 'ny@infocusinc.com',
+      },
+    ],
+    description: '2022年より自社の1Fと地下にクリエイティブスペース「CONTRAST」を運営。築45年の躯体をベースとした内装は「再構築」をコンセプトに3つのフロアで構成されており、クリエイターに寄り添った広く開放されたスペースとして、枠に囚われず実験的、かつ利用者によって継続的に再構築されていく空間を目指します。',
+    pic: 'about_business_pic01.png',
+  },
+  {
+    id: 2,
+    name: 'CREATIVE STUDIO “CONTRAST”',
+    address: '1-49-4-1F & B1F Tomigaya, Shibuya-ku, Tokyo 151-0063, Japan Map',
+    link: [
+      {
+        type: 'link',
+        caption: 'contrast-tokyo.com',
+        url: 'https://contrast-tokyo.com',
+      }
+    ],
+    description: '2022年より自社の1Fと地下にクリエイティブスペース「CONTRAST」を運営。築45年の躯体をベースとした内装は「再構築」をコンセプトに3つのフロアで構成されており、クリエイターに寄り添った広く開放されたスペースとして、枠に囚われず実験的、かつ利用者によって継続的に再構築されていく空間を目指します。',
+    pic: 'about_business_pic02.png',
+  },
+]
+---
+
+<section class="p-about-business">
+  <h2 class="p-about-business__title">(BUSINESSES DEVELOPMENT)</h2>
+
+  <div class="p-about-business__content">
+    <div class="p-about-business__content-list">
+      {data.map((item => (
+        <div class="p-about-business__content-item">
+          <BusinessItem
+            id={item.id}
+            name={item.name}
+            address={item.address}
+            link={item.link}
+            description={item.description}
+            pic={item.pic}
+          />
+        </div>
+      )))}
+    </div>
+  </div>
+</section>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-about-business {
+  padding-inline: 30px;
+  padding-block: 100px 160px;
+  @include me.sp {
+    padding-inline: 20px;
+    padding-block-end: 120px;
+  }
+
+  &__title {
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    text-align: center;
+    @include me.sp {
+      font-size: 2.4rem;
+      letter-spacing: -.02rem;
+    }
+  }
+
+  &__content {
+    margin-block-start: 40px;
+    @include me.pc {
+      border-top: solid 1px var(--c-gray02);
+    }
+    @include me.sp {
+      margin-block-start: 50px;
+    }
+
+    &-list {
+      display: grid;
+      @include me.sp {
+        row-gap: 50px;
+      }
+    }
+
+  }
+
+
+}
+</style>

@@ -1,0 +1,137 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const pageMeta = {
+  title: 'ページが見つかりません | 404 Error',
+  description: 'お探しのページは見つかりませんでした。URLをご確認いただくか、トップページからお探しください。',
+  ogType: 'website'
+};
+---
+
+<Layout
+  title="404 - ページが見つかりません"
+  pageName="not-found"
+  meta={pageMeta}
+>
+
+<main class="p-404">
+  <div class="p-404__container">
+    <div class="p-404__content">
+      <h1 class="p-404__title">404</h1>
+      <p class="p-404__message">
+        お探しのページは見つかりませんでした
+      </p>
+      <p class="p-404__description">
+        URLをご確認いただくか、<br>
+        以下のリンクからお探しください。
+      </p>
+      <div class="p-404__actions">
+        <a href="/" class="c-button c-button--primary">
+          トップページへ戻る
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+</Layout>
+
+<style lang="scss">
+@use '../assets/scss/mediaquery' as me;
+@use '../assets/scss/mixin' as mi;
+
+.p-404 {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  &__container {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+  }
+
+  &__content {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  &__title {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #6c757d;
+    margin: 0 0 1rem;
+    line-height: 1;
+
+    @include me.sp {
+      font-size: 4rem;
+    }
+  }
+
+  &__message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 1rem;
+
+    @include me.sp {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__description {
+    color: #666;
+    margin: 0 0 2rem;
+    line-height: 1.6;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.c-button {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+
+  &--primary {
+    background: #007bff;
+    color: white;
+
+    &:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+  }
+
+  &--secondary {
+    background: transparent;
+    color: #007bff;
+    border-color: #007bff;
+
+    &:hover {
+      background: #007bff;
+      color: white;
+      transform: translateY(-2px);
+    }
+  }
+
+  @include me.sp {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+</style>

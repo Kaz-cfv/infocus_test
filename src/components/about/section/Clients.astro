@@ -1,0 +1,228 @@
+---
+import Client from "../parts/Client.astro";
+
+const clients = [
+  {
+    id: 1,
+    slug: 'loewe',
+    name: 'LOEWE',
+    pic: 'logo_loewe.svg',
+  },
+  {
+    id: 2,
+    slug: 'humanmade',
+    name: 'HUMAN MADE inc.',
+    pic: 'logo_humanmade.svg',
+  },
+  {
+    id: 3,
+    slug: 'gsix',
+    name: 'GSIX',
+    pic: 'logo_gsix.svg',
+  },
+  {
+    id: 4,
+    slug: 'toga',
+    name: 'TOGA ARCHIVES',
+    pic: 'logo_toga.svg',
+  },
+  {
+    id: 5,
+    slug: 'bluenote',
+    name: 'BLUE NOTE JAPAN',
+    pic: 'logo_bluenote.svg',
+  },
+  {
+    id: 6,
+    slug: 'nb',
+    name: 'new balance',
+    pic: 'logo_nb.svg',
+  },
+  {
+    id: 7,
+    slug: 'netflix',
+    name: 'NETFLIX',
+    pic: 'logo_netflix.svg',
+  },
+  {
+    id: 8,
+    slug: 'haagen',
+    name: 'Häagen-Dazs',
+    pic: 'logo_haagen.svg',
+  },
+  {
+    id: 9,
+    slug: 'hugo',
+    name: 'HUGO BOSS',
+    pic: 'logo_hugo.svg',
+  },
+  {
+    id: 10,
+    slug: 'tab',
+    name: 'TOKYO ART BEAT',
+    pic: 'logo_tab.svg',
+  },
+  {
+    id: 11,
+    slug: 'kaonavi',
+    name: 'kaonavi',
+    pic: 'logo_kaonavi.svg',
+  },
+  {
+    id: 12,
+    slug: 'asobi',
+    name: 'ASOBI SYSTEM',
+    pic: 'logo_asobi.svg',
+  },
+  {
+    id: 13,
+    slug: 'shu',
+    name: 'shu uemura',
+    pic: 'logo_shu.svg',
+  },
+  {
+    id: 14,
+    slug: 'loreal',
+    name: 'LOREAL',
+    pic: 'logo_loreal.svg',
+  },
+  {
+    id: 15,
+    slug: 'akqa',
+    name: 'AKQA',
+    pic: 'logo_akqa.svg',
+  },
+  {
+    id: 16,
+    slug: 'budweiser',
+    name: 'Budweiser',
+    pic: 'logo_budweiser.svg',
+  },
+  {
+    id: 17,
+    slug: 'corona',
+    name: 'Corona',
+    pic: 'logo_corona.svg',
+  },
+  {
+    id: 18,
+    slug: 'akatsuki',
+    name: 'Akatsuki',
+    pic: 'logo_akatsuki.svg',
+  },
+  {
+    id: 19,
+    slug: 'sony',
+    name: 'SonyMusic',
+    pic: 'logo_sony.svg',
+  },
+  {
+    id: 20,
+    slug: 'kettle',
+    name: 'Kettle',
+    pic: 'logo_kettle.svg',
+  },
+  {
+    id: 21,
+    slug: 'universal',
+    name: 'UNIVERSAL MUSIC',
+    pic: 'logo_universal.svg',
+  },
+  {
+    id: 22,
+    slug: 'pixiedust',
+    name: 'Pixie Dust Technologies, Inc.',
+    pic: 'logo_pixiedust.svg',
+  },
+  {
+    id: 23,
+    slug: 'beams',
+    name: 'BEAMS',
+    pic: 'logo_beams.svg',
+  },
+  {
+    id: 24,
+    slug: 'zaiko',
+    name: 'ZAIKO',
+    pic: 'logo_zaiko.svg',
+  },
+  {
+    id: 25,
+    slug: 'mng',
+    name: 'Minna no Ginko',
+    pic: 'logo_mng.svg',
+  },
+]
+---
+
+<section class="p-about-clients">
+  <h2 class="p-about-clients__title">(OUR CLIENTS)</h2>
+
+  <div class="p-about-clients__content">
+    <ul class="p-about-clients__content-list">
+      {clients.map((client => (
+        <li class="p-about-clients__content-item">
+          <Client
+            id={client.id}
+            slug={client.slug}
+            name={client.name}
+            pic={client.pic}
+          />
+        </li>
+      )))}
+    </ul>
+  </div>
+</section>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-about-clients {
+  padding-inline: 30px;
+  padding-block-end: 100px;
+  @include me.sp {
+    padding-inline: 20px;
+  }
+
+  &__title {
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    text-align: center;
+    @include me.sp {
+      font-size: 2.4rem;
+      letter-spacing: -.02rem;
+    }
+  }
+
+  &__content {
+    margin-block-start: 60px;
+    @include me.sp {
+      margin-block-end: 50px;
+    }
+
+    &-list {
+      @include me.pc {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 40px;
+        row-gap: 30px;
+      }
+      @include me.sp {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 40px;
+        row-gap: 20px;
+      }
+    }
+
+    &-item {
+      @include me.pc {
+        max-width: 117px;
+      }
+    }
+
+  }
+}
+</style>

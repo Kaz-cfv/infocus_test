@@ -1,0 +1,341 @@
+---
+const sns = [
+  {
+    name: 'instagram',
+    url: 'https://www.instagram.com/in_focus_inc/'
+  },
+  {
+    name: 'twitter',
+    url: 'https://twitter.com/InFocus_Inc'
+  },
+  {
+    name: 'note',
+    url: 'https://note.com/infocusinc/'
+  },
+  {
+    name: 'fb',
+    url: 'https://www.facebook.com/infocusjp/'
+  }
+]
+
+const address = [
+  {
+    place: 'TOKYO',
+    description: '1-49-4, Tomigaya,<br>Shibuya-ku,<br>151-0063 Tokyo, Japan'
+  },
+  {
+    place: 'NEW YORK',
+    description: '161 Water Street, 20th<br>Floor #2038,<br>New York, NY 10038, USA'
+  }
+]
+---
+
+<footer class="l-footer js-footer">
+  <div class="l-footer__inner">
+    <div class="l-footer__contact">
+      <a href="#" class="l-footer__contact-link">
+        CONTACT US
+        <span class="l-footer__contact-icon"><svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 10.7274L17.8407 10.7274C15.5348 8.58802 11.5904 4.7066 9.13274 2.29218L11.4083 0L24 12.4389V12.5L11.4083 25L9.13274 22.5856C11.5904 20.2017 15.5348 16.2897 17.8407 14.1504L0 14.1504L0 10.7274Z" fill="white"/></svg></span>
+      </a>
+    </div>
+
+    <div class="l-footer__content">
+      <div class="l-footer__content-inner --left">
+        <div class="l-footer__newsletter">
+          <span class="l-footer__newsletter-icon"><svg width="23" height="14" viewBox="0 0 23 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L11.4872 8L22 1" stroke="white"/><rect x="0.5" y="0.5" width="22" height="13" stroke="white"/></svg></span>
+          <h3 class="l-footer__newsletter-title">NEWS LETTER</h3>
+          <form class="l-footer__newsletter-form">
+            <input type="email" placeholder="Enter Your email" class="l-footer__newsletter-input">
+            <button type="button" class="l-footer__newsletter-button">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="l-footer__content-inner --right">
+        <div class="l-footer__nav">
+          <ul class="l-footer__nav-list">
+            <li class="l-footer__nav-item"><a href="/projects">PROJECTS</a></li>
+            <li class="l-footer__nav-item"><a href="/news">NEWS</a></li>
+            <li class="l-footer__nav-item"><a href="/about">ABOUT</a></li>
+            <li class="l-footer__nav-item"><a href="/team">TEAM</a></li>
+          </ul>
+          <ul class="l-footer__nav-list">
+            <li class="l-footer__nav-item"><a href="/careers">CAREERS</a></li>
+            <li class="l-footer__nav-item"><a href="/contact">CONTACT</a></li>
+            <li class="l-footer__nav-item"><a href="/privacy-policy">PRIVACY POLICY</a></li>
+            <li class="l-footer__nav-item l-footer__sns">
+              {sns.map((item) => (
+                <a href={item.url} class="l-footer__sns-link" data-sns={item.name}>{item.name}</a>
+              ))}
+            </li>
+          </ul>
+        </div>
+
+        <div class="l-footer__address">
+          {address.map((elm) => (
+            <div class="l-footer__address-block">
+              <h3 class="l-footer__address-title">{elm.place}</h3>
+              <p class="l-footer__address-text" set:html={elm.description}></p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="l-footer__copyright">
+      <p>&copy IN FOCUS inc.</p>
+    </div>
+  </div>
+</footer>
+
+<style lang="scss">
+@use '../assets/scss/mediaquery' as me;
+@use '../assets/scss/mixin' as mi;
+
+.l-footer {
+  background-color: var(--c-black);
+  color: var(--c-white);
+  font-family: var(--f-en);
+  @include me.pc {
+    padding-inline: 24px;
+    padding-block: 80px 85px;
+  }
+  @include me.sp {
+    padding-block-end: 27px;
+  }
+
+  &__contact {
+    display: flex;
+    align-items: center;
+
+    &-link {
+      display: inline-flex;
+      align-items: center;
+      column-gap: 17px;
+      color: var(--c-white);
+      font-weight: 700;
+      font-size: 3.8rem;
+      @include me.sp {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        column-gap: 14px;
+        width: 100%;
+        height: 100px;
+        border-top: solid 2px var(--c-white);
+        font-size: 2.6rem;
+      }
+    }
+
+    &-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 24px;
+      height: 25px;
+      @include me.sp {
+        width: 15px;
+        height: 15.94px;
+      }
+    }
+  }
+
+  &__content {
+    display: grid;
+    @include me.pc {
+      grid-template-columns: max-content 1fr;
+      justify-content: space-between;
+      margin-top: 80px;
+    }
+    @include me.sp {
+      row-gap: 60px;
+      padding-inline: 22px;
+      padding-block-start: 50px;
+      border-top: 2px solid var(--c-white);
+    }
+
+    &-inner {
+      &.--right {
+        @include me.pc {
+          display: flex;
+          column-gap: 105px;
+          margin-left: auto;
+          padding-inline-start: 60px;
+          padding-inline-end: calc(81px - 24px);
+        }
+      }
+    }
+  }
+
+  &__newsletter {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    column-gap: 8px;
+    @include me.pc {
+      width: 338px;
+    }
+    @include me.sp {
+      row-gap: 10px;
+      width: calc(100% - 19.6899%);
+    }
+
+    &-icon {
+      display: block;
+      width: 23px;
+      height: 14px;
+    }
+
+    &-title {
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    &-form {
+      grid-column: 1 / 3;
+      grid-row: 2;
+      display: flex;
+      align-items: stretch;
+      position: relative;
+    }
+
+    &-input {
+      width: 100%;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      border-bottom: 1px solid var(--c-white);
+      color: var(--c-gray);
+      font-family: var(--f-en);
+      font-weight: 400;
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+    }
+
+    &-button {
+      padding-inline: 10px;
+      background-color: var(--c-white);
+      color: #1A1A1A;
+      font-family: var(--f-en);
+      font-weight: 700;
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    @include me.pc {
+      column-gap: 60px;
+    }
+    @include me.sp {
+      // column-gap: 138px;
+    }
+
+    &-list {
+      display: grid;
+      align-content: flex-start;
+      row-gap: 16px;
+      @include me.sp {
+        width: 50%;
+      }
+    }
+
+    &-item {
+
+      a {
+        color: var(--c-white);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.4rem;
+        line-height: 2.2rem;
+      }
+    }
+  }
+
+  &__sns {
+    display: flex;
+    align-items: center;
+    column-gap: 18px;
+    @include me.sp {
+      column-gap: 26px;
+    }
+
+    > a {
+      font-size: 0;
+    }
+
+    &-link {
+      display: inline-block;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      &[data-sns="instagram"] {
+        width: 14.48px;
+        height: 14.48px;
+        background-image: url(/common/images/common/icon_instagram_w.svg);
+      }
+      &[data-sns="twitter"] {
+        width: 14.48px;
+        height: 13.16px;
+        background-image: url(/common/images/common/icon_x_w.svg);
+      }
+      &[data-sns="note"] {
+        width: 14.27px;
+        height: 16.52px;
+        background-image: url(/common/images/common/icon_note_w.svg);
+      }
+      &[data-sns="fb"] {
+        width: 8.26px;
+        height: 15.77px;
+        background-image: url(/common/images/common/icon_fb_w.svg);
+      }
+    }
+  }
+
+  &__address {
+    @include me.pc {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 76px;
+      row-gap: 24px;
+    }
+    @include me.sp {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      // column-gap: 34px;
+      margin-top: 50px;
+    }
+
+    &-title {
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+      @include me.sp {
+        margin-bottom: 8px;
+      }
+    }
+
+    &-text {
+      color: var(--c-gray);
+      font-weight: 500;
+      font-size: 1.4rem;
+      line-height: 2.2rem;
+    }
+  }
+
+  &__copyright {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.83;
+    @include me.pc {
+      display: none;
+    }
+    @include me.sp {
+      margin-top: 50px;
+      padding-inline: 22px;
+    }
+  }
+}
+</style>

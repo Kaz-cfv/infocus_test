@@ -1,0 +1,24 @@
+@use 'mediaquery.scss' as *;
+
+.l-container {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.l-main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 400px;
+  background-color: var(--c-black-base);
+  color: var(--c-white);
+}
+
+.l-content {
+  padding-inline: 30px;
+  @include sp {
+    padding-inline: 20px;
+  }
+}

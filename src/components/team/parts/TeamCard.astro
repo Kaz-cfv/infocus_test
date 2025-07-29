@@ -1,0 +1,105 @@
+---
+interface Tags {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  id: number;
+  name: string;
+  pic: string;
+  url: string;
+  tags: Tags[];
+}
+
+const { id, name, pic, url, tags } = Astro.props;
+---
+
+<div class="c-team-card">
+  <a href={url} class="c-team-card__thumb">
+    <img src={pic} alt={name}>
+  </a>
+  <div class="c-team-card__info">
+    <h3 class="c-team-card__name">{name}</h3>
+    <ul class="c-team-card__tags">
+      {tags.map((tag => (
+        <li class="c-team-card__tags-item">
+          {tag.url != "#" && tag.url !='' ? (
+            <a href={tag.url}>{tag.name}</a>
+          ) : (
+            <span>{tag.name}</span>
+          )}
+        </li>
+      )))}
+    </ul>
+  </div>
+</div>
+
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-team-card {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  row-gap: 18px;
+
+  &__thumb {
+    display: block;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    row-gap: 22px;
+    @include me.sp {
+      row-gap: 12px;
+    }
+  }
+
+  &__name {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 0.78;
+    letter-spacing: .02rem;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 4px;
+    row-gap: 8px;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--c-gray);
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 0.80;
+      &::after {
+        content: "/";
+        display: inline-block;
+      }
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
+
+      a {
+        color: var(--c-gray);
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 0.80;
+      }
+    }
+  }
+}
+
+</style>
