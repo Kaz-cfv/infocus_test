@@ -9,8 +9,8 @@ export async function getStaticPaths() {
     let newsData = [];
 
     try {
-      console.log('📡 ニュースAPI（日本語）からデータを取得中...');
-      const newsResponse = await fetch('https://infocus.wp.site-prev2.com/wp-json/wp/v2/news?lang=ja&_embed', {
+      console.log('📡 CFV Article APIからデータを取得中...');
+      const newsResponse = await fetch('https://cfv.co.jp/wp-json/wp/v2/article?_embed', {
         headers: {
           'User-Agent': 'Astro-Build/1.0.0',
           'Accept': 'application/json',
@@ -20,9 +20,9 @@ export async function getStaticPaths() {
 
       if (newsResponse.ok) {
         const wpNews = await newsResponse.json();
-        console.log(`✅ ${wpNews.length}件のニュースを取得`);
+        console.log(`✅ ${wpNews.length}件の記事を取得`);
 
-        // ニュースデータを優先的に処理
+        // 記事データを処理
         const processedNews = wpNews.map((item, index) => {
           const formatDate = (dateString) => {
             try {
@@ -64,7 +64,7 @@ export async function getStaticPaths() {
             title = item.acfs.news_title;
           }
 
-          console.log(`🔍 ニュース${index + 1}: ID=${item.id}, slug="${slug}"`);
+          console.log(`🔍 記事${index + 1}: ID=${item.id}, slug="${slug}"`);
           console.log(`   タイトル取得結果: "${title}"`);
           console.log(`   元データ構造: ${typeof item.title}, rendered: ${item.title?.rendered}`);
 
@@ -85,17 +85,17 @@ export async function getStaticPaths() {
             author: item.acfs?.news_author || '',
             wordpressId: item.id,
             lastModified: item.modified || item.date,
-            sourceType: 'news'
+            sourceType: 'article'
           };
         });
 
         newsData.push(...processedNews);
 
       } else {
-        console.log('⚠️ ニュースAPI（日本語）が利用不可');
+        console.log('⚠️ CFV Article APIが利用不可');
       }
     } catch (newsError) {
-      console.log('ℹ️ ニュースAPI接続エラー:', newsError.message);
+      console.log('ℹ️ CFV Article API接続エラー:', newsError.message);
     }
 
 
@@ -116,7 +116,7 @@ export async function getStaticPaths() {
     console.error('💥 収集に失敗:', error);
 
     // データが取得できない場合はダミーデータを返してビルドを継続
-    console.log('🚨 緊急フォールバック: ニュースAPIもプロジェクトAPIも利用不可');
+    console.log('🚨 緊急フォールバック: CFV Article APIが利用不可');
     return [
       {
         params: { id: '1' },
