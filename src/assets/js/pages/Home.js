@@ -29,7 +29,7 @@ export class Home {
    * 初期化処理
    */
   init() {
-    this.fetchProjects();
+    // this.fetchProjects();
   }
 
   /**

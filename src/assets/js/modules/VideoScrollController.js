@@ -14,7 +14,7 @@ class VideoScrollController {
       // 動画を持つカードを特定して監視開始
       this.setupVideoCardTriggers();
 
-      console.log('VideoScrollController initialized successfully');
+      // console.log('VideoScrollController initialized successfully');
     } catch (error) {
       console.error('Failed to initialize VideoScrollController:', error);
     }
@@ -82,7 +82,7 @@ class VideoScrollController {
       });
     });
 
-    console.log(`${videoCards.length}枚の動画カードの監視を開始しました`);
+    // console.log(`${videoCards.length}枚の動画カードの監視を開始しました`);
   }
 
   activateCard(card, video) {
@@ -100,7 +100,7 @@ class VideoScrollController {
       }, { once: true });
     }
 
-    console.log(`カード ID:${card.dataset.id} がアクティブになりました`);
+    // console.log(`カード ID:${card.dataset.id} がアクティブになりました`);
   }
 
   deactivateCard(card, video) {
@@ -110,7 +110,7 @@ class VideoScrollController {
     // 動画を一時停止
     this.pauseVideo(video);
 
-    console.log(`カード ID:${card.dataset.id} が非アクティブになりました`);
+    // console.log(`カード ID:${card.dataset.id} が非アクティブになりました`);
   }
 
   playVideo(video) {

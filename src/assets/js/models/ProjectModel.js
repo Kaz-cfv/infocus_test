@@ -1,0 +1,1 @@
+// プロジェクトモデルクラス - infocus_projects.jsonのデータを扱う

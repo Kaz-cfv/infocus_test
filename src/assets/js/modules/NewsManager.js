@@ -30,7 +30,7 @@ class NewsAPI {
       }
 
       const data = await response.json();
-      console.log('📊 取得したニュースデータ:', data);
+      // console.log('📊 取得したニュースデータ:', data);
 
       return data;
     } catch (error) {
@@ -39,6 +39,29 @@ class NewsAPI {
     }
   }
 
+  /**
+   * 個別ニュースを取得
+   */
+  async fetchNewsDetail(id) {
+    try {
+      const url = `${this.baseURL}${this.endpoint}/${id}`;
+      // console.log('🔍 詳細API呼び出し URL:', url);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // console.log('📄 取得したニュース詳細:', data);
+
+      return data;
+    } catch (error) {
+      console.error('❌ ニュース詳細取得エラー:', error);
+      throw error;
+    }
+  }
 }
 
 class NewsList {
@@ -194,12 +217,36 @@ class NewsList {
   }
 }
 
+class NewsDetail {
+  constructor(newsAPI) {
+    this.newsAPI = newsAPI;
+    this.currentNews = null;
+  }
+
+  /**
+   * ニュース詳細の初期化
+   */
+  async init(newsId) {
+    try {
+      this.currentNews = await this.newsAPI.fetchNewsDetail(newsId);
+
+      window.NewsArticle = this.currentNews;
+      console.log('💾 NewsArticle をwindow変数に格納:', window.NewsArticle);
+
+      return this.currentNews;
+    } catch (error) {
+      console.error('❌ 詳細初期化に失敗:', error);
+      throw error;
+    }
+  }
+}
 
 // メインのNewsManagerクラス
 class NewsManager {
   constructor() {
     this.api = new NewsAPI();
     this.listManager = new NewsList(this.api);
+    this.detailManager = new NewsDetail(this.api);
   }
 
   /**
@@ -207,6 +254,13 @@ class NewsManager {
    */
   async initList() {
     return await this.listManager.init();
+  }
+
+  /**
+   * 詳細ページの初期化
+   */
+  async initDetail(newsId) {
+    return await this.detailManager.init(newsId);
   }
 
   /**
@@ -279,10 +333,53 @@ function renderNewsFromWindow() {
 window.newsManager = new NewsManager();
 window.renderNewsFromWindow = renderNewsFromWindow;
 
+/**
+ * 詳細ページの初期化処理
+ */
+async function initNewsDetail() {
+  // 詳細ページかどうかを判定
+  const isNewsDetailPage = document.querySelector('body').classList.contains('news-detail') ||
+                           window.location.pathname.includes('/news/') &&
+                           window.location.pathname !== '/news/' &&
+                           !window.location.pathname.endsWith('/news');
 
-// DOM準備完了後に実行（一覧ページのみ）
+  if (!isNewsDetailPage) {
+    return;
+  }
+
+  try {
+    // URLからスラッグを取得
+    const pathParts = window.location.pathname.split('/');
+    const slug = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+
+    if (!slug) {
+      console.error('❌ スラッグが取得できませんでした:', window.location.pathname);
+      return;
+    }
+
+    // Astroページのpropsから記事データを取得（フォールバック）
+    const newsData = window.newsData || null;
+
+    if (newsData) {
+      window.NewsArticle = newsData;
+      console.log('💾 NewsArticle をwindow変数に格納（Astroデータ）:', window.NewsArticle);
+    } else {
+      console.log('🔄 APIから詳細データ取得中...');
+      // APIから詳細データを取得（IDが必要な場合の代替案）
+      // この実装はWordPress APIの詳細エンドポイントに依存
+    }
+
+  } catch (error) {
+    console.error('❌ 詳細ページ初期化に失敗:', error);
+  }
+}
+
+// DOM準備完了後に実行
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', async () => {
+    // 詳細ページの初期化
+    await initNewsDetail();
+
     // 一覧ページの初期化
     if (window.NewsList && Array.isArray(window.NewsList) && window.NewsList.length > 0) {
       window.renderNewsFromWindow();
@@ -297,6 +394,9 @@ if (document.readyState === 'loading') {
     }
   });
 } else {
+  // 詳細ページの初期化
+  initNewsDetail();
+
   // 一覧ページの初期化
   if (window.NewsList && Array.isArray(window.NewsList) && window.NewsList.length > 0) {
     window.renderNewsFromWindow();
@@ -312,4 +412,4 @@ if (document.readyState === 'loading') {
   }
 }
 
-export { NewsManager, NewsAPI, NewsList, renderNewsFromWindow };
+export { NewsManager, NewsAPI, NewsList, NewsDetail, renderNewsFromWindow };

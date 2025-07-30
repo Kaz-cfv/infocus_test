@@ -46,7 +46,7 @@ export class VideoManager {
     const selectedVideo = getRandomVideo();
     videoElement.src = selectedVideo;
 
-    console.log('VideoManager: Video source set to:', selectedVideo);
+    // console.log('VideoManager: Video source set to:', selectedVideo);
 
     // イベントリスナーの設定
     videoElement.addEventListener('error', (e) => {

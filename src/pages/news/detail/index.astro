@@ -5,231 +5,130 @@ import Credit from '../../../components/news-detail/section/Credit.astro';
 import Share from '../../../components/news-detail/parts/Share.astro';
 import Related from '../../../components/news-detail/section/Related.astro';
 
-// URLパラメーターからidを取得
-const url = Astro.url;
-const id = url.searchParams.get('id');
-
-console.log('🔍 URLパラメーター取得:', {
-  fullUrl: url.toString(),
-  id: id,
-  searchParams: Object.fromEntries(url.searchParams.entries())
-});
-
-let article: any = null;
-
-// idが指定されている場合はAPIから記事を取得
-if (id) {
-  try {
-    console.log(`📡 記事ID: ${id} のデータを取得中...`);
-
-    // ニュースAPIから記事詳細を取得
-    const newsUrl = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/news/${id}`;
-    console.log(`🔗 ニュースAPI URL: ${newsUrl}`);
-    
-    const newsResponse = await fetch(newsUrl, {
-      headers: {
-        'User-Agent': 'Astro-Build/1.0.0',
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache'
-      }
-    });
-
-    console.log(`📊 ニュースAPIレスポンス: ${newsResponse.status} ${newsResponse.statusText}`);
-
-    if (newsResponse.ok) {
-      const newsData: any = await newsResponse.json();
-      console.log('✅ ニュースAPIから記事取得成功:', newsData);
-
-      // データを記事形式に変換
-      article = {
-        id: newsData.id,
-        slug: newsData.slug || `news-${newsData.id}`,
-        title: newsData.title?.rendered || 'タイトルなし',
-        date: new Date(newsData.date).toISOString().split('T')[0].replace(/-/g, '.'),
-        category: 'NEWS',
-        pic: newsData.acfs?.news_mv?.url || '/common/images/news/default.png',
-        content: newsData.content?.rendered || '',
-        article: newsData.acfs?.news_article || '',
-        credit: []
-      };
-    } else {
-      console.log(`⚠️ ニュースAPI失敗 (${newsResponse.status}), プロジェクトAPIを試行...`);
-
-      // プロジェクトAPIから記事詳細を取得
-      const projectUrl = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects/${id}`;
-      console.log(`🔗 プロジェクトAPI URL: ${projectUrl}`);
-      
-      const projectResponse = await fetch(projectUrl, {
-        headers: {
-          'User-Agent': 'Astro-Build/1.0.0',
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache'
-        }
-      });
-
-      console.log(`📊 プロジェクトAPIレスポンス: ${projectResponse.status} ${projectResponse.statusText}`);
-
-      if (projectResponse.ok) {
-        const projectData: any = await projectResponse.json();
-        console.log('✅ プロジェクトAPIから記事取得成功:', projectData);
-
-        article = {
-          id: projectData.id,
-          slug: projectData.slug || `project-${projectData.id}`,
-          title: projectData.title?.rendered || 'タイトルなし',
-          date: new Date(projectData.date).toISOString().split('T')[0].replace(/-/g, '.'),
-          category: 'PROJECT',
-          pic: projectData.acfs?.project_mv?.url || '/common/images/news/default.png',
-          content: projectData.content?.rendered || '',
-          article: projectData.acfs?.project_outline || '',
-          credit: []
-        };
-      } else {
-        console.log(`❌ プロジェクトAPIも失敗 (${projectResponse.status})`);
-        
-        // レスポンステキストも確認
-        try {
-          const errorText = await projectResponse.text();
-          console.log('❌ プロジェクトAPIエラー詳細:', errorText.substring(0, 200));
-        } catch (e) {
-          console.log('❌ プロジェクトAPIエラーテキスト取得失敗');
-        }
-      }
-    }
-  } catch (error) {
-    console.error('💥 記事取得エラー:', error);
-  }
-}
-
-// フォールバック用のダミーデータ
-if (!article) {
-  console.log('🚨 APIから記事が取得できないため、ダミーデータを使用');
-  article = {
-    id: 'fallback',
-    slug: 'detail01',
-    title: 'CHELMICO 鈴木真海子が出演する『散文の記憶 | 街・言葉・時々酒 BY MUDA』がYouTubeにて公開',
-    date: '2025.03.31',
-    category: 'Project',
-    pic: '/common/images/dummy/news_detail_eyecatch.png',
-    credit: [
-      {
-        title: 'movie',
-        items: [
-          {
-            caption: 'DIRECTION',
-            content: 'Taiju Nakajima (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'OFFLINE EDIT',
-            content: 'Miho Tanaka (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'MOTION GRAPHICS',
-            content: 'Miho Tanaka (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'GRAPHIC DESIGN',
-            content: 'Anna Senzaki (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'CINEMATOGRAPHY',
-            content: 'Yoshinori Kataoka (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'MUSIC',
-            content: 'Yudai Iwata',
-            link: false,
-            url: '',
-          },
-          {
-            caption: 'SOUND EFFECT',
-            content: 'Fumio Yasue',
-            link: false,
-            url: '',
-          },
-          {
-            caption: 'NARRATION',
-            content: 'Ayana Shimizu',
-            link: false,
-            url: '',
-          },
-        ],
-      },
-      {
-        title: 'Web site',
-        items: [
-          {
-            caption: 'CREATIVE DIRECTION',
-            content: 'Atsushi Kaneishi (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'WEB DIRECTION',
-            content: 'Atsushi Kaneishi (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'WEB DESIGN',
-            content: 'Miho Nagatsuka (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'PROGRAMMING',
-            content: 'Yuta Abe (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-        ],
-      },
-      {
-        title: '3DCG',
-        items: [
-          {
-            caption: 'ART DIRECTION',
-            content: 'Atsushi Kaneishi (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'CG PRODUCTION',
-            content: 'KASSEN',
-            link: false,
-            url: '',
-          },
-        ],
-      },
-      {
-        title: '',
-        items: [
-          {
-            caption: 'PRODUCE',
-            content: 'Kazuki Sekiyama (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-          {
-            caption: 'PRODUCTION MANAGEMENT',
-            content: 'Tomoyuki Ishizaki (IN FOCUS)',
-            link: true,
-            url: '/team/detail/',
-          },
-        ],
-      },
-    ],
-  };
+const article = {
+  slug: 'detail01',
+  title: 'CHELMICO 鈴木真海子が出演する『散文の記憶 | 街・言葉・時々酒 BY MUDA』がYouTubeにて公開',
+  date: '2025.03.31',
+  category: 'Project',
+  pic: '/common/images/dummy/news_detail_eyecatch.png',
+  credit: [
+    {
+      title: 'movie',
+      items: [
+        {
+          caption: 'DIRECTION',
+          content: 'Taiju Nakajima (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'OFFLINE EDIT',
+          content: 'Miho Tanaka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'MOTION GRAPHICS',
+          content: 'Miho Tanaka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'GRAPHIC DESIGN',
+          content: 'Anna Senzaki (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'CINEMATOGRAPHY',
+          content: 'Yoshinori Kataoka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'MUSIC',
+          content: 'Yudai Iwata',
+          link: false,
+          url: '',
+        },
+        {
+          caption: 'SOUND EFFECT',
+          content: 'Fumio Yasue',
+          link: false,
+          url: '',
+        },
+        {
+          caption: 'NARRATION',
+          content: 'Ayana Shimizu',
+          link: false,
+          url: '',
+        },
+      ],
+    },
+    {
+      title: 'Web site',
+      items: [
+        {
+          caption: 'CREATIVE DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'WEB DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'WEB DESIGN',
+          content: 'Miho Nagatsuka (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'PROGRAMMING',
+          content: 'Yuta Abe (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+      ],
+    },
+    {
+      title: '3DCG',
+      items: [
+        {
+          caption: 'ART DIRECTION',
+          content: 'Atsushi Kaneishi (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'CG PRODUCTION',
+          content: 'KASSEN',
+          link: false,
+          url: '',
+        },
+      ],
+    },
+    {
+      title: '',
+      items: [
+        {
+          caption: 'PRODUCE',
+          content: 'Kazuki Sekiyama (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+        {
+          caption: 'PRODUCTION MANAGEMENT',
+          content: 'Tomoyuki Ishizaki (IN FOCUS)',
+          link: true,
+          url: '/team/detail/',
+        },
+      ],
+    },
+  ],
 }
 
 const pageMeta = {
@@ -299,31 +198,6 @@ const pageMeta = {
   />
 </article>
 <Related />
-
-<script define:vars={{ article, id }}>
-  // window変数にNewsArticleとして記事データを保存
-  window.NewsArticle = article;
-  
-  console.log('💾 NewsArticleをwindow変数に保存:', window.NewsArticle);
-  console.log(`📝 記事ID: ${id || 'なし'}`);
-  console.log(`📰 記事タイトル: ${article.title}`);
-  console.log(`📅 記事日付: ${article.date}`);
-  console.log(`🏷️ カテゴリ: ${article.category}`);
-  
-  // デバッグ用の追加情報
-  console.log('🔍 記事の完全なデータ構造:');
-  console.table({
-    ID: article.id,
-    Slug: article.slug,
-    Title: article.title?.substring(0, 50) + '...',
-    Date: article.date,
-    Category: article.category,
-    HasPic: !!article.pic,
-    HasContent: !!article.content,
-    HasArticle: !!article.article,
-    CreditSections: article.credit?.length || 0
-  });
-</script>
 
 </Layout>
 

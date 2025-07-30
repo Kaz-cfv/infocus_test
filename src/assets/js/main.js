@@ -13,7 +13,7 @@ import { LenisManager } from './modules/LenisManager.js';
 import { Home } from './pages/Home.js';
 import { About } from './pages/About.js';
 import { TeamDetail } from './pages/TeamDetail.js';
-import { News } from './pages/News.js';
+// import { News } from './pages/News.js';
 
 class App {
   constructor() {
@@ -41,7 +41,7 @@ class App {
       this.initHome();
       this.initAbout();
       this.initTeamDetail();
-      this.initNews();
+      // this.initNews();
     } catch (error) {
       console.error('Error initializing components:', error);
     }

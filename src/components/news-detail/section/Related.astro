@@ -6,7 +6,7 @@ const { currentId } = Astro.props;
 const allNews = [
   {
     id: 1,
-    slug: 'we-want-yu-exhibition',
+    slug: 'detail',
     title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
     date: '2025.04.18',
     category: 'Project',
@@ -14,7 +14,7 @@ const allNews = [
   },
   {
     id: 2,
-    slug: 'tokyo-office-opening',
+    slug: 'detail',
     title: '東京オフィス新設のお知らせ',
     date: '2025.04.15',
     category: 'Press',
@@ -22,7 +22,7 @@ const allNews = [
   },
   {
     id: 3,
-    slug: 'design-award-news',
+    slug: 'detail',
     title: 'デザインアワード受賞のお知らせ',
     date: '2025.04.10',
     category: 'Press',
@@ -42,7 +42,7 @@ const related = allNews.filter(item => item.id !== currentId).slice(0, 3);
           title={item.title}
           date={item.date}
           category={item.category}
-          url={`/news/${item.id}`}
+          url={`/news/${item.slug}`}
           pic={item.pic}
         />
       </li>

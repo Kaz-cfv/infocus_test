@@ -1,31 +1,65 @@
 ---
-const categories = [
-  {
-    name: 'BRANDING',
-    url: '/',
-    quantity: 10
-  },
-  {
-    name: 'ART DIRECTION',
-    url: '/',
-    quantity: 44
-  },
-  {
-    name: 'WEB',
-    url: '/',
-    quantity: 80
-  },
-  {
-    name: 'FILM',
-    url: '/',
-    quantity: 38
-  },
-  {
-    name: 'EDITORIAL',
-    url: '/',
-    quantity: 23
+import { ENDPOINTS } from '../../../assets/js/api/Endpoints.js';
+
+// サーバーサイドでHomeデータを取得
+let categories = [];
+let totalProjects = 0;
+let debugInfo = { status: 'loading', error: null, categoriesCount: 0 };
+
+try {
+  // Astroのサーバーサイドでfetchを直接使用
+  const response = await fetch(ENDPOINTS.HOME);
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
-]
+
+  const rawData = await response.json();
+  console.log('📡 Raw data received:', !!rawData);
+
+  // データの安全な取得（HomeModelの処理をインライン化）
+  if (rawData?.home?.projects?.catergory && Array.isArray(rawData.home.projects.catergory)) {
+    // カテゴリデータを処理
+    categories = rawData.home.projects.catergory
+      .map(category => ({
+        termId: category.term_id || 0,
+        name: category.name || '',
+        slug: category.slug || '',
+        count: category.count || 0,
+        termOrder: category.term_order || '0'
+      }))
+      .sort((a, b) => {
+        const orderA = parseInt(a.termOrder) || 0;
+        const orderB = parseInt(b.termOrder) || 0;
+        return orderA - orderB;
+      });
+
+    // 全プロジェクト数を計算
+    totalProjects = categories.reduce((total, cat) => total + cat.count, 0);
+
+    debugInfo = {
+      status: 'success',
+      error: null,
+      categoriesCount: categories.length,
+      totalProjects: totalProjects
+    };
+
+    console.log('✅ Categories processed:', categories.length);
+    console.log('📊 Total projects:', totalProjects);
+  } else {
+    throw new Error('No categories data found in response');
+  }
+
+} catch (error) {
+  console.error('❌ Failed to fetch home data:', error);
+}
+
+// 最終確認
+console.log('🎯 Final render data:', {
+  categoriesCount: categories.length,
+  totalProjects: totalProjects,
+  categories: categories.map(cat => ({ name: cat.name, count: cat.count }))
+});
 ---
 
 <div class="p-home-intro">
@@ -37,22 +71,51 @@ const categories = [
     </a>
   </div>
   <ul class="p-home-intro-category">
+    <!-- 全カテゴリ表示用のALLアイテム -->
     <li class="p-home-intro-category__item" data-catgory="ALL">
-      <a href="/" class="p-home-intro-category__link">
+      <a href="/projects/" class="p-home-intro-category__link">
         <span class="p-home-intro-category__name">ALL</span>
-        <span class="p-home-intro-category__num">122</span>
+        <span class="p-home-intro-category__num">{totalProjects}</span>
       </a>
     </li>
-    {categories.map((cat) => (
-      <li class="p-home-intro-category__item" data-catgory={cat.name}>
-        <a href={cat.url} class="p-home-intro-category__link">
-          <span class="p-home-intro-category__name">{cat.name}</span>
-          <span class="p-home-intro-category__num">{cat.quantity}</span>
+    <!-- 動的カテゴリ表示 -->
+    {categories.map((category) => (
+      <li class="p-home-intro-category__item" data-catgory={category.name}>
+        <a href={`/projects/?category=${category.slug}`} class="p-home-intro-category__link">
+          <span class="p-home-intro-category__name">{category.name}</span>
+          <span class="p-home-intro-category__num">{category.count}</span>
         </a>
       </li>
     ))}
   </ul>
 </div>
+
+<!-- 詳細デバッグ情報（開発時のみ） -->
+{import.meta.env.MODE === 'development' && (
+  <script define:vars={{ categories, totalProjects, debugInfo }}>
+    console.group('🏷️ Category Render Debug');
+    console.log('Debug Info:', debugInfo);
+    console.log('Categories for render:', categories);
+    console.log('Total projects for render:', totalProjects);
+    console.log('DOM should show:', categories.length, 'category items + 1 ALL item');
+    console.groupEnd();
+
+    // DOMチェック機能
+    setTimeout(() => {
+      const categoryItems = document.querySelectorAll('.p-home-intro-category__item');
+      const categoryNums = document.querySelectorAll('.p-home-intro-category__num');
+
+      console.group('🔍 DOM Verification');
+      console.log('Category items in DOM:', categoryItems.length);
+      console.log('Category numbers in DOM:', categoryNums.length);
+
+      categoryNums.forEach((numEl, index) => {
+        console.log(`Item ${index}: "${numEl.textContent}"`);
+      });
+      console.groupEnd();
+    }, 100);
+  </script>
+)}
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;
