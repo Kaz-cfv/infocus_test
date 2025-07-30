@@ -31,23 +31,20 @@ const pageMeta = {
 
   // DOMContentLoaded後にデバッグ実行
   document.addEventListener('DOMContentLoaded', async () => {
-    // 開発環境でのみ実行（本番では無効化）
-    if (import.meta.env.MODE === 'development') {
-      try {
-        // ホームデータをデバッグ出力
-        await HomeDataDebugger.fetchAndDebugHomeData();
+    try {
+      // ホームデータをデバッグ出力
+      await HomeDataDebugger.fetchAndDebugHomeData();
 
-        // グローバル関数として利用可能にする
-        // console.log('💡 Debug functions available:');
-        // console.log('- debugHomeData() - 全データを出力');
-        // console.log('- debugHomeSection("heros") - ヒーロー動画のみ');
-        // console.log('- debugHomeSection("categories") - カテゴリのみ');
-        // console.log('- debugHomeSection("pickup") - ピックアップのみ');
-        // console.log('- debugHomeSection("banners") - バナーのみ');
+      // グローバル関数として利用可能にする
+      // console.log('💡 Debug functions available:');
+      // console.log('- debugHomeData() - 全データを出力');
+      // console.log('- debugHomeSection("heros") - ヒーロー動画のみ');
+      // console.log('- debugHomeSection("categories") - カテゴリのみ');
+      // console.log('- debugHomeSection("pickup") - ピックアップのみ');
+      // console.log('- debugHomeSection("banners") - バナーのみ');
 
-      } catch (error) {
-        console.error('🚨 Failed to debug home data:', error);
-      }
+    } catch (error) {
+      console.error('🚨 Failed to debug home data:', error);
     }
   });
 </script>
