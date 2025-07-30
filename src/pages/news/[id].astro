@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 
     try {
       console.log('📡 CFV Article APIからデータを取得中...');
-      const newsResponse = await fetch('https://cfv.co.jp/wp-json/wp/v2/article?_embed', {
+      const newsResponse = await fetch('https://infocus.wp.site-prev2.com/wp-json/wp/v2/team?_embed', {
         headers: {
           'User-Agent': 'Astro-Build/1.0.0',
           'Accept': 'application/json',
