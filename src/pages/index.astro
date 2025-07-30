@@ -31,7 +31,11 @@ const pageMeta = {
 
   // DOMContentLoaded後にデバッグ実行
   document.addEventListener('DOMContentLoaded', async () => {
+    // デバッグ実行（環境問わず）
     try {
+      console.log('🔍 Current environment mode:', import.meta.env.MODE);
+      console.log('🌐 Target API endpoint:', 'https://infocus.wp.site-prev2.com/wp-json/infocus/v1/options/home');
+      
       // ホームデータをデバッグ出力
       await HomeDataDebugger.fetchAndDebugHomeData();
 
@@ -45,6 +49,11 @@ const pageMeta = {
 
     } catch (error) {
       console.error('🚨 Failed to debug home data:', error);
+      console.error('🔍 Error details:', {
+        name: error.name,
+        message: error.message,
+        status: error.status || 'N/A'
+      });
     }
   });
 </script>
