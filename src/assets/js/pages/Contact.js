@@ -216,7 +216,7 @@ class Contact {
     };
   }
 
-  // Google Formsへのデータ送信
+  // Google Formsへのデータ送信 (Shopifyで成功している方法と同じ)
   async submitToGoogleForms() {
     const formUrl = this.formEndpoints[this.formId];
     if (!formUrl) {
@@ -225,26 +225,19 @@ class Contact {
     }
 
     try {
-      // FormDataを使用（Content-Typeヘッダーを設定しない）
-      const formData = new FormData();
-
-      // フォームデータをFormDataに追加
-      for (const [key, value] of Object.entries(this.formData)) {
-        formData.append(key, value);
-        console.log(`Adding to FormData: ${key} = ${value}`);
-      }
-
       const response = await fetch(formUrl, {
         method: 'POST',
         mode: 'no-cors',
-        body: formData  // Content-Typeヘッダーを指定しない
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(this.formData),
       });
 
-      console.log('Form submitted via FormData');
+      console.log('Form submitted successfully');
       return true;
-
     } catch (error) {
-      console.error('Submission failed:', error);
+      console.error('Form submission error:', error);
       return false;
     }
   }
