@@ -19,8 +19,7 @@ class Contact {
     // ボタン要素
     this.$submitButton = this.$inputContent.querySelector('.--button .c-button');
 
-    // 表示用とAPI送信用の別々のデータオブジェクトを用意
-    this.displayData = {};
+    // 送信用データオブジェクト
     this.formData = {};
 
     this.init();
@@ -63,27 +62,8 @@ class Contact {
     const requiredFields = this.$form.querySelectorAll('.--require');
 
     requiredFields.forEach(field => {
-      const errorMsg = field.querySelector('.error_msg');
-      const fieldName = field.getAttribute('data-fields');
-
-      // ラジオボタンのバリデーション
-      const radioButtons = field.querySelectorAll('input[type="radio"]');
-      if (radioButtons.length > 0) {
-        const isRadioChecked = Array.from(radioButtons).some(radio => radio.checked);
-        if (!isRadioChecked) {
-          errorMsg.textContent = '選択してください';
-          errorMsg.style.display = 'block';
-          isValid = false;
-        } else {
-          errorMsg.style.display = 'none';
-        }
-        return;
-      }
-
-      // その他の入力要素のバリデーション
       const input = field.querySelector('input, textarea, select');
-      if (!input) return;
-
+      const errorMsg = field.querySelector('.error_msg');
       const value = input.value.trim();
       const inputType = input.type || input.tagName.toLowerCase();
 
@@ -99,11 +79,7 @@ class Contact {
       } else if (inputType === 'email') {
         // メールアドレスのバリデーション
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!value) {
-          errorMsg.textContent = '必須です';
-          errorMsg.style.display = 'block';
-          isValid = false;
-        } else if (!emailPattern.test(value)) {
+        if (!emailPattern.test(value)) {
           errorMsg.textContent = '有効なメールアドレスを入力してください';
           errorMsg.style.display = 'block';
           isValid = false;
@@ -112,25 +88,19 @@ class Contact {
         }
       } else if (inputType === 'tel') {
         // 電話番号のバリデーション
-        if (!value) {
-          errorMsg.textContent = '必須です';
+        const containsHyphenPattern = /-/;
+        const numericPattern = /^[0-9]+$/;
+
+        if (containsHyphenPattern.test(value)) {
+          errorMsg.textContent = '電話番号にはハイフンを含めないでください';
+          errorMsg.style.display = 'block';
+          isValid = false;
+        } else if (!numericPattern.test(value)) {
+          errorMsg.textContent = '電話番号には数字のみを入力してください';
           errorMsg.style.display = 'block';
           isValid = false;
         } else {
-          const containsHyphenPattern = /-/;
-          const numericPattern = /^[0-9]+$/;
-
-          if (containsHyphenPattern.test(value)) {
-            errorMsg.textContent = '電話番号にはハイフンを含めないでください';
-            errorMsg.style.display = 'block';
-            isValid = false;
-          } else if (!numericPattern.test(value)) {
-            errorMsg.textContent = '電話番号には数字のみを入力してください';
-            errorMsg.style.display = 'block';
-            isValid = false;
-          } else {
-            errorMsg.style.display = 'none';
-          }
+          errorMsg.style.display = 'none';
         }
       } else {
         // 必須項目のバリデーション (共通)
@@ -150,7 +120,6 @@ class Contact {
   // フォームデータの収集
   collectFormData() {
     const formData = new FormData(this.$form);
-    this.displayData = {};
     this.formData = {};
 
     for (const [key, value] of formData.entries()) {
@@ -158,65 +127,38 @@ class Contact {
 
       // 日付フィールドの処理
       if (key.includes('entry.') && value.includes('-')) {
-        const isPotentialDate = /^\d{4}-\d{2}-\d{2}$/.test(value); // YYYY-MM-DD形式かどうかをチェック
+        const isPotentialDate = /^\d{4}-\d{2}-\d{2}$/.test(value);
         if (isPotentialDate) {
           try {
             const date = new Date(value);
-            // 元のキーから年月日のキーを生成
             const baseKey = key.split('_')[0];
 
             // Google Forms送信用データ
             this.formData[`${baseKey}_year`] = date.getFullYear().toString();
             this.formData[`${baseKey}_month`] = (date.getMonth() + 1).toString();
             this.formData[`${baseKey}_day`] = date.getDate().toString();
-
-            // 確認画面表示用データ
-            this.displayData[key] = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
           } catch (e) {
             console.error('Date parsing error:', e);
-            this.displayData[key] = value;
             this.formData[key] = value;
           }
         } else {
-          // 日付形式でない場合
-          this.displayData[key] = value;
           this.formData[key] = value;
         }
-      } else if (key.includes('entry.')) {
-        // entry.で始まるフィールドの処理
-        const input = this.$form.querySelector(`[name="${key}"]`);
-        if (input && input.type === 'checkbox') {
-          // チェックボックスの処理
-          if (input.checked) {
-            const checkboxValue = input.value; // value属性の値を取得
-            this.formData[key] = checkboxValue;   // 送信用にはvalue属性の値を使用
-            this.displayData[key] = checkboxValue; // 表示用も同じ
-          }
-        } else {
-          // その他のフィールド
-          this.formData[key] = value;
-          this.displayData[key] = value;
+      } else if (key.includes('entry.') && this.$form.querySelector(`[name="${key}"]`)?.type === 'checkbox') {
+        // チェックボックスの処理
+        const checkbox = this.$form.querySelector(`[name="${key}"]`);
+        if (checkbox.checked) {
+          const checkboxValue = checkbox.value;
+          this.formData[key] = checkboxValue;
         }
       } else {
-        // entry.で始まらないフィールド
+        // その他のフィールド
         this.formData[key] = value;
-        this.displayData[key] = value;
       }
     }
-
-    // デバッグ用
-    console.log('=== Form Data Collection ===');
-    console.log('Display Data:', this.displayData);
-    console.log('Form Data for API:', this.formData);
-
-    // グローバルにアクセス可能にする
-    window.contactData = {
-      displayData: this.displayData,
-      formData: this.formData
-    };
   }
 
-  // Google Formsへのデータ送信 (Shopifyで成功している方法と同じ)
+  // Google Formsへのデータ送信
   async submitToGoogleForms() {
     const formUrl = this.formEndpoints[this.formId];
     if (!formUrl) {
@@ -225,7 +167,8 @@ class Contact {
     }
 
     try {
-      const response = await fetch(formUrl, {
+      // no-corsモードではレスポンスを読み取れないが、これは正常
+      await fetch(formUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: {
@@ -234,9 +177,11 @@ class Contact {
         body: new URLSearchParams(this.formData),
       });
 
-      console.log('Form submitted successfully');
+      // no-corsモードでは常にtrue（送信自体はされている）
+      console.log('Form submitted successfully (no-cors mode)');
       return true;
     } catch (error) {
+      // ネットワークエラーなど、実際の送信失敗時のみfalse
       console.error('Form submission error:', error);
       return false;
     }
@@ -265,7 +210,7 @@ class Contact {
         this.$completeContent.style.display = 'block';
 
         // ページトップにスクロール
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo(0, 0);
 
         // フォームをリセット
         this.$form.reset();
