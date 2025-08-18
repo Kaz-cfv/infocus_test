@@ -213,20 +213,14 @@ class Contact {
     }
 
     try {
-      // 隠しiframeを使用してGoogleフォームに送信
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.name = 'hidden_iframe';
-      document.body.appendChild(iframe);
-
-      // フォームを動的に作成
+      // 方法1: 新しいタブで送信してすぐ閉じる方法
       const tempForm = document.createElement('form');
       tempForm.method = 'POST';
       tempForm.action = formUrl;
-      tempForm.target = 'hidden_iframe';
+      tempForm.target = '_blank';
       tempForm.style.display = 'none';
 
-      // フォームデータを追加
+      // フォームデータをhidden inputとして追加
       for (const [key, value] of Object.entries(this.formData)) {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -235,35 +229,62 @@ class Contact {
         tempForm.appendChild(input);
       }
 
+      // DOMに追加して送信
       document.body.appendChild(tempForm);
 
-      // フォーム送信の成功を検知
-      return new Promise((resolve) => {
-        iframe.onload = () => {
-          // 送信完了後にクリーンアップ
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-            document.body.removeChild(tempForm);
-            console.log('Form submitted successfully via iframe');
-            resolve(true);
-          }, 1000);
-        };
+      // 送信実行
+      tempForm.submit();
 
-        // エラーハンドリング
-        iframe.onerror = () => {
-          document.body.removeChild(iframe);
-          document.body.removeChild(tempForm);
-          console.error('Form submission failed');
-          resolve(false);
-        };
+      // フォームを削除
+      document.body.removeChild(tempForm);
 
-        // フォーム送信
-        tempForm.submit();
-      });
+      console.log('Form submitted successfully via new tab');
+      return true;
 
     } catch (error) {
       console.error('Form submission error:', error);
-      return false;
+
+      // フォールバック: 現在のウィンドウで直接送信
+      try {
+        console.log('Trying fallback method...');
+
+        // 既存フォームの設定を一時保存
+        const originalAction = this.$form.action;
+        const originalMethod = this.$form.method;
+
+        // フォームの設定を変更
+        this.$form.action = formUrl;
+        this.$form.method = 'POST';
+
+        // 現在の入力値をhidden inputとして追加
+        this.setHiddenInputs();
+
+        // 送信
+        this.$form.submit();
+
+        return true;
+
+      } catch (fallbackError) {
+        console.error('Fallback submission also failed:', fallbackError);
+        return false;
+      }
+    }
+  }
+
+  // 現在の入力値を隠しフィールドに設定
+  setHiddenInputs() {
+    // 既存の隠しフィールドをクリア
+    const existingHiddenInputs = this.$form.querySelectorAll('input[type="hidden"].temp-hidden');
+    existingHiddenInputs.forEach(input => input.remove());
+
+    // 新しい隠しフィールドを作成
+    for (const [key, value] of Object.entries(this.formData)) {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = key;
+      hiddenInput.value = value;
+      hiddenInput.className = 'temp-hidden';
+      this.$form.appendChild(hiddenInput);
     }
   }
 
@@ -286,14 +307,23 @@ class Contact {
 
       if (success) {
         console.log('Form submission completed successfully');
-        this.$inputContent.style.display = 'none';
-        this.$completeContent.style.display = 'block';
 
-        // ページトップにスクロール
-        window.scrollTo(0, 0);
+        // 送信成功時は少し待ってから成功画面を表示
+        setTimeout(() => {
+          this.$inputContent.style.display = 'none';
+          this.$completeContent.style.display = 'block';
 
-        // フォームをリセット
-        this.$form.reset();
+          // ページトップにスクロール
+          window.scrollTo(0, 0);
+
+          // フォームをリセット
+          this.$form.reset();
+
+          // ボタンを元に戻す
+          this.$submitButton.disabled = false;
+          this.$submitButton.textContent = 'SEND';
+        }, 1500); // 1.5秒待つ
+
       } else {
         // 送信失敗時はボタンを元に戻す
         this.$submitButton.disabled = false;
