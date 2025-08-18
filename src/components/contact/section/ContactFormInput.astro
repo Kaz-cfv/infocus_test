@@ -10,16 +10,16 @@ const categoryOptions = [
   { slug: 'other', value: 'Other', label: 'Other', checked: false }
 ];
 
-const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7LdXPCIVunEOjq7h63Xhs2JiQ/formResponse';
+const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL1qTB3vVyWZ4mIUfVOFbdFarZ9NQ/formResponse';
 ---
 
 <div class="contact__content" data-state="input">
   <form class="p-contact-form__form contact__form" id="inquiryForm" action={url} method="POST">
 
     <!-- Category Selection -->
-    <div class="contact__item --require" data-fields="entry.89439866">
+    <div class="contact__item --require" data-fields="entry.6962889">
       <FormRadio
-        name="entry.89439866"
+        name="entry.6962889"
         label="Category"
         options={categoryOptions}
         required
@@ -29,9 +29,9 @@ const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7L
     </div>
 
     <!-- Name Field -->
-    <div class="contact__item --require" data-fields="entry.1493719364">
+    <div class="contact__item --require" data-fields="entry.315956304">
       <FormInput
-        id="entry.1493719364"
+        id="entry.315956304"
         label="Name"
         type="text"
         required
@@ -43,9 +43,9 @@ const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7L
     </div>
 
     <!-- Company Field -->
-    <div class="contact__item" data-fields="entry.249789765">
+    <div class="contact__item" data-fields="entry.2098499189">
       <FormInput
-        id="entry.249789765"
+        id="entry.2098499189"
         label="Your Company"
         type="text"
         placeholder=""
@@ -56,9 +56,9 @@ const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7L
     </div>
 
     <!-- Email Field -->
-    <div class="contact__item --require" data-fields="entry.1765707690">
+    <div class="contact__item --require" data-fields="entry.1584875005">
       <FormInput
-        id="entry.1765707690"
+        id="entry.1584875005"
         label="Email"
         type="email"
         required
@@ -70,9 +70,9 @@ const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7L
     </div>
 
     <!-- Title Field -->
-    <div class="contact__item" data-fields="entry.1361160307">
+    <div class="contact__item" data-fields="entry.939554866">
       <FormInput
-        id="entry.1361160307"
+        id="entry.939554866"
         label="Title"
         type="text"
         placeholder=""
@@ -82,9 +82,9 @@ const url = 'https://docs.google.com/forms/d/e/1FAIpQLScXoU05Fxc2EftUIPQoqoKSQ7L
     </div>
 
     <!-- Message Field -->
-    <div class="contact__item --require" data-fields="entry.1056102378">
+    <div class="contact__item --require" data-fields="entry.668384495">
       <FormTextarea
-        id="entry.1056102378"
+        id="entry.668384495"
         label="Message"
         required
         placeholder=""
