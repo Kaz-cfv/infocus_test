@@ -1,0 +1,42 @@
+---
+export interface Props {
+  image: any;
+  caption?: string;
+  maxWidth?: string;
+}
+
+const { image, caption = '', maxWidth = '' } = Astro.props;
+
+const imageUrl = image?.url;
+const imageAlt = image?.alt || caption || 'Project image';
+---
+
+<figure class="c-single-image" style={maxWidth ? `max-width: ${maxWidth}` : ''}>
+  <img src={imageUrl} alt={imageAlt} />
+  {caption && (
+    <figcaption>{caption}</figcaption>
+  )}
+</figure>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+
+.c-single-image {
+  margin-block-end: 30px;
+  @include me.sp {
+    margin-block-end: 20px;
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+
+  figcaption {
+    display: inline-block;
+    font-size: 1.1rem;
+    margin-block-start: 20px;
+    color: var(--c-gray-light);
+  }
+}
+</style>

@@ -1,0 +1,141 @@
+---
+import InterviewCard from "../parts/InterviewCard.astro";
+---
+
+<aside class="p-jobs-aside">
+  <h2 class="p-jobs-aside__title">(STAFF INTERVIEW)</h2>
+
+  <div class="p-jobs-aside__content">
+    <ul class="p-jobs-aside__list js-more-content">
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+      <li class="p-jobs-aside__list-item js-more-item">
+        <InterviewCard />
+      </li>
+    </ul>
+
+    <div class="p-jobs-aside__btn">
+      <button class="js-more">
+        <span>VIEW ALL</span>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-jobs-aside {
+  border-top: solid 1px var(--c-white);
+  @include me.pc {
+    padding-block: 80px 100px;
+  }
+  @include me.sp {
+    padding-block-start: 60px;
+  }
+
+  &__title {
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    letter-spacing: -0.02rem;
+    text-align: center;
+    @include me.sp {
+      font-size: 2.2rem;
+    }
+  }
+
+  &__content {
+    display: grid;
+    row-gap: 50px;
+    margin-block-start: 70px;
+    @include me.sp {
+      margin-block-start: 28px;
+    }
+  }
+
+  &__list {
+    display: grid;
+    row-gap: 50px;
+    padding-inline: 40px;
+    @include me.pc {
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 30px;
+    }
+    @include me.sp {
+      padding-inline: 20px;
+    }
+  }
+
+  &__list-item {
+    &.is-hidden {
+      display: none;
+    }
+  }
+
+  &__btn {
+    padding-inline: 40px;
+    @include me.pc {
+      text-align: right;
+    }
+    @include me.sp {
+      text-align: center;
+    }
+
+    button {
+      color: var(--c-white);
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.4;
+      letter-spacing: -0.02rem;
+    }
+
+    span {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+      }
+    }
+  }
+}
+
+</style>

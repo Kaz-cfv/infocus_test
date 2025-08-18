@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Article from '../../components/team-detail/section/Article.astro';
+
+export async function getStaticPaths() {
+  try {
+    // 静的JSONファイルからチームデータを取得
+    const response = await fetch('https://infocus.wp.site-prev2.com/api/team.json');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const teamData = await response.json();
+    const teamArray = Array.isArray(teamData) ? teamData : [teamData];
+
+    // 各チームメンバーのパスを生成
+    return teamArray
+      .filter(item => item.title && item.slug)
+      .map((item) => ({
+        params: { slug: item.slug },
+        props: {
+          member: {
+            id: item.id,
+            slug: item.slug,
+            name: item.title.trim(),
+            image: item.acfs?.image?.url || '/common/images/team/default.png',
+            description: item.acfs?.html || '',
+            position: item.acfs?.position || '',
+            positionTags: item.acfs && item.acfs['position-tag'] && Array.isArray(item.acfs['position-tag'])
+              ? item.acfs['position-tag']
+              : [],
+            sns: item.acfs && item.acfs.sns && Array.isArray(item.acfs.sns)
+              ? item.acfs.sns
+              : [],
+            interview: item.acfs && item.acfs.interview && Array.isArray(item.acfs.interview) && item.acfs.interview.length > 0
+              ? item.acfs.interview[0]
+              : null
+          }
+        }
+      }));
+  } catch (error) {
+    console.error('❌ Failed to generate team static paths:', error);
+    return [];
+  }
+}
+
+const { member } = Astro.props;
+
+// Positionデータを整形（一覧と同じロジック）
+const positionData = [];
+
+// acfs.positionが存在し、空でない場合は最初に追加
+if (member.position && member.position.trim() !== '') {
+  positionData.push({
+    caption: member.position.trim()
+  });
+}
+
+// position-tagを追加
+if (member.positionTags && member.positionTags.length > 0) {
+  member.positionTags.forEach(tag => {
+    positionData.push({
+      caption: tag.name || ''
+    });
+  });
+}
+
+// SNSリンクデータを整形
+const linksData = [];
+if (member.sns && member.sns.length > 0) {
+  member.sns.forEach(snsItem => {
+    if (snsItem.url && snsItem.url.trim() !== '') {
+      const url = snsItem.url.trim();
+
+      // ドメインを判定してtype、caption、snsTypeを設定
+      let type = 'text';
+      let caption = 'Website';
+      let snsType = 'website';
+
+      if (url.includes('instagram.com')) {
+        type = 'icon';
+        caption = 'Instagram';
+        snsType = 'instagram';
+      } else if (url.includes('x.com') || url.includes('twitter.com')) {
+        type = 'icon';
+        caption = 'X';
+        snsType = 'x';
+      } else if (url.includes('note.com')) {
+        type = 'icon';
+        caption = 'note';
+        snsType = 'note';
+      } else if (url.includes('threads.net') || url.includes('threads.com')) {
+        type = 'icon';
+        caption = 'Threads';
+        snsType = 'threads';
+      } else if (url.includes('spotify.com')) {
+        type = 'icon';
+        caption = 'Spotify';
+        snsType = 'spotify';
+      }
+
+      linksData.push({
+        type: type,
+        caption: caption,
+        url: url,
+        snsType: snsType
+      });
+    }
+  });
+}
+
+// インタビューデータを整形
+let interviewData = null;
+if (member.interview) {
+  interviewData = {
+    title: member.interview.post_title || '',
+    description: member.interview.post_content || member.interview.post_excerpt || '',
+    pic: '/common/images/dummy/team_detail_interview.png', // 一旦ダミー画像を使用
+    url: member.interview.guid || '#'
+  };
+}
+
+const pageMeta = {
+  title: `${member.name} | TEAM`,
+  description: member.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+  ogpType: "article"
+};
+---
+
+<Layout
+  title=""
+  pageName="team-detail"
+  meta={pageMeta}
+>
+
+<Article
+  pic={member.image}
+  name={member.name}
+  position={positionData}
+  description={member.description}
+  links={linksData}
+  interview={interviewData}
+/>
+
+</Layout>

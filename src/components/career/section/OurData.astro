@@ -1,0 +1,257 @@
+---
+import Chart from "../parts/Chart.astro";
+import StatCard from "../parts/StatCard.astro";
+
+interface ProjectData {
+  year: number;
+  count: number;
+}
+
+interface TeamData {
+  category: string;
+  count: number;
+}
+
+// データ定義
+const annualProjects: ProjectData[] = [
+  { year: 2022, count: 175 },
+  { year: 2023, count: 273 },
+  { year: 2024, count: 340 }
+];
+
+const teamComposition: TeamData[] = [
+  { category: "Web", count: 16 },
+  { category: "Movie", count: 9 },
+  { category: "Graphic", count: 4 },
+  { category: "Edit", count: 3 },
+  { category: "Back Office", count: 2 },
+  { category: "CONTRAST", count: 1 },
+  { category: "NY", count: 2 }
+];
+
+const demographics = {
+  averageAge: 35,
+  genderRatio: "6:4",
+  overseasExperience: 10,
+  noExperience: 11,
+  totalMembers: 37
+};
+
+// セクションタイトル定義
+const sectionTitles = {
+  ourData: "OUR DATA",
+  date: "(2025年9月調べ)",
+  annualProjects: "年間案件数",
+  annualProjectsSubtitle: "（直近3年間）",
+  teamComposition: "チーム人数比",
+  averageAge: "平均年齢",
+  genderRatio: "男女比",
+  overseasExperience: "海外在住経験者",
+  overseasExperienceSub: "(2年以上）",
+  noExperience: "入社時未経験者"
+};
+---
+
+<section id="our_data" class="p-career-ourData">
+  <div class="p-career-ourData__inner" data-inner="1">
+    <div class="p-career-ourData__item p-career-ourData__head" data-item="head">
+      <h2 class="p-career-ourData__title">{sectionTitles.ourData}</h2>
+      <span class="p-career-ourData__date">{sectionTitles.date}</span>
+    </div>
+
+    <div class="p-career-ourData__item" data-item="chart">
+      <h3 class="p-career-ourData__caption">
+        {sectionTitles.annualProjects}
+        <span>{sectionTitles.annualProjectsSubtitle}</span>
+      </h3>
+      <div class="chart">
+        <Chart data={annualProjects} />
+      </div>
+    </div>
+
+    <div class="p-career-ourData__item" data-item="graph">
+      <h3 class="p-career-ourData__caption">
+        {sectionTitles.teamComposition}
+      </h3>
+      <div class="graph">
+        <figure>
+          <img src="/common/images/career/graph.png" alt={sectionTitles.teamComposition}>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-career-ourData__inner" data-inner="2">
+    <div class="p-career-ourData__item" data-item="age">
+      <StatCard
+        title={sectionTitles.averageAge}
+        value={demographics.averageAge}
+        unit="歳"
+        type="number"
+      />
+    </div>
+    <div class="p-career-ourData__item" data-item="gendar">
+      <StatCard
+        title={sectionTitles.genderRatio}
+        value={demographics.genderRatio}
+        description="<span>Male</span><span>Female</span>"
+        type="ratio"
+      />
+    </div>
+    <div class="p-career-ourData__item" data-item="overseas">
+      <StatCard
+        title={sectionTitles.overseasExperience}
+        subtitle={sectionTitles.overseasExperienceSub}
+        value={demographics.overseasExperience}
+        unit="人"
+        type="number"
+      />
+    </div>
+    <div class="p-career-ourData__item" data-item="beginer">
+      <StatCard
+        title={sectionTitles.noExperience}
+        value={demographics.noExperience}
+        unit="人"
+        type="number"
+      />
+    </div>
+  </div>
+</section>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-career-ourData {
+  position: relative;
+  border-top: solid 2px var(--c-gray);
+  color: var(--c-white);
+
+  &__inner {
+    &[data-inner="1"] {
+      @include me.pc {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    &[data-inner="2"] {
+      display: grid;
+      @include me.pc {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      @include me.sp {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .p-career-ourData__item {
+        @include me.pc {
+          &:not(:last-child) {
+            border-right: solid 1px var(--c-gray02);
+          }
+        }
+        @include me.sp {
+          &:not(:nth-child(2n)) {
+            border-right: solid 1px var(--c-gray02);
+          }
+        }
+      }
+    }
+  }
+
+  &__item {
+    padding-inline: 40px;
+    padding-block: 40px 60px;
+    border-bottom: solid 1px var(--c-gray02);
+    @include me.sp {
+      padding-inline: 20px;
+      padding-block: 50px;
+    }
+  }
+
+  &__head {
+    display: flex;
+    align-items: baseline;
+    column-gap: 12px;
+    @include me.sp {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+
+  &__title {
+    font-size: 5.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    @include me.sp {
+      font-size: 3.4rem;
+    }
+  }
+
+  &__date {
+    font-size: 1.4rem;
+    line-height: 0.96;
+  }
+
+  &__caption {
+    font-family: var(--f-jp);
+    font-size: 1.8rem;
+    line-height: 0.96;
+    @include me.sp {
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    span {
+      font-size: 1.4rem;
+    }
+  }
+
+  .chart {
+    margin-block-start: 40px;
+  }
+
+  .graph {
+    margin-block-start: 26px;
+    @include me.pc {
+      max-width: 432px;
+    }
+    @include me.sp {
+      margin-inline-end: 20px;
+      margin-block-start: 40px;
+    }
+  }
+
+  [data-item="head"] {
+    padding-block-start: 100px;
+    @include me.pc {
+      grid-column: 1;
+      grid-row: 1;
+      border-right: solid 1px var(--c-gray02);
+    }
+    @include me.sp {
+      padding-block-start: 80px;
+    }
+  }
+  [data-item="chart"] {
+    @include me.pc {
+      grid-column: 1;
+      grid-row: 2;
+      border-right: solid 1px var(--c-gray02);
+    }
+  }
+  [data-item="graph"] {
+    @include me.pc {
+      grid-column: 2;
+      grid-row: 1 / 3;
+    }
+  }
+  [data-item="beginer"] {
+    .c-stat-card__content {
+      @include me.sp {
+        margin-block-start: 49px;
+      }
+    }
+  }
+}
+</style>

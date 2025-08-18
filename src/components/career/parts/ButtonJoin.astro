@@ -1,0 +1,30 @@
+---
+---
+
+<a href="/contact/" class="c-button-join">
+  <span>JOIN US</span>
+</a>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-button-join {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 56px;
+  border-radius: 6px;
+  background-color: var(--c-white);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.8;
+  @include me.pc {
+    transition: opacity .3s var(--ease-out-quad);
+    &:hover {
+      opacity: .7;
+    }
+  }
+}
+
+</style>

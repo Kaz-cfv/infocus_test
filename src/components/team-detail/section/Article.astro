@@ -4,63 +4,55 @@ import FixedNavi from "../parts/FixedNavi.astro";
 import Projects from "./Projects.astro";
 import Interview from "./Interview.astro";
 
-const article = {
-  pic: '/common/images/team/02.png',
-  name: 'Sakurako Yamada',
-  position: [
-    {
-      caption: 'Assistant Web Director',
-    },
-    {
-      caption: 'Web Designer',
-    },
-  ],
-  description: '<p>大学で服飾を学んだ後、アパレル会社に入社。<br>ファッションに限らず幅広くデザインに携われる仕事がしたい思い、Webデザインを学び始める。<br>その後2024年にIN FOCUSに入社。<br><a href="#" target="_blank" rel="noopener noreferrer">Midia Interview</a><br><a href="#" target="_blank" rel="noopener noreferrer">CINRA Interview</a></p>',
-  links: [
-    {
-      type: 'icon',
-      caption: 'Instagram',
-      url: '#',
-    },
-    {
-      type: 'text',
-      caption: 'Website',
-      url: '#',
-    },
-    {
-      type: 'text',
-      caption: 'Interview',
-      url: '#',
-    },
-  ],
-  interview: {
-    title: '世界観を捉え、デザインに宿す ─ 槻舘翼（アートディレクター・グラフィックデザイナー）',
-    description: '<p>日経広告賞のアニバーサリー部門最優秀賞を受賞した「相鐵 創業60周年記念広告」のほか、さまざまなアートディレクション・グラフィックに携わる槻舘に、制作背景やデザインに対するこだわりについて話してもらいました。</p>',
-    pic: '/common/images/dummy/team_detail_interview.png',
-    url: '#',
-  },
+interface Position {
+  caption: string;
 }
+
+interface Links {
+  type: string;
+  caption: string;
+  url: string;
+  snsType?: string;
+}
+
+interface InterviewData {
+  title?: string;
+  description?: string;
+  pic?: string;
+  url?: string;
+}
+
+interface Props {
+  pic: string;
+  name: string;
+  position: Position[];
+  description: string;
+  links: Links[];
+  interview?: InterviewData;
+}
+
+const { pic, name, position, description, links, interview } = Astro.props;
 ---
 
 <article class="p-team-detail-article">
   <section class="p-team-detail-article__head">
     <figure class="p-team-detail-article__pic">
-      <img src={article.pic} alt={article.name}>
+      <img src={pic} alt={name}>
     </figure>
     <About
-      name={article.name}
-      position={article.position}
-      description={article.description}
-      links={article.links}
+      name={name}
+      position={position}
+      description={description}
+      links={links}
     />
   </section>
   <Projects />
-  {article.interview && article.interview.title && (
+  {interview && interview.title && (
     <Interview
-      title={article.interview.title}
-      description={article.interview.description}
-      pic={article.interview.pic}
-      url={article.interview.url}
+      title={interview.title}
+      description={interview.description}
+      pic={interview.pic}
+      url={interview.url}
     />
   )}
   <div class="p-team-detail-article__navi">

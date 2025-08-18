@@ -1,0 +1,381 @@
+---
+// FormFileUpload.astro - 汎用ファイルアップロードコンポーネント
+// Usage: <FormFileUpload id="files" accept=".pdf,.jpg,.jpeg,.mp4" maxSizeMB={10} multiple />
+
+export interface Props {
+  id: string;
+  label?: string;
+  accept?: string;
+  multiple?: boolean;
+  maxSizeMB?: number;
+  maxFiles?: number;
+  required?: boolean;
+  disabled?: boolean;
+  buttonText?: string;
+  noteText?: string;
+  className?: string;
+}
+
+const {
+  id,
+  label,
+  accept = '.pdf,.jpg,.jpeg,.mp4',
+  multiple = true,
+  maxSizeMB = 10,
+  maxFiles = 5,
+  required = false,
+  disabled = false,
+  buttonText = '+Upload files',
+  noteText,
+  className = '',
+} = Astro.props;
+
+// デフォルトのnoteText生成
+const defaultNoteText = `Max ${maxSizeMB}MB (${accept.replace(/\./g, '').replace(/,/g, ', ')})`;
+const displayNoteText = noteText || defaultNoteText;
+
+// name属性（idと同じ値を使用）
+const name = multiple ? `${id}[]` : id;
+---
+
+<div class={`c-form-file-upload ${className}`}>
+  {label && (
+    <label class="c-form-file-upload__label">
+      {required ? `${label}*` : label}
+    </label>
+  )}
+
+  <div class="c-form-file-upload__wrapper">
+    <input
+      type="file"
+      id={id}
+      name={name}
+      class="c-form-file-upload__input"
+      accept={accept}
+      multiple={multiple}
+      required={required}
+      disabled={disabled}
+      data-max-size={maxSizeMB * 1024 * 1024}
+      data-max-files={maxFiles}
+    />
+
+    <label for={id} class="c-form-file-upload__button">
+      {buttonText}
+    </label>
+
+    <span class="c-form-file-upload__note">
+      {displayNoteText}
+    </span>
+  </div>
+
+  <!-- ファイル一覧表示エリア -->
+  <div class="c-form-file-upload__files" id={`${id}-files`}>
+    <!-- JSで動的に追加される -->
+  </div>
+
+  <!-- エラーメッセージ表示エリア -->
+  <div class="c-form-file-upload__error" id={`${id}-error`}>
+    <!-- JSで動的に追加される -->
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-form-file-upload {
+
+  &__label {
+    display: block;
+    color: var(--c-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+    @include me.sp {
+      column-gap: 24px;
+    }
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__button {
+    display: inline-block;
+    padding-inline: 19px;
+    padding-block: 10px;
+    border: 1px solid var(--c-white);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--c-white);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    &:hover {
+      background-color: var(--c-white);
+      color: var(--c-black);
+    }
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  &__note {
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  // ファイル一覧エリア
+  &__files {
+    margin-top: 16px;
+    display: none;
+  }
+
+  &__file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background-color: #222222;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__file-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #2a2a2a;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__file-name {
+    flex: 1;
+    font-family: var(--f-en);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--c-white);
+    margin-right: 12px;
+    word-break: break-all;
+  }
+
+  &__file-size {
+    font-family: var(--f-en);
+    font-size: 1.2rem;
+    color: var(--c-gray);
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  &__remove-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--c-gray);
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--c-gray);
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    &:hover {
+      background-color: var(--c-input-error);
+      border-color: var(--c-input-error);
+      color: var(--c-white);
+    }
+  }
+
+  // エラーメッセージエリア
+  &__error {
+    margin-top: 16px;
+    display: none;
+  }
+
+  &__error-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      font-family: var(--f-en);
+      font-size: 1.2rem;
+      color: var(--c-input-error);
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // 無効化状態
+  &:has(&__input:disabled) {
+    opacity: 0.5;
+
+    .c-form-file-upload__button {
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: transparent;
+        color: var(--c-white);
+      }
+    }
+  }
+}
+</style>
+
+<script>
+// ファイルアップロード機能
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInputs = document.querySelectorAll('.c-form-file-upload__input');
+
+  fileInputs.forEach(input => {
+    const container = input.closest('.c-form-file-upload');
+    const filesContainer = container?.querySelector('.c-form-file-upload__files');
+    const errorContainer = container?.querySelector('.c-form-file-upload__error');
+    const maxSize = parseInt(input.dataset.maxSize || '0');
+    const maxFiles = parseInt(input.dataset.maxFiles || '5');
+
+    let selectedFiles = [];
+
+    input.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      const errors = [];
+
+      // ファイル数チェック
+      if (files.length > maxFiles) {
+        errors.push(`ファイルは最大${maxFiles}個まで選択できます。`);
+      }
+
+      // ファイルサイズチェック
+      files.forEach(file => {
+        if (file.size > maxSize) {
+          const maxSizeMB = Math.round(maxSize / (1024 * 1024));
+          errors.push(`"${file.name}" のサイズが大きすぎます。（最大${maxSizeMB}MB）`);
+        }
+      });
+
+      // エラー表示
+      if (errors.length > 0) {
+        showErrors(errorContainer, errors);
+        input.value = ''; // 入力をクリア
+        return;
+      }
+
+      // エラークリア
+      clearErrors(errorContainer);
+
+      // 選択されたファイルを保存
+      selectedFiles = files;
+
+      // ファイル一覧表示
+      displayFiles(filesContainer, files, input);
+    });
+  });
+
+  function displayFiles(container, files, input) {
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (files.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'block';
+
+    const fileList = document.createElement('ul');
+    fileList.className = 'c-form-file-upload__file-list';
+
+    files.forEach((file, index) => {
+      const listItem = document.createElement('li');
+      listItem.className = 'c-form-file-upload__file-item';
+
+      const fileName = document.createElement('span');
+      fileName.className = 'c-form-file-upload__file-name';
+      fileName.textContent = file.name;
+
+      const fileSize = document.createElement('span');
+      fileSize.className = 'c-form-file-upload__file-size';
+      fileSize.textContent = formatFileSize(file.size);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'c-form-file-upload__remove-btn';
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', () => {
+        removeFile(index, input, container);
+      });
+
+      listItem.appendChild(fileName);
+      listItem.appendChild(fileSize);
+      listItem.appendChild(removeBtn);
+      fileList.appendChild(listItem);
+    });
+
+    container.appendChild(fileList);
+  }
+
+  function removeFile(index, input, container) {
+    // DataTransferを使ってファイルリストを更新
+    const dt = new DataTransfer();
+    const files = Array.from(input.files || []);
+
+    files.forEach((file, i) => {
+      if (i !== index) {
+        dt.items.add(file);
+      }
+    });
+
+    input.files = dt.files;
+    displayFiles(container, Array.from(dt.files), input);
+  }
+
+  function showErrors(container, errors) {
+    if (!container) return;
+
+    container.innerHTML = '';
+    container.style.display = 'block';
+
+    const errorList = document.createElement('ul');
+    errorList.className = 'c-form-file-upload__error-list';
+
+    errors.forEach(error => {
+      const listItem = document.createElement('li');
+      listItem.textContent = error;
+      errorList.appendChild(listItem);
+    });
+
+    container.appendChild(errorList);
+  }
+
+  function clearErrors(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    container.style.display = 'none';
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+});
+</script>

@@ -1,0 +1,67 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CeoArticle from '../../../components/career/section/CeoArticle.astro';
+import AsideInterview from '../../../components/career/section/AsideInterview.astro';
+import Navi from '../../../components/career/parts/Navi.astro';
+
+const pageMeta = {
+  title: "CEO Message",
+};
+---
+
+<Layout
+  title=""
+  pageName="jobs"
+  meta={pageMeta}
+>
+
+<div class="p-jobs-content">
+  <div class="p-jobs-content__left">
+    <div class="p-jobs-content__left-inner">
+      <CeoArticle />
+      <AsideInterview />
+    </div>
+  </div>
+  <div class="p-jobs-content__right">
+    <Navi />
+  </div>
+</div>
+
+</Layout>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-jobs-content {
+  display: grid;
+  @include me.pc {
+    grid-template-columns: 1fr 278px;
+  }
+
+  &__left {
+    @include me.pc {
+      border-right: solid 1px var(--c-white);
+    }
+
+    &-inner {
+      @include me.sp {
+        padding-block-end: 100px;
+      }
+    }
+  }
+
+  &__right {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-block-end: 90px;
+    @include me.sp {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+</style>

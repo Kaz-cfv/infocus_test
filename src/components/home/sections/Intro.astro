@@ -1,5 +1,4 @@
 ---
-import { ENDPOINTS } from '../../../assets/js/api/Endpoints.js';
 
 // サーバーサイドでHomeデータを取得
 let categories = [];
@@ -7,8 +6,8 @@ let totalProjects = 0;
 let debugInfo = { status: 'loading', error: null, categoriesCount: 0 };
 
 try {
-  // Astroのサーバーサイドでfetchを直接使用
-  const response = await fetch(ENDPOINTS.HOME);
+  // 静的JSONファイルを直接読み込み
+  const response = await fetch('https://infocus.wp.site-prev2.com/api/home.json');
 
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -91,7 +90,7 @@ console.log('🎯 Final render data:', {
 </div>
 
 <!-- 詳細デバッグ情報（開発時のみ） -->
-{import.meta.env.MODE === 'development' && (
+<!-- {import.meta.env.MODE === 'development' && (
   <script define:vars={{ categories, totalProjects, debugInfo }}>
     console.group('🏷️ Category Render Debug');
     console.log('Debug Info:', debugInfo);
@@ -115,7 +114,7 @@ console.log('🎯 Final render data:', {
       console.groupEnd();
     }, 100);
   </script>
-)}
+)} -->
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;

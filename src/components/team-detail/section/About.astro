@@ -7,6 +7,7 @@ interface Links {
   type: string;
   caption: string;
   url: string;
+  snsType?: string;
 }
 
 interface Props {
@@ -33,7 +34,7 @@ const { name, position, description, links } = Astro.props;
     {links && links.length > 0 && (
       <ul class="p-team-detail__about-link">
         {links.map((link) => (
-          <li data-link={link.type}>
+          <li data-link={link.type} data-sns-type={link.snsType}>
             <a href={link.url} target="_blank" rel="noopener noreferrer">{link.caption}</a>
           </li>
         ))}
@@ -127,8 +128,10 @@ const { name, position, description, links } = Astro.props;
 
   &-link {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     column-gap: 24px;
+    row-gap: 12px;
     margin-block-start: 40px;
     @include me.sp {
       column-gap: 20px;
@@ -145,11 +148,29 @@ const { name, position, description, links } = Astro.props;
           width: 100%;
           height: 100%;
           font-size: 0;
-          background-image: url(/common/images/common/icon_instagram_w.svg);
           background-position: center center;
           background-repeat: no-repeat;
           background-size: cover;
         }
+      }
+      &[data-sns-type="instagram"] a {
+        background-image: url(/common/images/common/icon_instagram_w.svg);
+      }
+      &[data-sns-type="x"] a {
+        background-image: url(/common/images/common/icon_x_w.svg);
+      }
+      &[data-sns-type="note"] a {
+        background-image: url(/common/images/common/icon_note_w.svg);
+      }
+      &[data-sns-type="threads"] a {
+        background-image: url(/common/images/common/icon_threads_w.svg);
+      }
+      &[data-sns-type="spotify"] a {
+        background-image: url(/common/images/common/icon_spotify_w.svg);
+      }
+      &[data-sns-type="threads"],
+      &[data-sns-type="spotify"] {
+        display: none;
       }
       &[data-link="text"] {
         a {

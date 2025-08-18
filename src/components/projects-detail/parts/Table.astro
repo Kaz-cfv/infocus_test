@@ -60,7 +60,7 @@ const {
     </dt>
     <dd data-field="service">
       {service.map(service => (
-        <a href={service.url} class="--text">{service.name}</a>
+        <a href={`/projects/?category=${service.name}`} class="--text">{service.name}</a>
       ))}
     </dd>
   </dl>

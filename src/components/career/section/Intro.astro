@@ -1,0 +1,140 @@
+---
+---
+
+<div id="intro" class="p-career-intro">
+  <div class="p-career-intro__heading">
+    <span class="p-career-intro__heading-sub">We are the</span>
+    <p class="p-career-intro__heading-main">
+      <span>INDIPENDENT</span>
+      <i></i>
+      <span>COLLECTIVE</span>
+    </p>
+  </div>
+
+  <div class="p-career-intro__about">
+    <span class="p-career-intro__about-caption">我々は“独立した集団”です</span>
+    <p class="p-career-intro__about-desc">
+      「IFAZ」とはインフォーカスの構成要素を記号化するという考え方。<br>
+      例えばWebチームのことは、IFWD（IN FOCUS WEB DEPARTMENT）という呼び方にしています。今まで部門ごとに別れていたチームが、個々に散りばめられるイメージです。「IFAZ」の「IF」はインフォーカス、「AZ」はA to Z(インフォーカスにまつわるA to Z)を表しています。
+    </p>
+  </div>
+
+  <div class="p-career-intro__bg">
+    <picture>
+      <source media="(min-width: 769px)" srcset="/common/images/career/bg.png">
+      <img src="/common/images/career/bg.png" alt="">
+    </picture>
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-career-intro {
+  display: flex;
+  flex-direction: column;
+  row-gap: 80px;
+  position: relative;
+  padding-block: 100px;
+  @include me.pc {
+    padding-inline-start: 40px;
+  }
+  @include me.sp {
+    padding-inline: 20px;
+  }
+
+  &__heading {
+    display: grid;
+    row-gap: 34px;
+    position: relative;
+    z-index: 2;
+    @include me.sp {
+      row-gap: 14px;
+    }
+
+    &-sub {
+      font-size: 4rem;
+      line-height: 1.1;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+
+    &-main {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 11rem;
+      font-weight: 600;
+      line-height: 0.95;
+      @include me.pc {
+        gap: 30px;
+      }
+      @include me.sp {
+        column-gap: 16px;
+        font-size: 4.4rem;
+      }
+
+      span {
+        display: block;
+        &:first-child {
+          width: 100%;
+        }
+      }
+
+      i {
+        display: inline-block;
+        width: 100px;
+        height: 10px;
+        margin-inline-start: 27px;
+        margin-block-start: 16px;
+        background-color: var(--c-white);
+        @include me.sp {
+          width: 44px;
+          height: 4px;
+          margin-inline-start: 10px;
+          margin-block-start: 6px;
+        }
+      }
+    }
+  }
+
+  &__about {
+    display: grid;
+    row-gap: 24px;
+    position: relative;
+    z-index: 2;
+    font-family: var(--f-jp);
+    @include me.pc {
+      align-self: flex-end;
+      max-width: 46.0344%;
+      margin-inline-end: 173px;
+    }
+
+    &-caption {
+      font-size: 1.8rem;
+      line-height: 1.8;
+    }
+
+    &-desc {
+      font-size: 1.4rem;
+      line-height: 1.8;
+    }
+  }
+
+  &__bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+
+    img {
+      object-fit: cover;
+    }
+  }
+}
+</style>

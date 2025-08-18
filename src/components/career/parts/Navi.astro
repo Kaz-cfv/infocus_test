@@ -1,0 +1,139 @@
+---
+import ButtonJoin from "./ButtonJoin.astro";
+
+const navi = {
+  anchor: [
+    {
+      slug: 'intro',
+      caption: 'WHO WE ARE'
+    },
+    {
+      slug: 'position',
+      caption: 'OPEN POSITIONS'
+    },
+    {
+      slug: 'message',
+      caption: 'CEO MESSAGE'
+    },
+    {
+      slug: 'interview',
+      caption: 'STAFF INTERVIEWS'
+    },
+    {
+      slug: 'our_data',
+      caption: 'OUR DATA'
+    },
+  ],
+  sns: [
+    {
+      name: 'instagram',
+      url: 'https://www.instagram.com/in_focus_inc/'
+    },
+    {
+      name: 'twitter',
+      url: 'https://twitter.com/InFocus_Inc'
+    },
+    {
+      name: 'note',
+      url: 'https://note.com/infocusinc/'
+    },
+    {
+      name: 'fb',
+      url: 'https://www.facebook.com/infocusjp/'
+    },
+  ]
+}
+---
+
+<nav class="career-navi">
+  <ul class="career-navi__anchor">
+    {navi.anchor.map((item => (
+      <li class="career-navi__anchor-item" data-anchor={item.slug}>
+        <a href={`/careers/?id=${item.slug}`}>{item.caption}</a>
+      </li>
+    )))}
+  </ul>
+
+  <div class="career-navi__btn">
+    <ButtonJoin />
+  </div>
+
+  <ul class="career-navi__sns">
+    {navi.sns.map((item => (
+      <li class="career-navi__sns-item">
+        <a href={item.url} target="_blank" rel="noopener noreferrer" class="career-navi__sns-icon" data-sns={item.name}>{item.name}</a>
+      </li>
+    )))}
+  </ul>
+</nav>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.career-navi {
+  display: grid;
+  row-gap: 24px;
+  position: sticky;
+  top: var(--hd-height-pc-scrolled);
+  right: 0;
+
+  a {
+    color: var(--c-white);
+  }
+}
+
+.career-navi__anchor {
+
+  &-item {
+    border-bottom: solid 1px var(--c-gray02);
+
+    a {
+      display: block;
+      padding-inline: 20px;
+      padding-block: 18px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+  }
+}
+
+.career-navi__btn {
+  padding-inline: 20px;
+}
+
+.career-navi__sns {
+  display: flex;
+  align-items: center;
+  column-gap: 14px;
+  padding-inline: 20px;
+
+  &-item {}
+
+  &-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    font-size: 0;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    &[data-sns="instagram"] {
+      background-image: url(/common/images/common/icon_instagram_w.svg);
+    }
+    &[data-sns="twitter"] {
+      background-image: url(/common/images/common/icon_x_w.svg);
+    }
+    &[data-sns="note"] {
+      background-image: url(/common/images/common/icon_note_w.svg);
+    }
+    &[data-sns="fb"] {
+      width: 8px;
+      background-image: url(/common/images/common/icon_fb_w.svg);
+    }
+  }
+}
+</style>

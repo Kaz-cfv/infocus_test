@@ -1,0 +1,105 @@
+---
+import Item from "./Item.astro";
+
+interface Props {
+  title: string;
+  category: string;
+  jobData: Array<{
+    label: string;
+    content: string | string[];
+  }>;
+}
+
+const { title, category, jobData } = Astro.props;
+---
+
+<div class="c-accordion">
+  <details class="c-accordion__wrap js-details">
+    <summary class="c-accordion__head js-summary">
+      <span class="c-accordion__head-title">{title}</span>
+      <span class="c-accordion__head-category">{category}</span>
+      <i class="c-accordion__head-icon">+</i>
+    </summary>
+    <div class="c-accordion__content js-content">
+      {jobData.map((item) => (
+        <Item label={item.label} content={item.content} />
+      ))}
+    </div>
+  </details>
+</div>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+details > summary,
+summary {
+  list-style: none;
+  &::-webkit-details-marker,
+  &::marker {
+    display: none;
+  }
+}
+
+.c-accordion {
+
+  &__wrap {
+    padding-block-end: 16px;
+    border-top: solid 1px var(--c-gray03);
+    border-bottom: solid 1px var(--c-gray03);
+  }
+
+  &__head {
+    display: grid;
+    align-items: center;
+    padding-block: 16px 0;
+    @include me.pc {
+      grid-template-columns: 383px 1fr max-content;
+      column-gap: 14px;
+      cursor: pointer;
+    }
+    @include me.sp {
+      grid-template-columns: calc(68.6842%) 1fr max-content;
+      column-gap: 20px;
+    }
+
+    &-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-category {
+      color: rgba($color: #FFFFFF, $alpha: 0.5);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.4rem;
+      }
+    }
+
+    &-icon {
+      font-size: 1.6rem;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  &__content {
+    display: grid;
+    row-gap: 32px;
+    padding-block: 36px;
+    @include me.pc {
+      margin-inline-start: calc(383px + 14px);
+    }
+  }
+}
+
+</style>

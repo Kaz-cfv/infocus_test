@@ -1,0 +1,69 @@
+---
+export interface Props {
+  images: Array<{
+    image: any;
+    caption?: string;
+    maxWidth?: string;
+  }>;
+  mobileColumns?: '1' | '2';
+}
+
+const { images, mobileColumns = '2' } = Astro.props;
+
+function getImageUrl(image: any): string {
+  if (image?.url) return image.url;
+  return image.url;
+}
+---
+
+<div class={`c-image-2columns ${mobileColumns === '1' ? 'c-image-2columns--mobile-single' : ''}`}>
+  {images.map((item) => (
+    <figure class="c-image-2columns__item">
+      <img
+        src={getImageUrl(item.image)}
+        alt={item.image?.alt || 'Project image'}
+        style={item.maxWidth ? `max-width: ${item.maxWidth}` : ''}
+      />
+      {item.caption && (
+        <figcaption>{item.caption}</figcaption>
+      )}
+    </figure>
+  ))}
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+
+.c-image-2columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  margin-block-end: 30px;
+
+  @include me.sp {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 20px;
+    margin-block-end: 20px;
+  }
+
+  &--mobile-single {
+    @include me.sp {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__item {
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    figcaption {
+      display: inline-block;
+      font-size: 1.1rem;
+      margin-block-start: 20px;
+      color: var(--c-gray-light);
+    }
+  }
+}
+</style>

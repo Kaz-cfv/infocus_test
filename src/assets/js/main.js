@@ -10,9 +10,13 @@ import { VideoManager } from './modules/VideoManager.js';
 import { VideoScrollController } from './modules/VideoScrollController.js';
 import { ShareButton } from './modules/ShareButton.js';
 import { LenisManager } from './modules/LenisManager.js';
+import AnchorLink from './modules/AnchorLink.js';
 import { Home } from './pages/Home.js';
 import { About } from './pages/About.js';
 import { TeamDetail } from './pages/TeamDetail.js';
+import { Career } from './pages/Career.js';
+import { Jobs } from './pages/Jobs.js';
+import Contact from './pages/Contact.js';
 // import { News } from './pages/News.js';
 
 class App {
@@ -38,9 +42,13 @@ class App {
       this.initMenu();
       this.initVideo();
       this.initShareButtons();
+      this.initAnchorLink();
       this.initHome();
       this.initAbout();
       this.initTeamDetail();
+      this.initCareer();
+      this.initJobs();
+      this.initContact();
       // this.initNews();
     } catch (error) {
       console.error('Error initializing components:', error);
@@ -104,6 +112,10 @@ class App {
     }
   }
 
+  initAnchorLink() {
+    this.components.set('anchorLink', new AnchorLink());
+  }
+
   initHome() {
     // Home API Manager - トップページでのみ動作
     this.components.set('home', new Home());
@@ -117,6 +129,21 @@ class App {
   initTeamDetail() {
     // TeamDetail Page Manager - チーム詳細ページでのみ動作
     this.components.set('teamDetail', new TeamDetail());
+  }
+
+  initCareer() {
+    // Career Page Manager - キャリアページでのみ動作
+    this.components.set('career', new Career());
+  }
+
+  initJobs() {
+    // Jobs Page Manager - CEOインタビューページでのみ動作
+    this.components.set('jobs', new Jobs());
+  }
+
+  initContact() {
+    // Contact Page Manager - お問い合わせページでのみ動作
+    this.components.set('contact', new Contact());
   }
 
   initNews() {

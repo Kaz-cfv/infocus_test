@@ -1,20 +1,6 @@
 ---
-import CreditTable from "../parts/CreditTable.astro"
-
-interface CreditItem {
-  caption: string;
-  content: string;
-  link: boolean;
-  url: string;
-}
-
-interface Credit {
-  title: string;
-  items: CreditItem[];
-}
-
 interface Props {
-  creditData: Credit[];
+  creditData: string;
 }
 
 const { creditData } = Astro.props;
@@ -23,17 +9,12 @@ const { creditData } = Astro.props;
 <div class="p-project-detail__credit">
   <h2 class="p-project-detail__credit-title">CREDITS</h2>
   <div class="p-project-detail__credit-list">
-    {creditData.map((credit) => (
-      <CreditTable
-        heading={credit.title}
-        items={credit.items}
-      />
-    ))}
+    <div class="p-project-detail__creditTable" set:html={creditData}></div>
   </div>
 </div>
 
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -60,4 +41,58 @@ const { creditData } = Astro.props;
   }
 }
 
+.p-project-detail__creditTable {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  row-gap: 40px;
+
+  h3 {
+    margin-block-end: 22px;
+    font-size: 1.8rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 146px 1fr;
+    align-content: flex-start;
+    column-gap: 60px;
+    row-gap: 12px;
+    @include me.sp {
+      column-gap: 32px;
+    }
+  }
+
+  dt {
+    opacity: .5;
+    color: var(--c-white);
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  dd {
+    color: var(--c-white);
+    font-size: 1.4rem;
+    font-weight: 600;
+
+    a {
+      position: relative;
+      color: var(--c-white);
+      @include me.pc {
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: var(--c-white);
+        }
+      }
+      @include me.sp {
+        text-decoration: underline;
+      }
+    }
+  }
+}
 </style>

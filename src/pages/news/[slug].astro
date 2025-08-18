@@ -1,0 +1,282 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Content from '../../components/news-detail/parts/Content.astro';
+import Credit from '../../components/news-detail/section/Credit.astro';
+import Share from '../../components/news-detail/parts/Share.astro';
+import Related from '../../components/news-detail/section/Related.astro';
+
+export async function getStaticPaths() {
+  try {
+    // 静的JSONファイルからニュースデータを取得
+    const response = await fetch('https://infocus.wp.site-prev2.com/api/news.json');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const newsData = await response.json();
+    const newsArray = Array.isArray(newsData) ? newsData : [newsData];
+
+    // 各ニュース記事のパスを生成
+    return newsArray
+      .filter(item => item.title && item.date && item.slug)
+      .map((item) => ({
+        params: { slug: item.slug },
+        props: {
+          article: {
+            id: item.id,
+            slug: item.slug,
+            title: item.title,
+            date: new Date(item.date).toLocaleDateString('ja-JP', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+            }).replace(/\//g, '.'),
+            category: item.news && item.news[0] === 10 ? 'Project' : 'News',
+            pic: item.acfs?.news_eyecatch?.url || item.acfs?.news_mv?.url || '/common/images/news/default.png',
+            content: item.acfs?.news_article || '',
+            rawContent: item.acf?.news_article || ''
+          },
+          relatedArticles: newsArray
+            .filter(newsItem => newsItem.title && newsItem.date && newsItem.slug && newsItem.id !== item.id)
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 3)
+            .map(relatedItem => ({
+              id: relatedItem.id,
+              slug: relatedItem.slug,
+              title: relatedItem.title,
+              date: new Date(relatedItem.date).toLocaleDateString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+              }).replace(/\//g, '.'),
+              category: relatedItem.news && relatedItem.news[0] === 10 ? 'Project' : 'News',
+              pic: relatedItem.acfs?.news_eyecatch?.url || relatedItem.acfs?.news_mv?.url || '/common/images/news/default.png',
+              url: `/news/${relatedItem.slug}/`
+            }))
+        }
+      }));
+  } catch (error) {
+    console.error('❌ Failed to generate static paths:', error);
+    return [];
+  }
+}
+
+const { article, relatedArticles } = Astro.props;
+
+const pageMeta = {
+  title: `${article.title} | NEWS`,
+  description: article.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+  ogpType: "article"
+};
+---
+
+<Layout
+  title=""
+  pageName="news-detail"
+  meta={pageMeta}
+>
+
+<article class="p-news-detial-article">
+  <div class="p-news-detial-article__pic">
+    <figure>
+      <img src={article.pic} alt={article.title}>
+    </figure>
+  </div>
+
+  <section class="p-news-detial-article__about">
+    <h1 class="p-news-detial-article__about-title">{article.title}</h1>
+    <div class="p-news-detial-article__about-info">
+      <time class="p-news-detial-article__about-date">{article.date}</time>
+      <span class="p-news-detial-article__about-category">{article.category}</span>
+    </div>
+  </section>
+
+  <section class="p-news-detial-article__content">
+    <div class="c-article">
+      {article.content ? (
+        <div set:html={article.content} />
+      ) : (
+        <p>記事の内容が見つかりませんでした。</p>
+      )}
+    </div>
+    <!-- クレジット情報はJSONに含まれていないため、一旦コメントアウト -->
+    <!-- <Credit creditData={article.credit} /> -->
+  </section>
+
+  <Share
+    slug={article.slug}
+  />
+</article>
+<Related relatedArticles={relatedArticles} />
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+.p-news-detial-article {
+  margin-block-start: 50px;
+  @include me.sp {
+    margin-block-start: 24px;
+    padding-inline: 20px;
+  }
+
+  &__pic {
+    @include me.pc {
+      margin-inline: 148px;
+    }
+  }
+
+  &__about {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 24px;
+    }
+
+    &-title {
+      font-size: 2.2rem;
+      line-height: 1.5;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-info {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      margin-block-start: 22px;
+      color: var(--c-gray);
+      font-size: 1.6rem;
+      font-weight: 500;
+      @include me.sp {
+        margin-block-start: 16px;
+        font-size: 1.4rem;
+      }
+    }
+
+    &-date {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      &::after {
+        content: "-";
+        display: inline-block;
+      }
+    }
+
+  }
+
+  &__content {
+    margin-block-start: 50px;
+    @include me.pc {
+      max-width: 910px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      margin-block-start: 40px;
+    }
+  }
+}
+
+.c-article {
+  font-family: var(--f-jp);
+  font-size: 1.6rem;
+  line-height: 1.7;
+  @include me.sp {
+    font-size: 1.4rem;
+    line-height: 1.6;
+  }
+
+  h2 {
+    margin-block-end: 12px;
+    font-size: 1.8rem;
+    @include me.sp {
+      font-size: 1.7rem;
+    }
+  }
+
+  h3 {
+    margin-block-end: 12px;
+    font-size: 1.5rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1.4rem;
+    margin-block-end: 12px;
+    font-weight: 400;
+    line-height: 1.8;
+  }
+
+  p {
+    margin-block-end: 50px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+  }
+
+  a {
+    display: inline-block;
+    position: relative;
+    margin-block-end: 4px;
+    color: var(--c-white);
+    @include me.pc {
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: var(--c-white);
+      }
+    }
+    @include me.sp {
+      text-decoration: underline;
+    }
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    position: relative;
+    text-decoration: none;
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: var(--c-white);
+    }
+  }
+
+  figure {
+    margin-block-end: 30px;
+  }
+
+  figcaption {
+    display: inline-block;
+    margin-block-start: 20px;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    @include me.sp {
+      margin-block-start: 10px;
+    }
+  }
+}
+</style>

@@ -1,0 +1,91 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Intro from '../../components/career/section/Intro.astro';
+import Position from '../../components/career/section/Position.astro';
+import ButtonJoin from '../../components/career/parts/ButtonJoin.astro';
+import CeoMessage from '../../components/career/section/CeoMessage.astro';
+import Interview from '../../components/career/section/Interview.astro';
+import OurData from '../../components/career/section/OurData.astro';
+import Navi from '../../components/career/parts/Navi.astro';
+
+const pageMeta = {
+  title: "Career",
+};
+---
+
+<Layout
+  title=""
+  pageName="career"
+  meta={pageMeta}
+>
+
+<div class="p-career-content">
+  <div class="p-career-content__left">
+    <div class="p-career-content__left-inner">
+      <Intro />
+      <Position />
+      <div class="sticky-btn">
+        <ButtonJoin />
+      </div>
+    </div>
+    <CeoMessage />
+    <Interview />
+    <OurData />
+  </div>
+  <div class="p-career-content__right">
+    <Navi />
+  </div>
+</div>
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+.p-career-content {
+  display: grid;
+  @include me.pc {
+    grid-template-columns: 1fr 278px;
+  }
+
+  &__left {
+    @include me.pc {
+      border-right: solid 1px var(--c-white);
+    }
+
+    &-inner {
+      @include me.sp {
+        padding-block-end: 80px;
+      }
+    }
+  }
+
+  &__right {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-block-end: 90px;
+    @include me.sp {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+
+.sticky-btn {
+  position: sticky;
+  bottom: 100px;
+  left: 20px;
+  max-width: calc(100% - (20px * 2));
+  @include me.pc {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+</style>

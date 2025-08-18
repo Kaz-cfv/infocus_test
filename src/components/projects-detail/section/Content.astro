@@ -1,30 +1,89 @@
 ---
+import MovieUrl from "../parts/MovieUrl.astro";
+import SingleImage from "../parts/SingleImage.astro";
+import TextContent from "../parts/TextContent.astro";
+import TwoColumnImages from "../parts/TwoColumnImages.astro";
+import ThreePanelImages from "../parts/ThreePanelImages.astro";
 
+export interface Props {
+  contents?: Array<any>;
+  project?: any;
+}
+
+const { contents = [], project } = Astro.props;
+
+function getImageData(imageData: any): any {
+  if (typeof imageData === 'object' && imageData !== null && imageData.url) {
+    return imageData;
+  }
+
+  return null;
+}
 ---
 
 <div class="c-article">
-  <figure>
-    <img src="/common/images/dummy/project_detail_01.png" alt="">
-    <figcaption>Photo: Hulton Archive / Getty Images</figcaption>
-  </figure>
-  <figure>
-    <img src="/common/images/dummy/project_detail_02.png" alt="">
-  </figure>
-  <p>
-    IN FOCUSのプロジェクトメンバーに集まってもらい、座談会形式でインタビューを実施。3DCGやモーショングラフィックが詰まった「大人も子どもも楽しく学べるコンテンツ」をどのように実現していったのか、制作の進め方やその裏側について語ってもらいました。
-  </p>
-  <figure>
-    <img src="/common/images/dummy/project_detail_03.png" alt="">
-  </figure>
-  <figure>
-    <img src="/common/images/dummy/project_detail_04.png" alt="">
-  </figure>
-  <figure>
-    <img src="/common/images/dummy/project_detail_05.png" alt="">
-  </figure>
-  <figure>
-    <img src="/common/images/dummy/project_detail_06.png" alt="">
-  </figure>
+  {contents.map((item) => {
+    switch (item.acf_fc_layout) {
+      case 'movie_url':
+        return <MovieUrl url={item.url} />;
+
+      case 'image':
+        const imageData = getImageData(item.image);
+        return imageData ? (
+          <SingleImage
+            image={imageData}
+            caption={item.caption || ''}
+            maxWidth={item['max-width'] || ''}
+          />
+        ) : null;
+
+      case 'text':
+        return <TextContent text={item.text} />;
+
+      case 'image_2columns':
+        const resolvedImages = item.images?.map((img: any) => {
+          const resolvedImg = getImageData(img.image);
+          return resolvedImg ? {
+            image: resolvedImg,
+            caption: img.caption || '',
+            maxWidth: img['max-width'] || ''
+          } : null;
+        }).filter((img: any) => img !== null) || [];
+
+        return resolvedImages.length > 0 ? (
+          <TwoColumnImages
+            images={resolvedImages}
+            mobileColumns={item.mobile_columns}
+          />
+        ) : null;
+
+      case 'image_3panel':
+        const largePanelImage = getImageData(item.large?.image);
+        const smallPanelImages = item.small?.map((small: any) => {
+          const resolvedImg = getImageData(small.image);
+          return resolvedImg ? {
+            image: resolvedImg,
+            caption: small.caption || ''
+          } : null;
+        }).filter((img: any) => img !== null) || [];
+
+        return largePanelImage && smallPanelImages.length > 0 ? (
+          <ThreePanelImages
+            position={item.position}
+            large={{
+              image: largePanelImage,
+              caption: item.large?.caption || ''
+            }}
+            small={smallPanelImages}
+          />
+        ) : null;
+
+      default:
+        // 未知のレイアウトタイプの場合は警告を出す
+        console.warn(`Unknown layout type: ${item.acf_fc_layout}`);
+        return null;
+    }
+  })}
 </div>
 
 <style lang="scss">
@@ -40,87 +99,5 @@
   @include me.sp {
     margin-block-start: 60px;
   }
-
-  h2 {
-    margin-block-end: 12px;
-    font-size: 1.8rem;
-    @include me.sp {
-      font-size: 1.7rem;
-    }
-  }
-
-  h3 {
-    margin-block-end: 12px;
-    font-size: 1.5rem;
-    @include me.sp {
-      font-size: 1.4rem;
-    }
-  }
-
-  h4,
-  h5,
-  h6 {
-    font-size: 1.4rem;
-    margin-block-end: 12px;
-    font-weight: 400;
-  }
-
-  p {
-    margin-block-end: 30px;
-    font-size: 1.4rem;
-    line-height: 1.7;
-    @include me.sp {
-      margin-block-end: 20px;
-    }
-  }
-
-  a {
-    position: relative;
-    color: var(--c-white);
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background-color: var(--c-white);
-    }
-  }
-
-  em,
-  i {
-    font-style: italic;
-  }
-
-  u {
-    position: relative;
-    text-decoration: none;
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background-color: var(--c-white);
-    }
-  }
-
-  figure {
-    margin-block-end: 30px;
-    @include me.sp {
-      margin-block-end: 20px;
-    }
-
-  }
-
-  figcaption {
-    display: inline-block;
-    font-size: 1.1rem;
-    margin-block-start: 20px;
-  }
-
 }
-
 </style>

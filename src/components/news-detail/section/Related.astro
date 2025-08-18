@@ -1,52 +1,23 @@
 ---
 import NewsCard from "../../news/parts/NewsCard.astro";
 
-const { currentId } = Astro.props;
-
-const allNews = [
-  {
-    id: 1,
-    slug: 'detail',
-    title: '「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催',
-    date: '2025.04.18',
-    category: 'Project',
-    pic: '/common/images/news/01.png',
-  },
-  {
-    id: 2,
-    slug: 'detail',
-    title: '東京オフィス新設のお知らせ',
-    date: '2025.04.15',
-    category: 'Press',
-    pic: '/common/images/news/02.png',
-  },
-  {
-    id: 3,
-    slug: 'detail',
-    title: 'デザインアワード受賞のお知らせ',
-    date: '2025.04.10',
-    category: 'Press',
-    pic: '/common/images/news/03.png',
-  },
-];
-
-const related = allNews.filter(item => item.id !== currentId).slice(0, 3);
+const { relatedArticles = [] } = Astro.props;
 ---
 
 <aside class="p-news-detail-related">
   <ul class="p-news-detail-related__list">
-    {related.map((item => (
+    {relatedArticles.map((item) => (
       <li class="p-news-detail-related__item">
         <NewsCard
           id={item.id}
           title={item.title}
           date={item.date}
           category={item.category}
-          url={`/news/${item.slug}`}
+          url={item.url}
           pic={item.pic}
         />
       </li>
-    )))}
+    ))}
   </ul>
 
   <div class="p-news-detail-related__link">

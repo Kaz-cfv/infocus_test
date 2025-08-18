@@ -1,0 +1,46 @@
+---
+export interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<div class="c-text-content" set:html={text}></div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+
+.c-text-content {
+  margin-block-end: 30px;
+  font-size: 1.4rem;
+  line-height: 1.7;
+  font-family: var(--f-jp);
+
+  @include me.sp {
+    margin-block-end: 20px;
+  }
+
+  p {
+    margin-block-end: 1em;
+
+    &:last-child {
+      margin-block-end: 0;
+    }
+  }
+
+  a {
+    position: relative;
+    color: var(--c-white);
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: var(--c-white);
+    }
+  }
+}
+</style>

@@ -1,0 +1,214 @@
+---
+// FormRadio.astro - 汎用ラジオボタングループコンポーネント
+// Usage: <FormRadio name="category" label="Category" required options={categoryOptions} />
+
+export interface RadioOption {
+  slug: string;
+  value: string;
+  label: string;
+  disabled?: boolean;
+  checked?: boolean;
+}
+
+export interface Props {
+  name: string;
+  label: string;
+  options: RadioOption[];
+  required?: boolean;
+  disabled?: boolean;
+  direction?: 'horizontal' | 'vertical';
+  className?: string;
+}
+
+const {
+  name,
+  label,
+  options,
+  required = false,
+  disabled = false,
+  direction = 'horizontal',
+  className = '',
+} = Astro.props;
+
+// ラベルに必須マークを追加する
+const labelText = required ? `${label}*` : label;
+---
+
+<fieldset class={`c-form-radio ${className}`} disabled={disabled}>
+  <legend class="c-form-radio__label">
+    {labelText}
+  </legend>
+
+  <div class={`c-form-radio__group c-form-radio__group--${direction}`}>
+    {options.map((option, index) => {
+      const radioId = `${option.slug}`;
+      return (
+        <div class="c-form-radio__item">
+          <input
+            type="radio"
+            id={radioId}
+            name={name}
+            value={option.value}
+            class="c-form-radio__input"
+            checked={option.checked}
+            disabled={option.disabled || disabled}
+            required={required}
+          />
+          <label for={radioId} class="c-form-radio__option">
+            <span class="c-form-radio__button"></span>
+            <span class="c-form-radio__text">{option.label}</span>
+          </label>
+        </div>
+      );
+    })}
+  </div>
+</fieldset>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-form-radio {
+  margin: 0;
+  margin-block-end: 40px;
+  padding: 0;
+  border: none;
+
+  &__label {
+    display: block;
+    margin-block-end: 16px;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  &__group {
+    display: flex;
+    column-gap: 40px;
+
+    &--horizontal {
+      flex-direction: row;
+    }
+
+    &--vertical {
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  &__item {
+    position: relative;
+  }
+
+  &__input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+
+    &:checked + .c-form-radio__option .c-form-radio__button::after {
+      opacity: 1;
+    }
+
+    &:focus + .c-form-radio__option .c-form-radio__button {
+      outline: 1px solid var(--c-white);
+      outline-offset: 2px;
+    }
+
+    &:disabled + .c-form-radio__option {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    cursor: pointer;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+
+    &:hover:not(:has(.c-form-radio__input:disabled)) {
+      .c-form-radio__button {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  &__button {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--c-white);
+    border-radius: 0;
+    margin-inline-end: 8px;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s var(--ease-out-quad);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 6px;
+      height: 6px;
+      background-color: var(--c-white);
+      opacity: 0;
+      transition: opacity 0.3s var(--ease-out-quad);
+    }
+  }
+
+  &__text {
+    user-select: none;
+  }
+
+  // フィールドセット全体が無効化された場合
+  &:disabled {
+    opacity: 0.5;
+
+    .c-form-radio__option {
+      cursor: not-allowed;
+    }
+  }
+
+  // エラー状態のスタイル（将来の拡張用）
+  &.has-error {
+    .c-form-radio__button {
+      border-color: var(--c-input-error);
+    }
+
+    .c-form-radio__label {
+      color: var(--c-input-error);
+    }
+  }
+
+  // 成功状態のスタイル（将来の拡張用）
+  &.has-success {
+    .c-form-radio__button {
+      border-color: #51cf66;
+    }
+  }
+
+  // エラーメッセージ表示用（将来の拡張用）
+  &__error {
+    display: none;
+    margin-block-start: 8px;
+    color: var(--c-input-error);
+    font-size: 1.2rem;
+
+    &.is-visible {
+      display: block;
+    }
+  }
+
+  // ヘルプテキスト表示用（将来の拡張用）
+  &__help {
+    margin-block-start: 8px;
+    color: var(--c-gray);
+    font-size: 1.2rem;
+  }
+}
+</style>

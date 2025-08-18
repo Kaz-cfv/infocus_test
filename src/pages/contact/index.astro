@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ContactForm from '../../components/contact/section/ContactForm.astro';
+
+const pageMeta = {
+  title: "Contact",
+};
+---
+
+<Layout
+  title=""
+  pageName="contact"
+  meta={pageMeta}
+>
+
+<ContactForm />
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+</style>

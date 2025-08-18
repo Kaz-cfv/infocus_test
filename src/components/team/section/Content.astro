@@ -1,209 +1,73 @@
 ---
 import TeamCard from '../parts/TeamCard.astro';
 
-const items = [
-  {
-    id: 1,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/01.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/02.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/03.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/04.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/05.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/06.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 7,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/07.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 8,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/08.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 9,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/09.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 10,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/10.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-]
+// 静的JSONファイルからチームデータを取得
+let items = [];
 
+try {
+  const response = await fetch('https://infocus.wp.site-prev2.com/api/team.json');
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const teamData = await response.json();
+  const teamArray = Array.isArray(teamData) ? teamData : [teamData];
+
+  console.log('📊 Team items count:', teamArray.length);
+
+  // チームデータを処理
+  items = teamArray
+    .filter(item => item.title && item.slug)
+    .map((item, index) => {
+      const teamMember = {
+        id: item.id || index + 1,
+        name: item.title.trim(),
+        pic: item.acfs?.thumbnail?.url || '/common/images/team/default.png',
+        url: `/team/${item.slug}/`,
+        tags: []
+      };
+
+      // positionとposition-tagを処理
+      const tags = [];
+
+      // acfs.positionが存在し、空でない場合は最初にpタグとして追加
+      if (item.acfs && item.acfs.position && item.acfs.position.trim() !== '') {
+        tags.push({
+          name: item.acfs.position.trim(),
+          url: '#', // pタグで表示するためのマーカー
+          isPosition: true
+        });
+      }
+
+      // position-tagを追加（リンク付き）
+      if (item.acfs && item.acfs['position-tag'] && Array.isArray(item.acfs['position-tag'])) {
+        const positionTags = item.acfs['position-tag'].map(tag => ({
+          name: tag.name || '',
+          url: `/team/?position=${tag.slug || ''}`,
+          isPosition: false
+        }));
+        tags.push(...positionTags);
+      }
+
+      teamMember.tags = tags;
+
+      return teamMember;
+    });
+
+  console.log('✅ Team data loaded successfully:', {
+    total: items.length,
+    membersWithTags: items.filter(item => item.tags.length > 0).length
+  });
+
+} catch (error) {
+  console.error('❌ Failed to fetch team data:', error);
+  console.error('❌ Error details:', {
+    name: error.name,
+    message: error.message,
+    stack: error.stack?.substring(0, 200)
+  });
+}
 ---
 
 <div class="p-team-content">
@@ -268,7 +132,6 @@ const items = [
     row-gap: 50px;
   }
 }
-
 </style>
 
 <script>

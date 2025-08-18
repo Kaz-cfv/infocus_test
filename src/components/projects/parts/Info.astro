@@ -1,11 +1,15 @@
 ---
+export interface Props {
+  count: number;
+}
 
+const { count } = Astro.props;
 ---
 <div class="p-project-info l-content">
   <div class="p-project-info__title">
     <span class="p-project-info__title-name">ALL PROJECTS</span>
     -
-    <span class="p-project-info__title-num">(72)</span>
+    <span class="p-project-info__title-num">({count})</span>
   </div>
   <!-- <div class="p-project-info__title">
     <span class="p-project-info__title-name">Search results for “LOEWE”</span>

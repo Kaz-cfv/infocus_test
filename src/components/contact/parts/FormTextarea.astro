@@ -1,0 +1,183 @@
+---
+// FormTextarea.astro - 汎用テキストエリアコンポーネント
+// Usage: <FormTextarea id="message" label="Message" required rows={6} placeholder="メッセージを入力してください" />
+
+export interface Props {
+  id: string;
+  label: string;
+  required?: boolean;
+  placeholder?: string;
+  value?: string;
+  rows?: number;
+  cols?: number;
+  maxlength?: number;
+  minlength?: number;
+  readonly?: boolean;
+  disabled?: boolean;
+  resize?: 'none' | 'both' | 'horizontal' | 'vertical';
+  className?: string;
+}
+
+const {
+  id,
+  label,
+  required = false,
+  placeholder = '',
+  value = '',
+  rows = 6,
+  cols,
+  maxlength,
+  minlength,
+  readonly = false,
+  disabled = false,
+  resize = 'vertical',
+  className = '',
+} = Astro.props;
+
+// ラベルに必須マークを追加する
+const labelText = required ? `${label}*` : label;
+// textarea要素のname属性（idと同じ値を使用）
+const name = id;
+---
+
+<div class={`c-form-textarea ${className}`}>
+  <label for={id} class="c-form-textarea__label">
+    {labelText}
+  </label>
+  <textarea
+    id={id}
+    name={name}
+    class="c-form-textarea__field"
+    placeholder={placeholder}
+    rows={rows}
+    cols={cols}
+    maxlength={maxlength}
+    minlength={minlength}
+    readonly={readonly}
+    disabled={disabled}
+    required={required}
+    style={`resize: ${resize};`}
+  >{value}</textarea>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-form-textarea {
+
+  &__label {
+    display: block;
+    margin-block-end: 16px;
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  &__field {
+    width: 100%;
+    min-height: 156px;
+    padding: 16px;
+    background-color: var(--c-input-bg);
+    border: none;
+    border-radius: 4px;
+    color: var(--c-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.5;
+    transition: all 0.3s var(--ease-out-quad);
+
+    &::placeholder {
+      opacity: 0.7;
+    }
+
+    &:focus {
+      outline: 1px solid var(--c-white);
+      outline-offset: 0;
+    }
+
+    &:hover:not(:focus):not(:disabled) {
+      background-color: #2a2a2a;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      resize: none;
+    }
+
+    &:readonly {
+      background-color: #1a1a1a;
+      cursor: default;
+      resize: none;
+    }
+
+    // バリデーションエラー時のスタイル
+    &:invalid:not(:placeholder-shown) {
+      outline: 1px solid var(--c-input-error);
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+
+    // 必須フィールドで空の場合のスタイル
+    &:required:invalid:not(:focus):not(:placeholder-shown) {
+      outline: 1px solid var(--c-input-error);
+    }
+
+    // 正常な入力時のスタイル
+    &:valid:not(:placeholder-shown) {
+      outline: 1px solid #51cf66;
+    }
+  }
+
+  &__current-length {
+    transition: color 0.2s ease;
+
+    &.is-warning {
+      color: #ffd43b;
+    }
+
+    &.is-over-limit {
+      color: var(--c-input-error);
+      font-weight: 700;
+    }
+  }
+
+  &__max-length {
+    color: var(--c-gray);
+  }
+
+  // エラーメッセージ表示用（将来の拡張用）
+  &__error {
+    margin-top: 8px;
+    font-family: var(--f-en);
+    font-size: 1.2rem;
+    color: var(--c-input-error);
+    display: none;
+
+    &.is-visible {
+      display: block;
+    }
+  }
+
+  // 成功メッセージ表示用（将来の拡張用）
+  &__success {
+    margin-top: 8px;
+    font-family: var(--f-en);
+    font-size: 1.2rem;
+    color: #51cf66;
+    display: none;
+
+    &.is-visible {
+      display: block;
+    }
+  }
+
+  // ヘルプテキスト表示用（将来の拡張用）
+  &__help {
+    margin-top: 8px;
+    font-family: var(--f-en);
+    font-size: 1.2rem;
+    color: var(--c-gray);
+    line-height: 1.4;
+  }
+}
+</style>

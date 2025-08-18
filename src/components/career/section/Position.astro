@@ -1,0 +1,332 @@
+---
+import Accordion from "../parts/Accordion.astro";
+import ButtonJoin from "../parts/ButtonJoin.astro";
+
+const positions = [
+  {
+    title: 'WEBディレクター',
+    category: 'TOKYO',
+    data: [
+      {
+        label: '仕事内容',
+        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
+      },
+      {
+        label: '応募資格',
+        content: [
+          '未経験可',
+          '社会人経験1年以上',
+          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
+          '学習意欲のある方',
+          '物怖じせず前向きなコミュニケーション取れる方'
+        ]
+      },
+      {
+        label: '教育スキル',
+        content: [
+          'WEB関連業界の業界経験',
+          '見積もり作成や進行管理の経験',
+          '外部パートナーとの連携経験'
+        ]
+      },
+      {
+        label: '雇用形態',
+        content: '正社員（中途）<br>※試用期間3ヵ月'
+      },
+      {
+        label: '勤務地',
+        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
+      },
+      {
+        label: '勤務時間',
+        content: '10:00～19:00'
+      },
+      {
+        label: '給与',
+        content: '経験・能力の上、当社規定により決定'
+      },
+      {
+        label: '待遇',
+        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
+      },
+      {
+        label: '休日・休暇',
+        content: '土、祝、夏季休暇、年末年始休暇'
+      }
+    ]
+  },
+  {
+    title: 'WEBデザイナー',
+    category: 'TOKYO',
+    data: [
+      {
+        label: '仕事内容',
+        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
+      },
+      {
+        label: '応募資格',
+        content: [
+          '未経験可',
+          '社会人経験1年以上',
+          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
+          '学習意欲のある方',
+          '物怖じせず前向きなコミュニケーション取れる方'
+        ]
+      },
+      {
+        label: '教育スキル',
+        content: [
+          'WEB関連業界の業界経験',
+          '見積もり作成や進行管理の経験',
+          '外部パートナーとの連携経験'
+        ]
+      },
+      {
+        label: '雇用形態',
+        content: '正社員（中途）<br>※試用期間3ヵ月'
+      },
+      {
+        label: '勤務地',
+        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
+      },
+      {
+        label: '勤務時間',
+        content: '10:00～19:00'
+      },
+      {
+        label: '給与',
+        content: '経験・能力の上、当社規定により決定'
+      },
+      {
+        label: '待遇',
+        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
+      },
+      {
+        label: '休日・休暇',
+        content: '土、祝、夏季休暇、年末年始休暇'
+      }
+    ]
+  },
+  {
+    title: '映像プロダクションマネージャー',
+    category: 'TOKYO',
+    data: [
+      {
+        label: '仕事内容',
+        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
+      },
+      {
+        label: '応募資格',
+        content: [
+          '未経験可',
+          '社会人経験1年以上',
+          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
+          '学習意欲のある方',
+          '物怖じせず前向きなコミュニケーション取れる方'
+        ]
+      },
+      {
+        label: '教育スキル',
+        content: [
+          'WEB関連業界の業界経験',
+          '見積もり作成や進行管理の経験',
+          '外部パートナーとの連携経験'
+        ]
+      },
+      {
+        label: '雇用形態',
+        content: '正社員（中途）<br>※試用期間3ヵ月'
+      },
+      {
+        label: '勤務地',
+        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
+      },
+      {
+        label: '勤務時間',
+        content: '10:00～19:00'
+      },
+      {
+        label: '給与',
+        content: '経験・能力の上、当社規定により決定'
+      },
+      {
+        label: '待遇',
+        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
+      },
+      {
+        label: '休日・休暇',
+        content: '土、祝、夏季休暇、年末年始休暇'
+      }
+    ]
+  },
+  {
+    title: '映像プロデューサー',
+    category: 'TOKYO',
+    data: [
+      {
+        label: '仕事内容',
+        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
+      },
+      {
+        label: '応募資格',
+        content: [
+          '未経験可',
+          '社会人経験1年以上',
+          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
+          '学習意欲のある方',
+          '物怖じせず前向きなコミュニケーション取れる方'
+        ]
+      },
+      {
+        label: '教育スキル',
+        content: [
+          'WEB関連業界の業界経験',
+          '見積もり作成や進行管理の経験',
+          '外部パートナーとの連携経験'
+        ]
+      },
+      {
+        label: '雇用形態',
+        content: '正社員（中途）<br>※試用期間3ヵ月'
+      },
+      {
+        label: '勤務地',
+        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
+      },
+      {
+        label: '勤務時間',
+        content: '10:00～19:00'
+      },
+      {
+        label: '給与',
+        content: '経験・能力の上、当社規定により決定'
+      },
+      {
+        label: '待遇',
+        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
+      },
+      {
+        label: '休日・休暇',
+        content: '土、祝、夏季休暇、年末年始休暇'
+      }
+    ]
+  }
+];
+---
+
+<section id="position" class="p-career-position">
+  <h2 class="p-career-position__title">OPEN POSITIONS</h2>
+  <span class="p-career-position__sub">現在募集中のポジション</span>
+
+  <div class="p-career-position__content">
+    {positions.map((item) => (
+      <Accordion
+        title={item.title}
+        category={item.category}
+        jobData={item.data}
+      />
+    ))}
+  </div>
+
+  <div class="p-career-position__info">
+    <dl class="p-career-position__info-item">
+      <dt class="p-career-position__info-heading">
+        <span class="p-career-position__info-label">応募方法</span>
+      </dt>
+      <dd class="p-career-position__info-content">
+        CONTACTページから、履歴書と過去の実績が分かるポートフォリオをお送り下さい。<br>
+        経理 / 総務 / ギャラリー運営（アシスタント）に応募にされる方は履歴書のみ提出下さい。
+      </dd>
+    </dl>
+  </div>
+
+  <div class="p-career-position__btn">
+    <ButtonJoin />
+  </div>
+</section>
+
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-career-position {
+  padding-inline: 40px;
+  padding-block: 100px;
+  border-top: solid 2px var(--c-gray);
+  @include me.sp {
+    padding-inline: 20px;
+    padding-block: 80px 40px;
+  }
+
+  &__title {
+    font-size: 5.6rem;
+    font-weight: 600;
+    line-height: 0.96;
+    letter-spacing: -0.02rem;
+    @include me.sp {
+      font-size: 3.4rem;
+      line-height: 1.4;
+    }
+  }
+
+  &__sub {
+    display: inline-block;
+    margin-block-start: 16px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  &__content {
+    margin-block-start: 60px;
+  }
+
+  &__info {
+    margin-block-start: 50px;
+
+    &-item {
+      display: grid;
+      @include me.pc {
+        grid-template-columns: max-content 1fr;
+        column-gap: 52px;
+      }
+      @include me.sp {
+        row-gap: 16px;
+      }
+    }
+
+    &-heading {
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.8;
+    }
+
+    &-label {
+      display: inline-block;
+      padding-inline: 10px;
+      padding-block: 2px;
+      background-color: var(--c-white);
+      color: var(--c-black-base);
+    }
+
+    &-content {
+      font-size: 1.4rem;
+      line-height: 1.7;
+    }
+  }
+
+  &__btn {
+    margin-block-start: 40px;
+    @include me.pc {
+      max-width: 380px;
+    }
+    @include me.sp {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+
+</style>

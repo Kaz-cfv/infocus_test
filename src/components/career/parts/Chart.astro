@@ -1,0 +1,130 @@
+---
+interface ProjectData {
+  year: number;
+  count: number;
+}
+
+interface Props {
+  data: ProjectData[];
+}
+
+const { data } = Astro.props;
+
+// 最大値を取得してプログレス幅を計算
+const maxCount = Math.max(...data.map(item => item.count));
+---
+
+<div class="c-chart">
+  <div class="c-chart__list">
+    {data.map((project) => (
+      <div class="c-chart__item">
+        <div class="c-chart__year">{project.year}</div>
+        <div class="c-chart__bar">
+          <div
+            class="c-chart__progress"
+            style={`width: ${(project.count / maxCount) * 100}%`}
+          ></div>
+        </div>
+        <div class="c-chart__count">
+          <span class="c-chart__number">{project.count}</span>
+          <span class="c-chart__unit">件</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-chart {
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 24px;
+    @include me.sp {
+      row-gap: 20px;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  &__year {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+  }
+
+  &__bar {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 36px;
+    margin-inline-end: 4px;
+    background-color: transparent;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 0;
+      left: 0;
+      transform: translateY(-50%);
+      z-index: 1;
+      height: 1px;
+      background-image: repeating-linear-gradient(
+        to right,
+        var(--c-white) 0px,
+        var(--c-white) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+    }
+  }
+
+  &__progress {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    border-right: solid 1px var(--c-black-base);
+    background-color: var(--c-white);
+    transition: width 0.8s var(--ease-out-quart);
+  }
+
+  &__count {
+    display: flex;
+    align-items: baseline;
+    column-gap: 12px;
+    min-width: 80px;
+    @include me.sp {
+      column-gap: 6px;
+    }
+  }
+
+  &__number {
+    font-size: 4.2rem;
+    font-weight: 600;
+    line-height: 0.96;
+    @include me.sp {
+      font-size: 3rem;
+    }
+  }
+
+  &__unit {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+  }
+}
+</style>

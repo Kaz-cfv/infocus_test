@@ -1,0 +1,123 @@
+---
+export interface Props {
+  position: 'left' | 'right';
+  large: {
+    image: any;
+    caption?: string;
+  };
+  small: Array<{
+    image: any;
+    caption?: string;
+  }>;
+}
+
+const { position, large, small } = Astro.props;
+
+function getImageUrl(image: any): string {
+  if (image?.url) return image.url;
+  return image.url;
+}
+---
+
+<div class={`c-image-3panel c-image-3panel--${position}`}>
+  <div class="c-image-3panel__large">
+    <figure>
+      <img
+        src={getImageUrl(large.image)}
+        alt={large.image?.alt || 'Project large image'}
+      />
+      {large.caption && (
+        <figcaption>{large.caption}</figcaption>
+      )}
+    </figure>
+  </div>
+
+  <div class="c-image-3panel__small">
+    {small.map((item) => (
+      <figure>
+        <img
+          src={getImageUrl(item.image)}
+          alt={item.image?.alt || 'Project small image'}
+        />
+        {item.caption && (
+          <figcaption>{item.caption}</figcaption>
+        )}
+      </figure>
+    ))}
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+
+.c-image-3panel {
+  display: grid;
+  gap: 20px;
+  margin-block-end: 30px;
+
+  @include me.pc {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include me.sp {
+    grid-template-columns: 1fr;
+    margin-block-end: 20px;
+  }
+
+  &--left {
+    .c-image-3panel__large {
+      @include me.pc {
+        order: 1;
+      }
+    }
+    .c-image-3panel__small {
+      @include me.pc {
+        order: 2;
+      }
+    }
+  }
+
+  &--right {
+    .c-image-3panel__large {
+      @include me.pc {
+        order: 2;
+      }
+    }
+    .c-image-3panel__small {
+      @include me.pc {
+        order: 1;
+      }
+    }
+  }
+
+  &__large {
+    figure {
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+
+  &__small {
+    display: grid;
+    gap: 20px;
+
+    figure {
+      img {
+        width: 100%;
+        height: auto;
+      }
+    }
+  }
+
+  figure {
+    figcaption {
+      display: inline-block;
+      font-size: 1.1rem;
+      margin-block-start: 20px;
+      color: var(--c-gray-light);
+    }
+  }
+}
+</style>

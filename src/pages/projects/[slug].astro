@@ -1,0 +1,105 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Article from '../../components/projects-detail/section/Article.astro';
+import Related from '../../components/projects-detail/section/Related.astro';
+
+export async function getStaticPaths() {
+  try {
+    const response = await fetch('https://infocus.wp.site-prev2.com/api/projects.json');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseText = await response.text();
+    let projectsData;
+
+    try {
+      projectsData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError);
+      throw parseError;
+    }
+
+    const projectsArray = Array.isArray(projectsData) ? projectsData : [projectsData];
+
+    return projectsArray
+      .filter(item => item.title && item.slug)
+      .map((project) => ({
+        params: { slug: project.slug },
+        props: { project }
+      }));
+  } catch (error) {
+    console.error('❌ Failed to fetch projects for static paths:', error);
+    return [];
+  }
+}
+
+const { project } = Astro.props;
+
+// 全プロジェクトデータを取得（関連プロジェクト用）
+let allProjects = [];
+try {
+  const response = await fetch('https://infocus.wp.site-prev2.com/api/projects.json');
+
+  if (response.ok) {
+    const responseText = await response.text();
+    const projectsData = JSON.parse(responseText);
+    const projectsArray = Array.isArray(projectsData) ? projectsData : [projectsData];
+
+    allProjects = projectsArray
+      .filter(item => item.title && item.slug && item.slug !== project.slug) // 現在のプロジェクトを除外
+      .map((item, index) => {
+        // tagsの構造を確認して適切に抽出
+        let tags = [];
+        if (item.acfs?.tags && Array.isArray(item.acfs.tags)) {
+          tags = item.acfs.tags.filter(tag => tag.terms && tag.terms.name).map(tag => ({
+            name: tag.terms.name,
+            url: `/projects/?category=${tag.terms.term_id || ''}`
+          }));
+        }
+
+        return {
+          id: item.id || index + 1,
+          title: item.title.trim(),
+          tags: tags,
+          imageSrc: item.acfs?.thumbnail?.image?.url,
+          url: `/projects/${item.slug}/`,
+          type: "default"
+        };
+      })
+      .sort((a, b) => b.id - a.id) // IDの降順でソート（新しい順）
+      .slice(0, 4); // 関連プロジェクトは最大4件まで表示
+  }
+} catch (error) {
+  console.error('❌ Failed to fetch related projects:', error);
+}
+
+// メタデータの設定
+const title = project.title;
+const description = project.acfs?.outline ? project.acfs.outline.replace(/<[^>]*>/g, '').substring(0, 160) : '';
+
+const pageMeta = {
+  title: title,
+  ogpType: "website"
+};
+---
+
+<Layout
+  title={title}
+  pageName="project-detail"
+  meta={pageMeta}
+>
+
+<Article project={project} />
+{allProjects.length > 0 && (
+  <Related projects={allProjects} />
+)}
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+</style>

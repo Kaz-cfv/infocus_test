@@ -1,0 +1,73 @@
+---
+interface Props {
+  label: string;
+  content: string | string[];
+}
+
+const { label, content } = Astro.props;
+---
+
+<dl>
+  <dt>
+    <span>{label}</span>
+  </dt>
+  <dd>
+    {Array.isArray(content) ? (
+      <ul>
+        {content.map((item) => (
+          <li set:html={item}></li>
+        ))}
+      </ul>
+    ) : (
+      <p set:html={content}></p>
+    )}
+  </dd>
+</dl>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+dl {
+  display: grid;
+  row-gap: 12px;
+}
+
+dt {
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+span {
+  display: inline-block;
+  padding-inline: 10px;
+  padding-block: 2px;
+  background-color: var(--c-white);
+  color: var(--c-black-base);
+}
+
+dd {
+  font-size: 1.4rem;
+  line-height: 1.7;
+
+  p:not(:first-child) {
+    margin-block-start: 8px;
+  }
+
+  ul {
+    display: grid;
+    row-gap: 4px;
+
+    li {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 2px;
+
+      &::before {
+        content: "・";
+      }
+    }
+  }
+}
+</style>

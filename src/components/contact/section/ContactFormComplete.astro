@@ -1,0 +1,80 @@
+---
+---
+
+<div class="contact__content" data-state="complete">
+  <div class="p-contact-complete__content">
+    <h2 class="p-contact-complete__title">Thank you for your inquiry</h2>
+    <div class="p-contact-complete__actions">
+      <a href="/" class="p-contact-complete__back-btn">
+        Back to TOP
+      </a>
+    </div>
+  </div>
+</div>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-contact-form {
+  .contact__content[data-state="complete"] {
+    padding-block: 60px;
+    text-align: center;
+
+    .p-contact-complete__content {
+      // 中央揃え用のコンテナ
+    }
+
+    .p-contact-complete__title {
+      margin-block-end: 40px;
+      color: var(--c-white);
+      font-family: var(--f-en);
+      font-size: 3.6rem;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+
+      @include me.sp {
+        font-size: 2.4rem;
+        margin-block-end: 32px;
+      }
+    }
+
+    .p-contact-complete__actions {
+      // アクションボタン用のコンテナ
+    }
+
+    .p-contact-complete__back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding-inline: 32px;
+      padding-block: 16px;
+      border: 1px solid var(--c-white);
+      border-radius: 4px;
+      background-color: transparent;
+      color: var(--c-white);
+      font-weight: 600;
+      font-size: 1.4rem;
+      text-decoration: none;
+      transition: all 0.3s var(--ease-out-quad);
+
+      @include me.sp {
+        padding-inline: 24px;
+        padding-block: 12px;
+        font-size: 1.3rem;
+      }
+
+      &:hover {
+        background-color: var(--c-white);
+        color: var(--c-black);
+        // transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+</style>

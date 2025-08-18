@@ -2,6 +2,7 @@
 interface Tags {
   name: string;
   url: string;
+  isPosition?: boolean;
 }
 
 interface Props {
@@ -22,20 +23,20 @@ const { id, name, pic, url, tags } = Astro.props;
   <div class="c-team-card__info">
     <h3 class="c-team-card__name">{name}</h3>
     <ul class="c-team-card__tags">
-      {tags.map((tag => (
+      {tags.map((tag) => (
         <li class="c-team-card__tags-item">
-          {tag.url != "#" && tag.url !='' ? (
+          {tag.isPosition ? (
+            <p>{tag.name}</p>
+          ) : tag.url && tag.url !== "#" && tag.url !== '' ? (
             <a href={tag.url}>{tag.name}</a>
           ) : (
             <span>{tag.name}</span>
           )}
         </li>
-      )))}
+      ))}
     </ul>
   </div>
 </div>
-
-
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;
@@ -101,5 +102,4 @@ const { id, name, pic, url, tags } = Astro.props;
     }
   }
 }
-
 </style>

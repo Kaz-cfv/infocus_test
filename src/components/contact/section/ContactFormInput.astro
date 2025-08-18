@@ -1,0 +1,215 @@
+---
+import FormInput from '../parts/FormInput.astro';
+import FormTextarea from '../parts/FormTextarea.astro';
+import FormRadio from '../parts/FormRadio.astro';
+import FormFileUpload from '../parts/FormFileUpload.astro';
+
+const categoryOptions = [
+  { slug: 'new_project', value: 'New Project', label: 'New Project', checked: false },
+  { slug: 'recruit', value: 'Recruit', label: 'Recruit', checked: false },
+  { slug: 'other', value: 'Other', label: 'Other', checked: false }
+];
+---
+
+<div class="contact__content" data-state="input">
+  <form class="p-contact-form__form contact__form" id="inquiryForm" action="https://docs.google.com/forms/u/0/d/1Bw-6GAnVhXIkcMgqtIbecBqk_LdnHYnr0ZVkG2B63Iw/formResponse" method="POST">
+
+    <!-- Category Selection -->
+    <div class="contact__item --require" data-fields="entry.89439866">
+      <FormRadio
+        name="entry.89439866"
+        label="Category"
+        options={categoryOptions}
+        required
+        direction="horizontal"
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Name Field -->
+    <div class="contact__item --require" data-fields="entry.1493719364">
+      <FormInput
+        id="entry.1493719364"
+        label="Name"
+        type="text"
+        required
+        placeholder=""
+        autocomplete="name"
+        maxlength={50}
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Company Field -->
+    <div class="contact__item" data-fields="entry.249789765">
+      <FormInput
+        id="entry.249789765"
+        label="Your Company"
+        type="text"
+        placeholder=""
+        autocomplete="organization"
+        maxlength={100}
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Email Field -->
+    <div class="contact__item --require" data-fields="entry.1765707690">
+      <FormInput
+        id="entry.1765707690"
+        label="Email"
+        type="email"
+        required
+        placeholder=""
+        autocomplete="email"
+        maxlength={100}
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Title Field -->
+    <div class="contact__item" data-fields="entry.1361160307">
+      <FormInput
+        id="entry.1361160307"
+        label="Title"
+        type="text"
+        placeholder=""
+        maxlength={100}
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Message Field -->
+    <div class="contact__item --require" data-fields="entry.1056102378">
+      <FormTextarea
+        id="entry.1056102378"
+        label="Message"
+        required
+        placeholder=""
+        rows={6}
+        maxlength={1000}
+        resize="vertical"
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- File Upload -->
+    <div class="contact__item" data-fields="files">
+      <FormFileUpload
+        id="entry.856080106"
+        accept=".pdf,.jpg,.jpeg,.mp4"
+        maxSizeMB={10}
+        maxFiles={5}
+        multiple
+        buttonText="+Upload files"
+        noteText="Max 10MB (pdf, jpg, mp4)"
+      />
+      <span class="error_msg">エラーメッセージ</span>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="contact__item --button">
+      <button type="button" class="c-button">SEND</button>
+    </div>
+
+  </form>
+</div>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-contact-form {
+  .contact__item {
+    margin-bottom: 40px;
+
+    &.--require {
+      position: relative;
+    }
+
+    // エラーメッセージのスタイル
+    .error_msg {
+      display: none;
+      color: #ff6b6b;
+      font-size: 1.2rem;
+      margin-top: 8px;
+      font-family: var(--f-en);
+    }
+
+    // 確認画面用の dt/dd スタイル
+    dt {
+      color: var(--c-white);
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-family: var(--f-en);
+    }
+
+    dd {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      word-break: break-word;
+
+      .confirm_content {
+        display: block;
+        min-height: 1.6em;
+      }
+    }
+
+    // ボタン配置
+    &.--button {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 60px;
+
+      .c-button {
+        min-width: 160px;
+        padding: 16px 32px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: var(--f-en);
+
+        // デフォルトボタン（確認する、送信する）
+        &:not(.--back) {
+          background-color: var(--c-white);
+          color: var(--c-black-base);
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            // transform: translateY(-2px);
+          }
+        }
+
+        // 戻るボタン
+        &.--back {
+          background-color: transparent;
+          color: var(--c-white);
+          border: 2px solid var(--c-white);
+
+          &:hover {
+            background-color: var(--c-white);
+            color: var(--c-black-base);
+          }
+        }
+      }
+
+      @include me.sp {
+        flex-direction: column;
+        align-items: center;
+
+        .c-button {
+          width: 100%;
+          max-width: 280px;
+        }
+      }
+    }
+  }
+}
+</style>

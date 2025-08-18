@@ -1,0 +1,276 @@
+---
+// FormSubmitButton.astro - 汎用送信ボタンコンポーネント
+// Usage: <FormSubmitButton text="SEND" loading={false} disabled={false} />
+
+export interface Props {
+  text?: string;
+  type?: 'submit' | 'button' | 'reset';
+  disabled?: boolean;
+  loading?: boolean;
+  loadingText?: string;
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'primary' | 'secondary' | 'outline';
+  fullWidth?: boolean;
+  className?: string;
+  onClick?: string;
+}
+
+const {
+  text = 'SEND',
+  type = 'submit',
+  disabled = false,
+  loading = false,
+  loadingText = 'Sending...',
+  size = 'large',
+  variant = 'primary',
+  fullWidth = true,
+  className = '',
+  onClick,
+} = Astro.props;
+
+// 表示テキストの決定
+const displayText = loading ? loadingText : text;
+
+// クラス名の生成
+const buttonClasses = [
+  'c-form-submit-button',
+  `c-form-submit-button--${size}`,
+  `c-form-submit-button--${variant}`,
+  fullWidth ? 'c-form-submit-button--full-width' : '',
+  loading ? 'c-form-submit-button--loading' : '',
+  className
+].filter(Boolean).join(' ');
+---
+
+<div class="c-form-submit-button-wrapper">
+  <button
+    type={type}
+    class={buttonClasses}
+    disabled={disabled || loading}
+    onclick={onClick}
+    aria-label={loading ? loadingText : text}
+  >
+    {loading && (
+      <span class="c-form-submit-button__spinner">
+        <svg class="c-form-submit-button__spinner-icon" viewBox="0 0 24 24">
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="2"
+            fill="none"
+            stroke-linecap="round"
+            stroke-dasharray="60"
+            stroke-dashoffset="60"
+          />
+        </svg>
+      </span>
+    )}
+    <span class="c-form-submit-button__text">
+      {displayText}
+    </span>
+  </button>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-form-submit-button-wrapper {
+  margin-block-start: 80px;
+  @include me.sp {
+    max-width: 69.2857vw;
+    margin-block-start: 32px;
+  }
+}
+
+.c-form-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--f-en);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-out-quad);
+  position: relative;
+  overflow: hidden;
+
+  // サイズバリエーション
+  &--small {
+    height: 40px;
+    padding: 0 24px;
+    font-size: 1.4rem;
+    line-height: 1.6;
+  }
+
+  &--medium {
+    height: 48px;
+    padding: 0 32px;
+    font-size: 1.5rem;
+    line-height: 1.7;
+  }
+
+  &--large {
+    height: 57px;
+    padding: 0 40px;
+    font-size: 1.6rem;
+    line-height: 1.8;
+
+    @include me.sp {
+      height: 48px;
+      font-size: 1.4rem;
+    }
+  }
+
+  // 幅バリエーション
+  &--full-width {
+    width: 100%;
+    max-width: 430px;
+  }
+
+  // カラーバリエーション
+  &--primary {
+    background-color: var(--c-white);
+    color: var(--c-black);
+
+    &:hover:not(:disabled) {
+      background-color: var(--c-gray);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--c-black);
+    color: var(--c-white);
+    border: 1px solid var(--c-white);
+
+    &:hover:not(:disabled) {
+      background-color: var(--c-white);
+      color: var(--c-black);
+      transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  &--outline {
+    background-color: transparent;
+    color: var(--c-white);
+    border: 1px solid var(--c-white);
+
+    &:hover:not(:disabled) {
+      background-color: var(--c-white);
+      color: var(--c-black);
+      transform: translateY(-2px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // ローディング状態
+  &--loading {
+    cursor: not-allowed;
+
+    .c-form-submit-button__spinner {
+      display: inline-block;
+    }
+  }
+
+  // 無効化状態
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+
+    &:hover {
+      transform: none !important;
+    }
+  }
+
+  // スピナー
+  &__spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  &__spinner-icon {
+    width: 100%;
+    height: 100%;
+    animation: spin 1s linear infinite;
+  }
+
+  // テキスト
+  &__text {
+    user-select: none;
+  }
+
+  // キーボードフォーカス
+  &:focus-visible {
+    outline: 2px solid var(--c-white);
+    outline-offset: 2px;
+  }
+
+  // 成功状態（将来の拡張用）
+  &--success {
+    background-color: #51cf66;
+    color: var(--c-white);
+
+    &:hover:not(:disabled) {
+      background-color: #40c057;
+    }
+  }
+
+  // エラー状態（将来の拡張用）
+  &--error {
+    background-color: var(--c-input-error);
+    color: var(--c-white);
+
+    &:hover:not(:disabled) {
+      background-color: #ff5252;
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    stroke-dashoffset: 60;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    transform: rotate(360deg);
+    stroke-dashoffset: -60;
+  }
+}
+
+// ダブルクリック防止のスタイル
+.c-form-submit-button:active {
+  pointer-events: none;
+}
+
+// レスポンシブ対応
+@include me.sp {
+  .c-form-submit-button-wrapper {
+    text-align: center;
+  }
+
+  .c-form-submit-button--full-width {
+    width: 100%;
+    max-width: none;
+  }
+}
+</style>

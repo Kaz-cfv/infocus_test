@@ -1,86 +1,11 @@
 ---
 import RelatedCard from "../../ProjectCard.astro";
 
-const projects = [
-  {
-    id: 1,
-    title: 'LOEWE x GR8L',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/01.jpg',
-    url: '#'
-  },
-  {
-    id: 2,
-    title: 'HUMAN MADE',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/02.jpg',
-    url: '#'
-  },
-  {
-    id: 3,
-    title: 'Adobe Photoshop',
-    tags: [
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/03.jpg',
-    url: '#'
-  },
-  {
-    id: 4,
-    title: 'KEI Collection PARIS',
-    tags: [
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/04.jpg',
-    url: '#'
-  },
-  {
-    id: 5,
-    title: 'uka Regenerative Good',
-    tags: [
-      { name: 'Movie', url: '/category/movie' },
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/05.jpg',
-    url: '#'
-  },
-  {
-    id: 6,
-    title: 'TOGA ARCHIVES',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/06.jpg',
-    url: '#'
-  },
-  {
-    id: 7,
-    title: 'CANADA GOOSE',
-    tags: [
-      { name: 'Movie', url: '/category/movie' },
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/07.jpg',
-    url: '#'
-  },
-  {
-    id: 8,
-    title: 'BLUE NOTE PLACE',
-    tags: [
-      { name: 'Graphic', url: '/category/graphic' },
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/08.jpg',
-    url: '#'
-  },
-];
+export interface Props {
+  projects: any[];
+}
 
+const { projects } = Astro.props;
 ---
 <aside class="p-project-detail-related">
   <div class="p-project-detail-related__title">(RELATED PROJECTS)</div>

@@ -1,0 +1,167 @@
+---
+import ContactFormInput from './ContactFormInput.astro';
+import ContactFormComplete from './ContactFormComplete.astro';
+---
+
+<section class="p-contact-form">
+  <div class="p-contact-form__inner contact">
+
+    <!-- 共通ヘッダー部分 -->
+    <div class="p-contact-form__head">
+      <h2 class="p-contact-form__title">CONTACT US</h2>
+      <p class="p-contact-form__subtitle">Let's have a conversation.</p>
+    </div>
+
+    <!-- 入力画面 -->
+    <ContactFormInput />
+
+    <!-- 完了画面 -->
+    <ContactFormComplete />
+
+  </div>
+</section>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-contact-form {
+  background-color: var(--c-black-base);
+  padding-block: 100px;
+
+  &__inner {
+    @include me.pc {
+      max-width: 675px;
+      margin-inline: auto;
+    }
+    @include me.sp {
+      padding-inline: 20px;
+    }
+  }
+
+  // 状態遷移のための基本スタイル
+  .contact {
+    position: relative;
+  }
+
+  .contact__content {
+    &[data-state="input"] {
+      display: block;
+    }
+
+    &[data-state="confirm"],
+    &[data-state="complete"] {
+      display: none;
+    }
+  }
+
+  &__head {
+    display: grid;
+    row-gap: 12px;
+    margin-block-end: 80px;
+    @include me.pc {
+      grid-template-columns: repeat(2, max-content);
+      align-items: flex-end;
+      column-gap: 44px;
+    }
+  }
+
+  &__title {
+    font-size: 4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin-block-end: 4px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  &__form {
+    @include me.pc {
+      max-width: 675px;
+    }
+  }
+}
+
+// メッセージ表示用のスタイル
+.contact-form-message {
+  margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 6px;
+  animation: slideInDown 0.3s ease-out;
+
+  &--success {
+    background-color: rgba(81, 207, 102, 0.1);
+    border: 1px solid #51cf66;
+
+    h3 {
+      color: #51cf66;
+    }
+
+    p {
+      color: var(--c-white);
+    }
+  }
+
+  &--error {
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid #ff6b6b;
+
+    h3 {
+      color: #ff6b6b;
+    }
+
+    p {
+      color: var(--c-white);
+    }
+  }
+
+  &__content {
+    h3 {
+      font-family: var(--f-en);
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    p {
+      font-family: var(--f-en);
+      font-size: 1.4rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+}
+
+@keyframes slideInDown {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// レスポンシブ対応
+@include me.sp {
+  .contact-form-message {
+    margin-bottom: 30px;
+    padding: 16px;
+
+    &__content {
+      h3 {
+        font-size: 1.4rem;
+      }
+
+      p {
+        font-size: 1.3rem;
+      }
+    }
+  }
+}
+</style>

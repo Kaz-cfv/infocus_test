@@ -1,0 +1,80 @@
+---
+---
+
+<div class="c-interview-card">
+  <a href="#" target="_blank" rel="noopener noreferrer" class="c-interview-card__thumb">
+    <figure>
+      <img src="/common/images/career/interview01.png" alt="">
+    </figure>
+  </a>
+  <div class="c-interview-card__info">
+    <div class="c-interview-card__info-title">「崩すための型」を作り込み、スタッフの集合値を引き出す</div>
+    <span class="c-interview-card__info-staff">Taiju Nakajima</span>
+    <ul class="c-interview-card__info-tags">
+      <li>
+        <a href="#">Art Director</a>
+      </li>
+      <li>
+        <a href="#">Executive Officer</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.c-interview-card {
+  display: grid;
+  row-gap: 12px;
+
+  &__thumb {
+    display: block;
+    aspect-ratio: 340 / 192;
+  }
+
+  &__info {
+    display: grid;
+    row-gap: 10px;
+
+    &-title {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    &-staff {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    &-tags {
+      display: flex;
+      column-gap: 8px;
+
+      li {
+        display: flex;
+        column-gap: 8px;
+        color: rgba($color: #AAAAAA, $alpha: 0.9);
+        font-size: 1.4rem;
+        font-weight: 700;
+
+        &:not(:last-child) {
+          &::after {
+            content: "/";
+          }
+        }
+
+        a {
+          color: rgba($color: #AAAAAA, $alpha: 0.9);
+        }
+      }
+    }
+  }
+}
+
+</style>
