@@ -48,7 +48,7 @@ class App {
       this.initTeamDetail();
       this.initCareer();
       this.initJobs();
-      // this.initContact();
+      this.initContact();
       // this.initNews();
     } catch (error) {
       console.error('Error initializing components:', error);
