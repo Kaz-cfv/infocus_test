@@ -73,6 +73,20 @@ const { title, pageName, meta } = Astro.props;
 import '../assets/js/main.js';
 </script>
 
+<script is:inline>
+// Contact page specific initialization
+if (document.body.dataset.page === 'contact') {
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const { default: Contact } = await import('/src/assets/js/pages/Contact.js');
+      new Contact();
+    } catch (error) {
+      console.error('Failed to load Contact module:', error);
+    }
+  });
+}
+</script>
+
 <style>
 :root {
   /* Color */
