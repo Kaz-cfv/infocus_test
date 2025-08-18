@@ -17,19 +17,6 @@ const pageMeta = {
 
 </Layout>
 
-<!-- Contactページ専用スクリプトを直接読み込み -->
-<script src="/common/js/contact.js" is:inline></script>
-<script is:inline>
-  // Contactクラスが読み込まれた後に初期化
-  document.addEventListener('DOMContentLoaded', () => {
-    if (window.Contact) {
-      new window.Contact();
-    } else {
-      console.error('Contact class not found');
-    }
-  });
-</script>
-
 <style lang="scss" is:global>
 @use '../../assets/scss/mediaquery' as me;
 @use '../../assets/scss/mixin' as mi;
