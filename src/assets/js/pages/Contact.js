@@ -224,22 +224,86 @@ class Contact {
       return false;
     }
 
-    try {
-      const response = await fetch(formUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(this.formData),
-      });
+    return new Promise((resolve) => {
+      try {
+        // 非表示iframeを作成
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.top = '-9999px';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.border = 'none';
+        iframe.style.opacity = '0';
+        iframe.name = 'hidden_iframe_' + Date.now();
 
-      console.log('Form submitted successfully');
-      return true;
-    } catch (error) {
-      console.error('Form submission error:', error);
-      return false;
-    }
+        // 一時的なフォームを作成
+        const tempForm = document.createElement('form');
+        tempForm.method = 'POST';
+        tempForm.action = formUrl;
+        tempForm.target = iframe.name;
+        tempForm.style.display = 'none';
+
+        // フォームデータをhidden inputとして追加
+        for (const [key, value] of Object.entries(this.formData)) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = value;
+          tempForm.appendChild(input);
+          console.log(`Adding to form: ${key} = ${value}`);
+        }
+
+        // DOMに追加
+        document.body.appendChild(iframe);
+        document.body.appendChild(tempForm);
+
+        // iframeのロード完了を監視
+        let completed = false;
+        const cleanup = () => {
+          if (completed) return;
+          completed = true;
+
+          setTimeout(() => {
+            try {
+              if (iframe.parentNode) {
+                document.body.removeChild(iframe);
+              }
+              if (tempForm.parentNode) {
+                document.body.removeChild(tempForm);
+              }
+            } catch (e) {
+              console.log('Cleanup error (non-critical):', e);
+            }
+          }, 100);
+
+          console.log('Form submitted via iframe');
+          resolve(true);
+        };
+
+        // イベントリスナーを設定
+        iframe.onload = cleanup;
+        iframe.onerror = () => {
+          console.log('iframe error occurred, but continuing...');
+          cleanup();
+        };
+
+        // タイムアウトを設定
+        setTimeout(() => {
+          if (!completed) {
+            console.log('iframe timeout, assuming success');
+            cleanup();
+          }
+        }, 3000);
+
+        // フォーム送信
+        tempForm.submit();
+
+      } catch (error) {
+        console.error('Form submission error:', error);
+        resolve(false);
+      }
+    });
   }
 
   // 送信処理
