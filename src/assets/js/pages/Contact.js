@@ -167,21 +167,15 @@ class Contact {
     }
 
     try {
-      // no-corsモードではレスポンスを読み取れないが、これは正常
-      await fetch(formUrl, {
+      const response = await fetch(formUrl, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
         body: new URLSearchParams(this.formData),
       });
 
-      // no-corsモードでは常にtrue（送信自体はされている）
       console.log('Form submitted successfully (no-cors mode)');
       return true;
     } catch (error) {
-      // ネットワークエラーなど、実際の送信失敗時のみfalse
       console.error('Form submission error:', error);
       return false;
     }
