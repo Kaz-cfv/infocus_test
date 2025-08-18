@@ -16,7 +16,7 @@ import { About } from './pages/About.js';
 import { TeamDetail } from './pages/TeamDetail.js';
 import { Career } from './pages/Career.js';
 import { Jobs } from './pages/Jobs.js';
-import Contact from './pages/Contact.js';
+// import Contact from './pages/Contact.js';
 // import { News } from './pages/News.js';
 
 class App {
@@ -48,7 +48,7 @@ class App {
       this.initTeamDetail();
       this.initCareer();
       this.initJobs();
-      this.initContact();
+      // this.initContact();
       // this.initNews();
     } catch (error) {
       console.error('Error initializing components:', error);
