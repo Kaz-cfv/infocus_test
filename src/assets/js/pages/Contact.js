@@ -19,7 +19,8 @@ class Contact {
     // ボタン要素
     this.$submitButton = this.$inputContent.querySelector('.--button .c-button');
 
-    // 送信用データオブジェクト
+    // 表示用とAPI送信用の別々のデータオブジェクトを用意
+    this.displayData = {};
     this.formData = {};
 
     this.init();
@@ -148,48 +149,71 @@ class Contact {
 
   // フォームデータの収集
   collectFormData() {
+    const formData = new FormData(this.$form);
+    this.displayData = {};
     this.formData = {};
 
-    // 全ての入力要素を取得してデータを収集
-    const inputs = this.$form.querySelectorAll('input, textarea, select');
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) continue; // ファイル型は除外
 
-    inputs.forEach(input => {
-      const name = input.name;
-      if (!name) return; // name属性がない場合はスキップ
+      // 日付フィールドの処理
+      if (key.includes('entry.') && value.includes('-')) {
+        const isPotentialDate = /^\d{4}-\d{2}-\d{2}$/.test(value); // YYYY-MM-DD形式かどうかをチェック
+        if (isPotentialDate) {
+          try {
+            const date = new Date(value);
+            // 元のキーから年月日のキーを生成
+            const baseKey = key.split('_')[0];
 
-      if (input.type === 'radio') {
-        // ラジオボタンの処理
-        if (input.checked) {
-          this.formData[name] = input.value;
-          console.log(`Radio collected: ${name} = ${input.value}`);
+            // Google Forms送信用データ
+            this.formData[`${baseKey}_year`] = date.getFullYear().toString();
+            this.formData[`${baseKey}_month`] = (date.getMonth() + 1).toString();
+            this.formData[`${baseKey}_day`] = date.getDate().toString();
+
+            // 確認画面表示用データ
+            this.displayData[key] = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+          } catch (e) {
+            console.error('Date parsing error:', e);
+            this.displayData[key] = value;
+            this.formData[key] = value;
+          }
+        } else {
+          // 日付形式でない場合
+          this.displayData[key] = value;
+          this.formData[key] = value;
         }
-      } else if (input.type === 'checkbox') {
-        // チェックボックスの処理
-        if (input.checked) {
-          this.formData[name] = input.value;
-          console.log(`Checkbox collected: ${name} = ${input.value}`);
+      } else if (key.includes('entry.')) {
+        // entry.で始まるフィールドの処理
+        const input = this.$form.querySelector(`[name="${key}"]`);
+        if (input && input.type === 'checkbox') {
+          // チェックボックスの処理
+          if (input.checked) {
+            const checkboxValue = input.value; // value属性の値を取得
+            this.formData[key] = checkboxValue;   // 送信用にはvalue属性の値を使用
+            this.displayData[key] = checkboxValue; // 表示用も同じ
+          }
+        } else {
+          // その他のフィールド
+          this.formData[key] = value;
+          this.displayData[key] = value;
         }
-      } else if (input.type === 'file') {
-        // ファイル型は除外
-        return;
       } else {
-        // その他のフィールド（text, email, textarea等）
-        const value = input.value ? input.value.trim() : '';
-        if (value) {
-          this.formData[name] = value;
-          console.log(`Input collected: ${name} = ${value}`);
-        }
+        // entry.で始まらないフィールド
+        this.formData[key] = value;
+        this.displayData[key] = value;
       }
-    });
-
-    // デバッグ用ログ
-    console.log('=== Final collected form data ===');
-    console.log(this.formData);
-
-    // データが空の場合は警告
-    if (Object.keys(this.formData).length === 0) {
-      console.warn('警告: フォームデータが空です');
     }
+
+    // デバッグ用
+    console.log('=== Form Data Collection ===');
+    console.log('Display Data:', this.displayData);
+    console.log('Form Data for API:', this.formData);
+
+    // グローバルにアクセス可能にする
+    window.contactData = {
+      displayData: this.displayData,
+      formData: this.formData
+    };
   }
 
   // Google Formsへのデータ送信
@@ -201,122 +225,20 @@ class Contact {
     }
 
     try {
-      // FormDataを使用してデータを作成
-      const formData = new FormData();
-
-      // フォームデータをFormDataに追加
-      for (const [key, value] of Object.entries(this.formData)) {
-        formData.append(key, value);
-        console.log(`Adding to FormData: ${key} = ${value}`);
-      }
-
-      // fetchで送信（no-corsモード）
       const response = await fetch(formUrl, {
         method: 'POST',
         mode: 'no-cors',
-        body: formData
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(this.formData),
       });
 
-      console.log('Form submitted via fetch (no-cors)');
+      console.log('Form submitted successfully');
       return true;
-
     } catch (error) {
-      console.error('Fetch submission failed:', error);
-
-      // フォールバック: iframeを使用した送信
-      try {
-        console.log('Trying iframe fallback method...');
-        return this.submitViaIframe(formUrl);
-      } catch (iframeError) {
-        console.error('Iframe fallback also failed:', iframeError);
-        return false;
-      }
-    }
-  }
-
-  // iframeを使用したフォールバック送信
-  submitViaIframe(formUrl) {
-    return new Promise((resolve) => {
-      // 非表示iframeを作成
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'absolute';
-      iframe.style.left = '-9999px';
-      iframe.style.top = '-9999px';
-      iframe.style.width = '1px';
-      iframe.style.height = '1px';
-      iframe.style.border = 'none';
-      iframe.name = 'hidden_iframe_' + Date.now();
-
-      // 一時的なフォームを作成
-      const tempForm = document.createElement('form');
-      tempForm.method = 'POST';
-      tempForm.action = formUrl;
-      tempForm.target = iframe.name;
-      tempForm.style.display = 'none';
-
-      // フォームデータをhidden inputとして追加
-      for (const [key, value] of Object.entries(this.formData)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        tempForm.appendChild(input);
-        console.log(`Adding to temp form: ${key} = ${value}`);
-      }
-
-      // DOMに追加
-      document.body.appendChild(iframe);
-      document.body.appendChild(tempForm);
-
-      // iframeのロード完了を監視
-      let completed = false;
-      const cleanup = () => {
-        if (completed) return;
-        completed = true;
-
-        setTimeout(() => {
-          try {
-            if (iframe.parentNode) {
-              document.body.removeChild(iframe);
-            }
-            if (tempForm.parentNode) {
-              document.body.removeChild(tempForm);
-            }
-          } catch (e) {
-            console.log('Cleanup error (non-critical):', e);
-          }
-        }, 100);
-
-        console.log('Form submitted via iframe fallback');
-        resolve(true);
-      };
-
-      // イベントリスナーを設定
-      iframe.onload = cleanup;
-      iframe.onerror = cleanup;
-
-      // タイムアウトも設定
-      setTimeout(cleanup, 5000);
-
-      // フォーム送信
-      tempForm.submit();
-    });
-  }
-
-  // 現在の入力値を隠しフィールドに設定
-  setHiddenInputs() {
-    // 既存の隠しフィールドをクリア
-    const existingHiddenInputs = this.$form.querySelectorAll('input[type="hidden"].temp-hidden');
-    existingHiddenInputs.forEach(input => input.remove());
-
-    // 新しい隠しフィールドを作成
-    for (const [key, value] of Object.entries(this.formData)) {
-      const hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = key;
-      hiddenInput.value = value;
-      hiddenInput.className = 'temp-hidden';
-      this.$form.appendChild(hiddenInput);
+      console.error('Form submission error:', error);
+      return false;
     }
   }
 
@@ -339,26 +261,14 @@ class Contact {
 
       if (success) {
         console.log('Form submission completed successfully');
+        this.$inputContent.style.display = 'none';
+        this.$completeContent.style.display = 'block';
 
-        // 送信成功時は少し待ってから成功画面を表示
-        setTimeout(() => {
-          this.$inputContent.style.display = 'none';
-          this.$completeContent.style.display = 'block';
+        // ページトップにスクロール
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
-          // ページトップにスクロール
-          window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-
-          // フォームをリセット
-          this.$form.reset();
-
-          // ボタンを元に戻す
-          this.$submitButton.disabled = false;
-          this.$submitButton.textContent = 'SEND';
-        }, 800); // 0.8秒待つだけに短縮
-
+        // フォームをリセット
+        this.$form.reset();
       } else {
         // 送信失敗時はボタンを元に戻す
         this.$submitButton.disabled = false;
