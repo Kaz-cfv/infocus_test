@@ -41,7 +41,7 @@ class VideoScrollController {
     }
 
     if (videoCards.length === 0) {
-      console.log('動画を持つカードが見つかりませんでした');
+      // console.log('動画を持つカードが見つかりませんでした');
       return;
     }
 

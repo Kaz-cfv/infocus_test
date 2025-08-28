@@ -111,6 +111,9 @@ const { title, description, pic, url } = Astro.props;
   &-pic {
     position: relative;
     z-index: 1;
+    @include me.pc {
+      max-width: 330px;
+    }
   }
 
   &-link {

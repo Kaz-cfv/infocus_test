@@ -2,74 +2,78 @@
 const category = [
   {
     name: 'BRANDING',
-    url: '#'
+    slug: 'branding',
   },
   {
     name: 'ART DIRECTION',
-    url: '#'
+    slug: 'art-direction',
   },
   {
     name: 'WEB',
-    url: '#'
+    slug: 'web',
   },
   {
     name: 'FILM',
-    url: '#'
+    slug: 'film',
   },
   {
     name: 'EDITORIAL',
-    url: '#'
+    slug: 'editorial',
+  },
+  {
+    name: 'GLOBAL',
+    slug: 'global',
   },
   {
     name: 'ARCHIVED',
-    url: '#'
+    slug: 'archived',
   }
 ]
 
-const type = [
+const tags = [
   {
     name: 'CI・VI',
-    url: '#',
+    slug: 'ci-vi',
   },
   {
     name: 'Advertisement',
-    url: '#',
+    slug: 'advertisement',
   },
   {
     name: 'Photography',
-    url: '#',
+    slug: 'photography',
   },
   {
     name: 'Graphic',
-    url: '#',
+    slug: 'graphic',
   },
   {
     name: '3DCG',
-    url: '#',
+    slug: '3dcg',
   },
   {
     name: 'Brand Website',
-    url: '#',
+    slug: 'brand-website',
   },
   {
     name: 'Corporate Website',
-    url: '#',
+    slug: 'corporate-website',
   },
   {
     name: 'E-Commerce',
-    url: '#',
+    slug: 'e-commerce',
   },
   {
     name: 'Brand Film',
-    url: '#',
+    slug: 'brand-film',
   },
   {
     name: 'Documentary Film',
-    url: '#',
+    slug: 'documentary-film',
   },
   {
     name: 'Motion Graphic',
-    url: '#',
+    slug: 'motion-graphic',
   },
 ]
 ---
@@ -102,13 +106,13 @@ const type = [
 
     <ul class="p-project-head__category">
       <li class="p-project-head__category-item" data-category="All">
-        <a href="#" aria-current="true">
+        <a href="/projects/" aria-current="true">
           <span>ALL</span>
         </a>
       </li>
       {category.map(category => (
         <li class="p-project-head__category-item" data-category={category.name}>
-          <a href={category.url} aria-current="false">
+          <a href={category.slug === 'archived' ? '/projects/?archived=true' : `/projects/?category=${category.slug}`} aria-current="false">
             <span>{category.name}</span>
           </a>
         </li>
@@ -116,10 +120,10 @@ const type = [
     </ul>
   </div>
 
-  <ul class="p-project-head__type">
-    {type.map(type => (
-      <li class="p-project-head__type-item">
-        <a href={type.url}>{type.name}</a>
+  <ul class="p-project-head__tag js-hover">
+    {tags.map(tag => (
+      <li class="p-project-head__tag-item js-hover-item">
+        <a href={`/projects/?tag=${tag.slug}`}>{tag.name}</a>
       </li>
     ))}
   </ul>
@@ -178,19 +182,23 @@ const type = [
     column-gap: 10px;
     row-gap: 10px;
     @include me.pc {
-      max-width: 324px;
+      max-width: 384px;
     }
 
     &-item {
+      @include me.pc {
+        min-width: 60.18px;
+      }
 
       a {
-        display: inline-block;
+        display: block;
         position: relative;
         padding-inline: 16px;
         padding-block: 5px 6px;
         color: var(--c-white);
         font-size: 1.4rem;
         font-weight: 600;
+        text-align: center;
         @include me.pc {
           font-size: 1.2rem;
         }
@@ -207,6 +215,7 @@ const type = [
         }
         &[aria-current="true"] {
           color: var(--c-black-base);
+          pointer-events: none;
           &::before {
             border-color: var(--c-gray02);
             background-color: var(--c-white);
@@ -352,7 +361,7 @@ const type = [
   }
 
 
-  &__type {
+  &__tag {
     display: flex;
     flex-wrap: wrap;
     column-gap: 6px;

@@ -3,21 +3,21 @@ import Item from "./Item.astro";
 
 interface Props {
   title: string;
-  category: string;
+  sub: string;
   jobData: Array<{
     label: string;
     content: string | string[];
   }>;
 }
 
-const { title, category, jobData } = Astro.props;
+const { title, sub, jobData } = Astro.props;
 ---
 
 <div class="c-accordion">
   <details class="c-accordion__wrap js-details">
     <summary class="c-accordion__head js-summary">
       <span class="c-accordion__head-title">{title}</span>
-      <span class="c-accordion__head-category">{category}</span>
+      <span class="c-accordion__head-category">{sub}</span>
       <i class="c-accordion__head-icon">+</i>
     </summary>
     <div class="c-accordion__content js-content">

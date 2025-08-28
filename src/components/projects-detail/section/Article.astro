@@ -7,18 +7,55 @@ import Credit from "./Credit.astro";
 
 export interface Props {
   project: any;
+  prevProject?: {
+    slug: string;
+    title: string;
+  } | null;
+  nextProject?: {
+    slug: string;
+    title: string;
+  } | null;
 }
 
-const { project } = Astro.props;
+const { project, prevProject = null, nextProject = null } = Astro.props;
+
+const getEyecatchData = () => {
+  const movieUrl = project.acfs?.main?.movie?.url;
+  const imageUrl = project.acfs?.main?.image?.url;
+
+  // 動画が設定されている場合（falseでない場合）は動画を優先
+  if (movieUrl && movieUrl !== false) {
+    return {
+      type: 'video',
+      url: movieUrl,
+      caption: project.title || 'Project video',
+      hasMedia: true
+    };
+  }
+
+  // 動画がない場合、画像をチェック
+  if (imageUrl && imageUrl !== false) {
+    return {
+      type: 'image',
+      url: imageUrl,
+      caption: project.title || 'Project image',
+      hasMedia: true
+    };
+  }
+
+  // どちらも設定されていない場合
+  return {
+    type: null,
+    url: null,
+    caption: null,
+    hasMedia: false
+  };
+};
 
 const article = {
-  eyecatch: {
-    type: 'image',
-    url: project.acfs?.main?.image?.url || '/common/images/dummy/project_detail_thumb.png',
-    caption: project.title || 'Project image',
-  },
+  eyecatch: getEyecatchData(),
   title: project.title || '',
-  website: project.acfs?.project_url?.url || '#',
+  website: project.acfs?.project_url || '',
   client: project.acfs?.basics?.clients || '',
   year: project.acfs?.basics?.year || '',
   service: project.acfs?.basics?.service ?
@@ -35,19 +72,21 @@ const article = {
 }
 ---
 
-<article class="p-project-detail-article">
+<article class="p-project-detail-article" data-main-content>
   <div class="p-project-detail__fixedNavi--sp">
-    <FixedNavi />
+    <FixedNavi prevProject={prevProject} nextProject={nextProject} />
   </div>
   <div class="p-project-detail-article__info">
     <div class="p-project-detail-article__info-inner">
-      <div class="p-project-detail-article__info-thumb">
-        {article.eyecatch.type === 'video' ? (
-          <video src={article.eyecatch.url} muted autoplay playsinline></video>
-        ) : (
-          <figure><img src={article.eyecatch.url} alt={article.eyecatch.caption} /></figure>
-        )}
-      </div>
+      {article.eyecatch.hasMedia && (
+        <div class="p-project-detail-article__info-thumb">
+          {article.eyecatch.type === 'video' ? (
+            <video src={article.eyecatch.url} muted autoplay loop playsinline></video>
+          ) : (
+            <figure><img src={article.eyecatch.url} alt={article.eyecatch.caption} /></figure>
+          )}
+        </div>
+      )}
       <h1 class="p-project-detail-article__info-title">{article.title}</h1>
       <Table
         website={article.website}
@@ -57,21 +96,23 @@ const article = {
         awards={article.awards}
       />
       <div class="p-project-detail__fixedNavi--pc">
-        <FixedNavi />
+        <FixedNavi prevProject={prevProject} nextProject={nextProject} />
       </div>
     </div>
   </div>
 
   <div class="p-project-detail-article__content">
-    <div class="p-project-detail-article__eyecatch">
-      {article.eyecatch.type === 'video' ? (
-        <video src={article.eyecatch.url} muted autoplay playsinline></video>
-      ) : (
-        <figure>
-          <img src={article.eyecatch.url} alt={article.eyecatch.caption} />
-        </figure>
-      )}
-    </div>
+    {article.eyecatch.hasMedia && (
+      <div class="p-project-detail-article__eyecatch">
+        {article.eyecatch.type === 'video' ? (
+          <video src={article.eyecatch.url} muted autoplay loop playsinline></video>
+        ) : (
+          <figure>
+            <img src={article.eyecatch.url} alt={article.eyecatch.caption} />
+          </figure>
+        )}
+      </div>
+    )}
     <Lead
       title={article.lead.title}
       text={article.lead.text}

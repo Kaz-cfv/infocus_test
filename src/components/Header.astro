@@ -86,26 +86,31 @@ navigationItems.forEach(item => {
 
       <!-- ナビゲーション -->
       <nav class="l-header__nav">
-        <ul class="l-header__nav-list">
+        <ul class="l-header__nav-list js-hover">
           {navigationItems.map((item) => (
             item.isDivider ? (
               <li class="l-header__nav-item l-header__nav-item--divider"></li>
             ) : (
-              <li class="l-header__nav-item" data-navi={item.navi}>
+              <li class="l-header__nav-item js-hover-item" data-navi={item.navi}>
                 <a href={item.url}>{item.title}</a>
               </li>
             )
           ))}
+          <li class="l-header__nav-item js-lang" data-navi="lang">
+            <a href="/en/" class="js-lang-item" data-state="">EN</a>
+            /
+            <a href="/" class="js-lang-item" data-state="current">JA</a>
+          </li>
         </ul>
       </nav>
     </div>
 
     <div class="l-header__inner-right">
       <!-- 言語切り替え -->
-      <div class="l-header__lang">
-        <a href="#" class="l-header__lang-link">EN</a>
+      <div class="l-header__lang js-hover js-lang">
+        <a href="/en/" class="l-header__lang-link js-lang-item js-hover-item" data-state="">EN</a>
         <span>/</span>
-        <a href="#" class="l-header__lang-link">JP</a>
+        <a href="/" class="l-header__lang-link js-lang-item js-hover-item" data-state="current">JA</a>
       </div>
 
       <!-- ハンバーガーメニューボタン -->
@@ -122,6 +127,16 @@ navigationItems.forEach(item => {
 @use '../assets/scss/mediaquery' as me;
 @use '../assets/scss/mixin' as mi;
 
+.js-lang {
+  &-item {
+    color: var(--c-gray04) !important;
+  }
+
+  [data-state="current"] {
+    color: var(--c-white) !important;
+  }
+}
+
 .l-header {
   display: grid;
   position: sticky;
@@ -136,7 +151,8 @@ navigationItems.forEach(item => {
     align-items: center;
     position: relative;
     z-index: 2;
-    height: 80px;
+    // height: 80px;
+    height: 53.42px;
     padding-inline: 40px;
     border-bottom: 2px solid var(--c-white);
     background-color: var(--c-black-base);
@@ -147,12 +163,12 @@ navigationItems.forEach(item => {
       padding-inline: 17px;
     }
     @at-root .is-opened & {
-      background-color: var(--cp-menu-bg);
+      background-color: var(--c-black-base);
       border-bottom-color: var(--cp-menu-bg);
     }
     @at-root .is-scrolled & {
       @include me.pc {
-        height: 53.42px;
+        // height: 53.42px;
       }
     }
 
@@ -160,7 +176,11 @@ navigationItems.forEach(item => {
       display: flex;
       align-items: center;
       @include me.pc {
-        column-gap: 152px;
+        // column-gap: 152px;
+        column-gap: 10.5555vw;
+      }
+      @media (max-width: 999px) {
+        column-gap: calc(10.5555vw * 0.6);
       }
       @include me.sp {
         justify-content: space-between;
@@ -181,22 +201,24 @@ navigationItems.forEach(item => {
 
   &__logo {
     display: block;
-    width: 80px;
-    height: 30px;
+    // width: 80px;
+    // height: 30px;
+    width: 49px;
+    height: 19px;
     @include me.sp {
       width: 61px;
       height: 23px;
     }
     @at-root .is-scrolled & {
       @include me.pc {
-        width: 49px;
-        height: 19px;
+        // width: 49px;
+        // height: 19px;
       }
     }
 
     svg path {
       @at-root .is-opened & {
-        fill: var(--c-black);
+        // fill: var(--c-black);
       }
     }
   }
@@ -220,12 +242,25 @@ navigationItems.forEach(item => {
         &[data-navi="projects"] {
           display: block;
         }
+        @at-root .is-opened &[data-navi="projects"] {
+          display: none;
+        }
+      }
+      &[data-navi="lang"] {
+        @include me.pc {
+          display: none;
+        }
+      }
+      @at-root .is-opened &[data-navi="lang"] {
+        @include me.sp {
+          display: block;
+        }
       }
 
       a {
         color: var(--c-white);
         @at-root .is-opened & {
-          color: var(--c-black);
+          // color: var(--c-black);
         }
       }
 
@@ -244,18 +279,12 @@ navigationItems.forEach(item => {
     @include me.sp {
       display: none;
     }
-    @at-root .is-opened & {
-      color: var(--c-black);
-    }
 
     &-link {
       font-family: var(--f-en);
       font-weight: 600;
       font-size: 1.4rem;
       color: var(--c-white);
-      @at-root .is-opened & {
-        color: var(--c-black);
-      }
     }
   }
 
@@ -264,32 +293,27 @@ navigationItems.forEach(item => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
+    // width: 40px;
+    // height: 40px;
+    width: 18px;
+    height: 18px;
     background: transparent;
-    border: 2px solid var(--c-white);
-    border-radius: 100%;
-    @at-root .is-opened & {
-      border-color: var(--c-black);
-    }
     @at-root .is-scrolled & {
       @include me.pc {
-        width: 25px;
-        height: 25px;
+        // width: 25px;
+        // height: 25px;
       }
     }
 
     &-line {
       display: block;
-      width: 18px;
+      // width: 18px;
+      width: 100%;
       height: 2px;
       background-color: var(--c-white);
-      @at-root .is-opened & {
-        background-color: var(--c-black);
-      }
       @at-root .is-scrolled & {
         @include me.pc {
-          width: 11px;
+          // width: 11px;
         }
       }
 

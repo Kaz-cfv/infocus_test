@@ -2,216 +2,61 @@
 import Accordion from "../parts/Accordion.astro";
 import ButtonJoin from "../parts/ButtonJoin.astro";
 
-const positions = [
-  {
-    title: 'WEBディレクター',
-    category: 'TOKYO',
-    data: [
-      {
-        label: '仕事内容',
-        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
-      },
-      {
-        label: '応募資格',
-        content: [
-          '未経験可',
-          '社会人経験1年以上',
-          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
-          '学習意欲のある方',
-          '物怖じせず前向きなコミュニケーション取れる方'
-        ]
-      },
-      {
-        label: '教育スキル',
-        content: [
-          'WEB関連業界の業界経験',
-          '見積もり作成や進行管理の経験',
-          '外部パートナーとの連携経験'
-        ]
-      },
-      {
-        label: '雇用形態',
-        content: '正社員（中途）<br>※試用期間3ヵ月'
-      },
-      {
-        label: '勤務地',
-        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
-      },
-      {
-        label: '勤務時間',
-        content: '10:00～19:00'
-      },
-      {
-        label: '給与',
-        content: '経験・能力の上、当社規定により決定'
-      },
-      {
-        label: '待遇',
-        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
-      },
-      {
-        label: '休日・休暇',
-        content: '土、祝、夏季休暇、年末年始休暇'
-      }
-    ]
-  },
-  {
-    title: 'WEBデザイナー',
-    category: 'TOKYO',
-    data: [
-      {
-        label: '仕事内容',
-        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
-      },
-      {
-        label: '応募資格',
-        content: [
-          '未経験可',
-          '社会人経験1年以上',
-          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
-          '学習意欲のある方',
-          '物怖じせず前向きなコミュニケーション取れる方'
-        ]
-      },
-      {
-        label: '教育スキル',
-        content: [
-          'WEB関連業界の業界経験',
-          '見積もり作成や進行管理の経験',
-          '外部パートナーとの連携経験'
-        ]
-      },
-      {
-        label: '雇用形態',
-        content: '正社員（中途）<br>※試用期間3ヵ月'
-      },
-      {
-        label: '勤務地',
-        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
-      },
-      {
-        label: '勤務時間',
-        content: '10:00～19:00'
-      },
-      {
-        label: '給与',
-        content: '経験・能力の上、当社規定により決定'
-      },
-      {
-        label: '待遇',
-        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
-      },
-      {
-        label: '休日・休暇',
-        content: '土、祝、夏季休暇、年末年始休暇'
-      }
-    ]
-  },
-  {
-    title: '映像プロダクションマネージャー',
-    category: 'TOKYO',
-    data: [
-      {
-        label: '仕事内容',
-        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
-      },
-      {
-        label: '応募資格',
-        content: [
-          '未経験可',
-          '社会人経験1年以上',
-          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
-          '学習意欲のある方',
-          '物怖じせず前向きなコミュニケーション取れる方'
-        ]
-      },
-      {
-        label: '教育スキル',
-        content: [
-          'WEB関連業界の業界経験',
-          '見積もり作成や進行管理の経験',
-          '外部パートナーとの連携経験'
-        ]
-      },
-      {
-        label: '雇用形態',
-        content: '正社員（中途）<br>※試用期間3ヵ月'
-      },
-      {
-        label: '勤務地',
-        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
-      },
-      {
-        label: '勤務時間',
-        content: '10:00～19:00'
-      },
-      {
-        label: '給与',
-        content: '経験・能力の上、当社規定により決定'
-      },
-      {
-        label: '待遇',
-        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
-      },
-      {
-        label: '休日・休暇',
-        content: '土、祝、夏季休暇、年末年始休暇'
-      }
-    ]
-  },
-  {
-    title: '映像プロデューサー',
-    category: 'TOKYO',
-    data: [
-      {
-        label: '仕事内容',
-        content: 'ディレクターやプロデューサーと連携しながら、プロジェクトマネジメント業務を担当していただきます。クライアントとのやり取り、予算管理、リソース管理など、案件をスムーズに進めるための進行管理をしていただきます。'
-      },
-      {
-        label: '応募資格',
-        content: [
-          '未経験可',
-          '社会人経験1年以上',
-          'Zoom、Google、スプレッドシート、Slackなどの基本的なPCスキル',
-          '学習意欲のある方',
-          '物怖じせず前向きなコミュニケーション取れる方'
-        ]
-      },
-      {
-        label: '教育スキル',
-        content: [
-          'WEB関連業界の業界経験',
-          '見積もり作成や進行管理の経験',
-          '外部パートナーとの連携経験'
-        ]
-      },
-      {
-        label: '雇用形態',
-        content: '正社員（中途）<br>※試用期間3ヵ月'
-      },
-      {
-        label: '勤務地',
-        content: '東京都渋谷区富ヶ谷1-31丁目49-4'
-      },
-      {
-        label: '勤務時間',
-        content: '10:00～19:00'
-      },
-      {
-        label: '給与',
-        content: '経験・能力の上、当社規定により決定'
-      },
-      {
-        label: '待遇',
-        content: '交通費支給（月額3万5千円まで）、各種社会保険完備'
-      },
-      {
-        label: '休日・休暇',
-        content: '土、祝、夏季休暇、年末年始休暇'
-      }
-    ]
-  }
-];
+interface Props {
+  positions: any[];
+}
+
+const { positions } = Astro.props;
+
+// APIデータをアコーディオン用の形式に変換
+// 改行コードを<br>タグに変換する関数
+const formatTextWithBreaks = (text: string | undefined) => {
+  if (!text) return '';
+  return text.replace(/\r\n|\n|\r/g, '<br>');
+};
+
+const formattedPositions = positions.map(position => ({
+  title: position.title.rendered,
+  place: position.acfs.place,
+  data: [
+    {
+      label: '仕事内容',
+      content: formatTextWithBreaks(position.acfs.details)
+    },
+    {
+      label: '応募資格',
+      content: formatTextWithBreaks(position.acfs.requires)
+    },
+    {
+      label: '教育スキル',
+      content: formatTextWithBreaks(position.acfs.skill)
+    },
+    {
+      label: '雇用形態',
+      content: formatTextWithBreaks(position.acfs.type)
+    },
+    {
+      label: '勤務地',
+      content: formatTextWithBreaks(position.acfs.location)
+    },
+    {
+      label: '勤務時間',
+      content: formatTextWithBreaks(position.acfs.hours)
+    },
+    {
+      label: '給与',
+      content: formatTextWithBreaks(position.acfs.salary)
+    },
+    {
+      label: '待遇',
+      content: formatTextWithBreaks(position.acfs.benefis)
+    },
+    {
+      label: '休日・休暇',
+      content: formatTextWithBreaks(position.acfs.timeoff)
+    }
+  ].filter(item => item.content) // データがある項目のみ表示
+}));
 ---
 
 <section id="position" class="p-career-position">
@@ -219,10 +64,10 @@ const positions = [
   <span class="p-career-position__sub">現在募集中のポジション</span>
 
   <div class="p-career-position__content">
-    {positions.map((item) => (
+    {formattedPositions.map((item) => (
       <Accordion
         title={item.title}
-        category={item.category}
+        sub={item.place}
         jobData={item.data}
       />
     ))}

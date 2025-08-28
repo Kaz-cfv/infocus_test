@@ -1,51 +1,145 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Article from '../../components/team-detail/section/Article.astro';
+import Related from '../../components/team-detail/section/Related.astro';
 
 export async function getStaticPaths() {
   try {
-    // 静的JSONファイルからチームデータを取得
-    const response = await fetch('https://infocus.wp.site-prev2.com/api/team.json');
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // チームデータを取得
+    const teamResponse = await fetch('https://infocus.wp.site-prev2.com/api/team.json');
+    if (!teamResponse.ok) {
+      throw new Error(`HTTP error! status: ${teamResponse.status}`);
     }
-
-    const teamData = await response.json();
+    const teamData = await teamResponse.json();
     const teamArray = Array.isArray(teamData) ? teamData : [teamData];
 
+    // インタビューデータを取得
+    const careerResponse = await fetch('https://infocus.wp.site-prev2.com/api/career.json');
+    let interviewData = [];
+    if (careerResponse.ok) {
+      const careerData = await careerResponse.json();
+      // career.jsonの構造に合わせて取得
+      if (Array.isArray(careerData) && careerData.length > 0 && careerData[0].interview) {
+        interviewData = careerData[0].interview;
+      } else {
+        console.error('❌ Career data structure unexpected:', careerData);
+      }
+    } else {
+      console.error('❌ Failed to fetch career.json:', careerResponse.status);
+    }
+
     // 各チームメンバーのパスを生成
-    return teamArray
+    // 前後ナビゲーション用に日付順でソート（降順 = 新しい順）
+    const sortedTeamArray = teamArray
       .filter(item => item.title && item.slug)
-      .map((item) => ({
-        params: { slug: item.slug },
-        props: {
-          member: {
-            id: item.id,
-            slug: item.slug,
-            name: item.title.trim(),
-            image: item.acfs?.image?.url || '/common/images/team/default.png',
-            description: item.acfs?.html || '',
-            position: item.acfs?.position || '',
-            positionTags: item.acfs && item.acfs['position-tag'] && Array.isArray(item.acfs['position-tag'])
-              ? item.acfs['position-tag']
-              : [],
-            sns: item.acfs && item.acfs.sns && Array.isArray(item.acfs.sns)
-              ? item.acfs.sns
-              : [],
-            interview: item.acfs && item.acfs.interview && Array.isArray(item.acfs.interview) && item.acfs.interview.length > 0
-              ? item.acfs.interview[0]
-              : null
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return sortedTeamArray
+      .map((item) => {
+        // 現在のメンバーのインデックスを取得
+        const currentIndex = sortedTeamArray.findIndex(p => p.slug === item.slug);
+
+        // 前後のメンバーを特定
+        let prevMember = null;
+        let nextMember = null;
+
+        if (currentIndex !== -1) {
+          // 前のメンバー（より新しいメンバー）
+          if (currentIndex > 0) {
+            const prev = sortedTeamArray[currentIndex - 1];
+            prevMember = {
+              slug: prev.slug,
+              name: prev.title
+            };
+          }
+
+          // 次のメンバー（より古いメンバー）
+          if (currentIndex < sortedTeamArray.length - 1) {
+            const next = sortedTeamArray[currentIndex + 1];
+            nextMember = {
+              slug: next.slug,
+              name: next.title
+            };
           }
         }
-      }));
+        // チームメンバーに関連するインタビューを検索
+        // team.jsonのacfs.interview[0].IDとcareer.jsonのinterview.idを照合
+        let memberInterview = null;
+        if (item.acfs?.interview && Array.isArray(item.acfs.interview) && item.acfs.interview.length > 0) {
+          const teamInterviewId = item.acfs.interview[0].ID; // IDは大文字
+
+          memberInterview = interviewData.find(interview => {
+            const matchFound = interview.id === teamInterviewId;
+            return matchFound;
+          });
+        }
+
+        return {
+          params: { slug: item.slug },
+          props: {
+            member: {
+              id: item.id,
+              slug: item.slug,
+              name: item.title.trim(),
+              image: item.acfs?.image?.url || '/common/images/team/default.png',
+              description: item.acfs?.html || '',
+              position: item.acfs?.position || '',
+              positionTags: item.acfs && item.acfs['position-tag'] && Array.isArray(item.acfs['position-tag'])
+                ? item.acfs['position-tag']
+                : [],
+              sns: item.acfs && item.acfs.sns && Array.isArray(item.acfs.sns)
+                ? item.acfs.sns
+                : [],
+              interview: memberInterview || null
+            },
+            // 前後のメンバー情報を追加
+            prevMember: prevMember,
+            nextMember: nextMember,
+            // 他のメンバー一覧も同時に渡す（現在のメンバーを除く）
+            otherMembers: sortedTeamArray
+              .filter(otherItem => otherItem.slug !== item.slug)
+              .map((otherItem) => {
+                // position-tagデータを整形
+                const tags = [];
+
+                // acfs.positionが存在し、空でない場合は最初に追加
+                if (otherItem.acfs?.position && otherItem.acfs.position.trim() !== '') {
+                  tags.push({
+                    name: otherItem.acfs.position.trim(),
+                    url: '/team/'
+                  });
+                }
+
+                // position-tagを追加
+                if (otherItem.acfs && otherItem.acfs['position-tag'] && Array.isArray(otherItem.acfs['position-tag'])) {
+                  otherItem.acfs['position-tag'].forEach(tag => {
+                    if (tag.name) {
+                      tags.push({
+                        name: tag.name,
+                        url: `/team/?position=${tag.slug}`
+                      });
+                    }
+                  });
+                }
+
+                return {
+                  id: otherItem.id,
+                  name: otherItem.title.trim(),
+                  pic: otherItem.acfs?.thumbnail?.url || otherItem.acfs?.image?.url,
+                  url: `/team/${otherItem.slug}/`,
+                  tags: tags
+                };
+              })
+          }
+        };
+      });
   } catch (error) {
     console.error('❌ Failed to generate team static paths:', error);
     return [];
   }
 }
 
-const { member } = Astro.props;
+const { member, otherMembers, prevMember, nextMember } = Astro.props;
 
 // Positionデータを整形（一覧と同じロジック）
 const positionData = [];
@@ -114,10 +208,10 @@ if (member.sns && member.sns.length > 0) {
 let interviewData = null;
 if (member.interview) {
   interviewData = {
-    title: member.interview.post_title || '',
-    description: member.interview.post_content || member.interview.post_excerpt || '',
-    pic: '/common/images/dummy/team_detail_interview.png', // 一旦ダミー画像を使用
-    url: member.interview.guid || '#'
+    title: member.interview.title?.rendered || '',
+    description: member.interview.acfs?.text || '',
+    pic: member.interview.acfs?.image?.url,
+    url: member.interview.acfs?.url || member.interview.link || '#'
   };
 }
 
@@ -141,6 +235,12 @@ const pageMeta = {
   description={member.description}
   links={linksData}
   interview={interviewData}
+  prevMember={prevMember}
+  nextMember={nextMember}
 />
+
+{otherMembers && otherMembers.length > 0 && (
+  <Related members={otherMembers} />
+)}
 
 </Layout>

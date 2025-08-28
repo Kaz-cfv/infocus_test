@@ -1,17 +1,52 @@
 ---
+interface Props {
+  prevProject?: {
+    slug: string;
+    title: string;
+  } | null;
+  nextProject?: {
+    slug: string;
+    title: string;
+  } | null;
+}
 
+const { prevProject = null, nextProject = null } = Astro.props;
 ---
 
 <nav class="p-project-detail__fixedNavi">
   <ul class="p-project-detail__fixedNavi-list">
-    <li data-navi="prev" class="p-project-detail__fixedNavi-item --first">
-      <a href="#">Prev</a>
+    <li
+      data-navi="prev"
+      class={`p-project-detail__fixedNavi-item --first ${!prevProject ? '--disabled' : ''}`}
+    >
+      {prevProject ? (
+        <a
+          href={`/projects/${prevProject.slug}/`}
+          title={prevProject.title}
+        >
+          Prev
+        </a>
+      ) : (
+        <span>Prev</span>
+      )}
     </li>
     <li data-navi="projects" class="p-project-detail__fixedNavi-item">
       <a href="/projects/">All Projects</a>
     </li>
-    <li data-navi="next" class="p-project-detail__fixedNavi-item --last">
-      <a href="#">Next</a>
+    <li
+      data-navi="next"
+      class={`p-project-detail__fixedNavi-item --last ${!nextProject ? '--disabled' : ''}`}
+    >
+      {nextProject ? (
+        <a
+          href={`/projects/${nextProject.slug}/`}
+          title={nextProject.title}
+        >
+          Next
+        </a>
+      ) : (
+        <span>Next</span>
+      )}
     </li>
   </ul>
 </nav>
@@ -36,14 +71,16 @@
         background-color: transparent;
       }
     }
-    &.--first,
-    &.--last{
-      a {
+    // 無効状態のスタイル
+    &.--disabled {
+      a, span {
         pointer-events: none;
+        opacity: 0.5;
+        color: var(--c-gray) !important;
       }
     }
 
-    a {
+    a, span {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -53,6 +90,7 @@
       color: var(--c-white);
       font-size: 1.4rem;
       font-weight: 600;
+
       &::after {
         content: "";
         position: absolute;
@@ -61,6 +99,15 @@
         width: 1px;
         height: 100%;
         background-color: var(--c-gray);
+      }
+    }
+
+    // ホバー効果（有効な場合のみ）
+    &:not(.--disabled) a {
+      transition: background-color .3s var(--ease-in-out-quad);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
       }
     }
   }

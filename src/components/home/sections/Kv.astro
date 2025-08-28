@@ -1,8 +1,9 @@
 ---
-
+// Props型定義 - 空のPropsでクライアントサイドで動的に設定
+export interface Props {}
 ---
 
-<div class="p-home-kv" data-video>
+<div class="p-home-kv" data-video id="kvContainer">
   <div class="p-home-kv__item">
     <video
       id="kvVideo"
@@ -15,6 +16,53 @@
     </video>
   </div>
 </div>
+
+<!-- クライアントサイドでAPIデータを受け取る -->
+<script>
+  // カスタムイベントでAPIデータを受け取る
+  document.addEventListener('homeDataLoaded', (event) => {
+    const homeData = (event as CustomEvent).detail;
+
+    // ヒーロー動画のデータを処理
+    let heroMovie = null;
+
+    // データ構造に応じて柔軟に対応
+    let herosData = null;
+    if (homeData?.heros) {
+      herosData = homeData.heros;
+    } else if (homeData?.home?.heros) {
+      herosData = homeData.home.heros;
+    }
+
+    if (herosData && Array.isArray(herosData) && herosData.length > 0) {
+      // 複数の動画からランダムに1つを選択
+      const randomIndex = Math.floor(Math.random() * herosData.length);
+      const selectedHero = herosData[randomIndex];
+
+      // movieプロパティから動画URLを取得
+      heroMovie = selectedHero.movie || null;
+      // console.log('🎥 動画URLを取得:', heroMovie);
+    }
+
+    // 動画URLをvideoタグに設定
+    const videoElement = document.getElementById('kvVideo');
+    if (videoElement && heroMovie) {
+      // HTMLVideoElementとして型キャスト
+      const video = videoElement as HTMLVideoElement;
+      video.src = heroMovie;
+
+      video.addEventListener('error', (e) => {
+        console.error('❌ 動画の読み込みエラー:', e);
+      });
+
+    } else {
+      console.warn('⚠️ 動画URLが取得できませんでした', {
+        videoElement: !!videoElement,
+        heroMovie: heroMovie
+      });
+    }
+  });
+</script>
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;

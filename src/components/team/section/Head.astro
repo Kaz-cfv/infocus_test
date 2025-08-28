@@ -1,18 +1,19 @@
 ---
-// チームカテゴリーのデータ
-const categories = [
-  { name: "Producer", url: "#" },
-  { name: "Art Director", url: "#" },
-  { name: "Graphic Designer", url: "#" },
-  { name: "Web Director", url: "#" },
-  { name: "Web Designer", url: "#" },
-  { name: "Front-end Engineer", url: "#" },
-  { name: "Editor", url: "#" },
-  { name: "Film Director", url: "#" },
-  { name: "Film Editor", url: "#" },
-  { name: "Production Manager", url: "#" },
-  { name: "Project Manager", url: "#" },
-  { name: "Account Manager", url: "#" }
+// ポジションのデータ
+const positions = [
+  { name: "Creative Director", slug: "creative-director" },
+  { name: "Producer", slug: "producer" },
+  { name: "Art Director", slug: "art-director" },
+  { name: "Graphic Designer", slug: "graphic-designer" },
+  { name: "Web Director", slug: "web-director" },
+  { name: "Web Designer", slug: "web-designer" },
+  { name: "Front-end Engineer", slug: "front-end-engineer" },
+  { name: "Engineer", slug: "engineer" },
+  { name: "Film Director", slug: "film-director" },
+  { name: "Film Editor", slug: "film-editor" },
+  { name: "Production Manager", slug: "production-manager" },
+  { name: "Project Manager", slug: "project-manager" },
+  { name: "Account Manager", slug: "account-manager" }
 ];
 
 ---
@@ -20,19 +21,16 @@ const categories = [
 <div class="p-team-head">
   <h2 class="p-team-head__title">TEAM</h2>
 
-  <ul class="p-team-head__category">
-    <li class="p-team-head__category-item" data-filter="">
-      <a href="#">Creative Director</a>
-    </li>
-    {categories.map((category => (
-      <li class="p-team-head__category-item">
-        <a href={category.url}>{category.name}</a>
+  <ul class="p-team-head__position js-hover">
+    {positions.map((position => (
+      <li class="p-team-head__position-item js-hover-item" data-filter="">
+        <a href={`/team/?position=${position.slug}`}>{position.name}</a>
       </li>
     )))}
   </ul>
 
   <div class="p-team-head__btn" data-filter="current">
-    <button>ALL</button>
+    <a href="/team/">ALL</a>
   </div>
 </div>
 
@@ -65,7 +63,7 @@ const categories = [
     }
   }
 
-  &__category {
+  &__position {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -98,6 +96,11 @@ const categories = [
           color: var(--c-white);
         }
       }
+      &[data-filter="uncurrent"] {
+        a {
+          color: var(--c-gray);
+        }
+      }
 
       a {
         color: var(--c-white);
@@ -115,13 +118,16 @@ const categories = [
     @include me.sp {
       margin-block-start: 30px;
     }
-    &[data-filter="current"] button {
+    &[data-filter="current"] a {
       pointer-events: none;
       background-color: var(--c-white);
       color: var(--c-black-base);
     }
 
-    button {
+    a {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
       width: 60.18px;
       height: 25px;
       border: solid 1px var(--c-white);
@@ -134,7 +140,5 @@ const categories = [
       }
     }
   }
-
 }
-
 </style>

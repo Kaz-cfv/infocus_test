@@ -1,23 +1,38 @@
 ---
+interface Props {
+  title: string;
+  image?: string;
+  name: string;
+  position: string;
+  url: string;
+}
+
+const { title, image, name, position, url } = Astro.props;
+
+// ポジションを配列に分割（複数ポジションがスラッシュ区切りの場合）
+const positions = position ? position.split('/').map(p => p.trim()) : [];
 ---
 
 <div class="c-interview-card">
-  <a href="#" target="_blank" rel="noopener noreferrer" class="c-interview-card__thumb">
+  <a href={url} target="_blank" rel="noopener noreferrer" class="c-interview-card__thumb">
     <figure>
-      <img src="/common/images/career/interview01.png" alt="">
+      <img src={image} alt={title}>
     </figure>
   </a>
   <div class="c-interview-card__info">
-    <div class="c-interview-card__info-title">「崩すための型」を作り込み、スタッフの集合値を引き出す</div>
-    <span class="c-interview-card__info-staff">Taiju Nakajima</span>
-    <ul class="c-interview-card__info-tags">
-      <li>
-        <a href="#">Art Director</a>
-      </li>
-      <li>
-        <a href="#">Executive Officer</a>
-      </li>
-    </ul>
+    <div class="c-interview-card__info-title">{title}</div>
+    {name && (
+      <span class="c-interview-card__info-staff">{name}</span>
+    )}
+    {positions.length > 0 && (
+      <ul class="c-interview-card__info-tags">
+        {positions.map((pos, index) => (
+          <li key={index}>
+            <span>{pos}</span>
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
 </div>
 
@@ -69,7 +84,7 @@
           }
         }
 
-        a {
+        a, span {
           color: rgba($color: #AAAAAA, $alpha: 0.9);
         }
       }

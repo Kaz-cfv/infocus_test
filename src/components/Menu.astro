@@ -1,4 +1,6 @@
 ---
+import NewsLetter from "./NewsLetter.astro"
+
 const menu = [
   {
     name: 'PROJECTS',
@@ -32,6 +34,21 @@ const menu = [
   },
 ]
 
+const links = [
+  {
+    name: 'IFFD',
+    url: 'https://iffd.in-focus.co.jp/'
+  },
+  {
+    name: 'IFNY',
+    url: '#'
+  },
+  {
+    name: 'STORE',
+    url: '#'
+  },
+]
+
 const sns = [
   {
     name: 'instagram',
@@ -56,9 +73,9 @@ const sns = [
   <!-- ナビゲーション -->
   <div class="l-menu__inner">
     <nav class="l-menu__navi">
-      <ul class="l-menu__navi-list">
+      <ul class="l-menu__navi-list js-hover">
         {menu.map((item) => (
-          <li class="l-menu__navi-item" data-menu={item.navi}>
+          <li class="l-menu__navi-item js-hover-item" data-menu={item.navi}>
             <a href={item.url}>{item.name}</a>
           </li>
         ))}
@@ -71,40 +88,48 @@ const sns = [
         <section class="l-menu__section" data-section="tokyo">
           <span class="l-menu__section-heading">TOKYO</span>
           <p>
-            1-49-4, TOMIGAYA, SHIBUYA-KU, TOKYO, 151-0063
-          </p>
-          <p>
-            TEL / FAX +81 3 6427 5227
+            1-49-4, Tomigaya,&nbsp;<br class="sp">
+            Shibuya-ku,<br>
+            151-0063 Tokyo, Japan
           </p>
         </section>
         <section class="l-menu__section" data-section="newyork">
           <span class="l-menu__section-heading">NEWYORK</span>
           <p>
-            ny@infocusinc.com
+            161 Water Street,&nbsp;<br class="sp">
+            20th Floor<br class="pc">
+            #2038,<br>
+            New York, NY 10038, USA
           </p>
         </section>
       </div>
+    </div>
 
-      <div class="l-menu__info-inner" data-info="sns">
-        <ul class="l-menu__sns">
-          {sns.map((item) => (
-            <li class="l-menu__sns-item" data-sns={item.name}>
-              <a href={item.url} target="_blank">{item.name}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div class="l-menu__link">
+      <ul class="l-menu__link-list js-hover">
+        {links.map((link => (
+          <li class="l-menu__link-item js-hover-item">
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.name}
+              <span><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.0736 8.72203L7.36962 2.33958C5.70689 2.40791 2.78076 2.37538 0.958582 2.39815L0.958574 0.689864L10.3193 0.665467L10.342 0.688244L10.2737 10.0725L8.5199 10.0725C8.55406 8.26167 8.57683 5.27785 8.64515 3.61511L2.34912 9.99756L1.0736 8.72203Z" fill="white"/></svg></span>
+            </a>
+          </li>
+        )))}
+      </ul>
+    </div>
 
-      <div class="l-menu__info-inner" data-info="lang">
-        <ul class="l-menu__lang">
-          <li class="l-menu__lang-item"><a href="#">EN</a></li>
-          <li class="l-menu__lang-item"><a href="#">JP</a></li>
-        </ul>
-      </div>
+    <ul class="l-menu__sns js-hover">
+      {sns.map((item) => (
+        <li class="l-menu__sns-item js-hover-item" data-sns={item.name}>
+          <a href={item.url} target="_blank">{item.name}</a>
+        </li>
+      ))}
+    </ul>
+
+    <div class="l-menu__newsletter">
+      <NewsLetter />
     </div>
   </div>
-
-  <div class="l-menu__logo"><img src="/common/images/common/logo_hd_fade.png" width="652px" height="280px"></div>
 </div>
 
 <style lang="scss">
@@ -112,6 +137,7 @@ const sns = [
 @use '../assets/scss/mixin' as mi;
 
 .l-menu {
+  overflow: hidden;
   opacity: 0;
   visibility: hidden;
   position: absolute;
@@ -120,17 +146,21 @@ const sns = [
   z-index: -1;
   width: 100vw;
   height: 100dvh;
-  background-color: var(--cp-menu-bg);
+  background-color: var(--c-black-base);
   transition: opacity .3s ease-out, visibility .3s ease-out;
+
   @include me.pc {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
+    background-color: rgba($color: #111111, $alpha: 0.74);
   }
+
   @include me.sp {
-    padding-inline: 17px;
-    padding-block: 85px;
+    padding-inline: 30px;
+    padding-block: calc(var(--hd-height-sp) + 70px);
   }
+
   &.is-opened {
     opacity: 1;
     visibility: visible;
@@ -138,42 +168,59 @@ const sns = [
   }
 
   &__inner {
+    display: grid;
+    transform: translateX(100%);
+    transition: transform .3s var(--ease-out-quad);
+
+    @at-root .l-menu.is-opened & {
+      transform: translateX(0);
+    }
+
     @include me.pc {
-      display: grid;
-      grid-template-columns: 55% 45%;
-      align-content: flex-start;
+      grid-template-columns: repeat(2, max-content);
+      justify-content: center;
+      align-content: center;
+      column-gap: 92px;
+      row-gap: 53px;
       position: relative;
       z-index: 2;
-      max-width: 800px;
-      width: 100vw;
-      margin-inline: auto;
+      width: 50vw;
+      height: 100vh;
+      border-left: solid 1px var(--c-white);
+      background-color: var(--c-black-base);
+    }
+
+    @include me.sp {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 30px;
+      row-gap: 40px;
     }
   }
 
   &__navi {
+    @include me.pc {
+      grid-row: 1 / 4;
+    }
 
     &-list {
       display: grid;
       @include me.pc {
-        row-gap: 4px;
+        row-gap: 40px;
+      }
+      @include me.sp {
+        row-gap: 18px;
       }
     }
 
     &-item {
-      font-size: 4.4rem;
+      font-size: 3rem;
       font-weight: 600;
       @include me.sp {
-        font-size: 3.8rem;
+        font-size: 2.6rem;
       }
 
       a {
-        @include me.pc {
-          transition: color .3s ease-out, text-shadow .3s ease-out;
-          &:hover {
-            color: transparent;
-            text-shadow: 0 0 20px rgba(0,0,0,.4);
-          }
-        }
+        color: var(--c-white);
       }
     }
   }
@@ -185,16 +232,13 @@ const sns = [
       padding-block-start: 10px;
     }
     @include me.sp {
-      margin-top: 20px;
+      padding-block-start: 4px;
       row-gap: 20px;
     }
 
     &-inner {
       display: grid;
       row-gap: 30px;
-      @include me.sp {
-        row-gap: 20px;
-      }
 
       &[data-info="office"] {
         @include me.sp {
@@ -225,6 +269,7 @@ const sns = [
     &-heading {
       display: inline-block;
       margin-bottom: 10px;
+      color: var(--c-white);
       font-size: 1.8rem;
       font-weight: 600;
       @include me.sp {
@@ -237,13 +282,9 @@ const sns = [
     }
 
     p {
-      font-size: 1.2rem;
-      @include me.pc {
-        line-height: 2;
-      }
-      @include me.sp {
-        font-size: 1.1rem;
-      }
+      color: var(--c-gray);
+      font-size: 1.4rem;
+      line-height: 1.8;
 
       & + p {
         margin-top: 2px;
@@ -254,10 +295,51 @@ const sns = [
     }
   }
 
+  &__link {
+    @include me.pc {
+      grid-column: 2;
+      grid-row: 3 / 5;
+    }
+
+    &-list {
+      display: grid;
+      row-gap: 22px;
+    }
+
+    &-item {
+
+      a {
+        display: flex;
+        align-items: center;
+        column-gap: 8px;
+        color: var(--c-white);
+        font-size: 1.8rem;
+        font-weight: 600;
+      }
+
+      span {
+        display: block;
+        margin-block-start: 2px;
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+
   &__sns {
     display: flex;
     align-items: center;
-    column-gap: 12px;
+    align-self: flex-end;
+    column-gap: 22px;
+    @include me.pc {
+      grid-column: 1;
+      grid-row: 4;
+    }
+    @include me.sp {
+      grid-column: 2;
+      grid-row: 2;
+      column-gap: 24px;
+    }
 
     &-item {
       font-size: 0;
@@ -268,34 +350,34 @@ const sns = [
       &[data-sns="instagram"] {
         width: 23px;
         height: 23px;
-        background-image: url(/common/images/common/icon_instagram.svg);
+        background-image: url(/common/images/common/icon_instagram_w.svg);
         @include me.sp {
-          width: 19px;
-          height: 19px;
+          width: 18px;
+          height: 18px;
         }
       }
       &[data-sns="twitter"] {
         width: 18px;
         height: 18px;
-        background-image: url(/common/images/common/icon_x.svg);
+        background-image: url(/common/images/common/icon_x_w.svg);
         @include me.sp {
-          width: 16px;
-          height: 19px;
+          width: 18px;
+          height: 18px;
         }
       }
       &[data-sns="note"] {
         width: 20px;
         height: 20px;
-        background-image: url(/common/images/common/icon_note.svg);
+        background-image: url(/common/images/common/icon_note_w.svg);
         @include me.sp {
-          width: 16px;
-          height: 19px;
+          width: 18px;
+          height: 18px;
         }
       }
       &[data-sns="fb"] {
         width: 11px;
         height: 22px;
-        background-image: url(/common/images/common/icon_fb.svg);
+        background-image: url(/common/images/common/icon_fb_w.svg);
         @include me.sp {
           width: 10px;
           height: 19px;
@@ -309,27 +391,13 @@ const sns = [
     }
   }
 
-  &__lang {
-    display: flex;
-    column-gap: 15px;
-
-    &-item {
-
-      a {
-        font-size: 1.4rem;
-        font-weight: 600;
-      }
+  &__newsletter {
+    grid-column: 1 / 3;
+    @include me.pc {
+      grid-row: 5;
     }
-  }
-
-  &__logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    opacity: .17;
     @include me.sp {
-      display: none;
+      margin-block-start: 54px;
     }
   }
 }

@@ -12,15 +12,7 @@ const { label, content } = Astro.props;
     <span>{label}</span>
   </dt>
   <dd>
-    {Array.isArray(content) ? (
-      <ul>
-        {content.map((item) => (
-          <li set:html={item}></li>
-        ))}
-      </ul>
-    ) : (
-      <p set:html={content}></p>
-    )}
+    <p set:html={content}></p>
   </dd>
 </dl>
 

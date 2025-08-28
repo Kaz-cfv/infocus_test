@@ -1,0 +1,33 @@
+---
+import Layout from '@layouts/LayoutEn.astro';
+import Kv from '@components/home/sections/Kv.astro';
+import Intro from '@components/home/sections/Intro.astro';
+import Projects from '@components/home/sections/Projects.astro';
+import Asides from '@components/home/sections/Asides.astro';
+
+const pageMeta = {
+  title: "HOME",
+  ogpType: "website"
+};
+---
+
+<Layout
+  title=""
+  pageName="home"
+  meta={pageMeta}
+>
+
+<div class="l-main-content" data-main-content>
+  <Kv />
+  <Intro />
+  <Projects />
+  <Asides />
+</div>
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+</style>

@@ -22,9 +22,9 @@ const { id, name, pic, url, tags } = Astro.props;
   </a>
   <div class="c-team-card__info">
     <h3 class="c-team-card__name">{name}</h3>
-    <ul class="c-team-card__tags">
+    <ul class="c-team-card__tags js-hover">
       {tags.map((tag) => (
-        <li class="c-team-card__tags-item">
+        <li class="c-team-card__tags-item js-hover-item">
           {tag.isPosition ? (
             <p>{tag.name}</p>
           ) : tag.url && tag.url !== "#" && tag.url !== '' ? (

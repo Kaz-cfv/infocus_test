@@ -1,317 +1,28 @@
 ---
 import TeamCard from '../../team/parts/TeamCard.astro';
 
-const items = [
-  {
-    id: 1,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/11.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/12.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/13.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/14.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/15.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 6,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/11.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 7,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/12.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 8,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/13.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 9,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/14.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 10,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/15.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 11,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/11.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 12,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/12.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 13,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/13.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 14,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/14.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-  {
-    id: 15,
-    name: 'Atsushi Kaneishi',
-    pic: '/common/images/team/15.png',
-    url: '/team/detail/',
-    tags: [
-      {
-        name: 'Executive Officer',
-        url: '/team/',
-      },
-      {
-        name: 'Creative Director',
-        url: '/team/',
-      },
-      {
-        name: 'Web Director',
-        url: '/team/',
-      },
-    ],
-  },
-]
+interface Props {
+  members?: Array<{
+    id: number;
+    name: string;
+    pic: string;
+    url: string;
+    tags: Array<{
+      name: string;
+      url: string;
+    }>;
+  }>;
+}
 
+const { members = [] } = Astro.props;
 ---
 
 <aside class="p-team-detail__related">
 
-  <div class="p-team-detail__related-title">(MEET MORE)</div>
+  <div class="p-team-detail__related-title">MEET MORE</div>
   <div class="p-team-detail__related-content js-more-content">
     <ul class="p-team-detail__related-list">
-      {items.map((item => (
+      {members.map((item) => (
         <li class="p-team-detail__related-item">
           <TeamCard
             id={item.id}
@@ -321,7 +32,7 @@ const items = [
             tags={item.tags}
           />
         </li>
-      )))}
+      ))}
     </ul>
 
     <!-- SP時の2カラムレイアウト用 -->
@@ -337,7 +48,6 @@ const items = [
       <span><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.52691 0.114V10.705C9.71691 9.413 11.5019 7.441 12.8279 6.047L14.1199 7.373L7.54091 14.241H7.48991L0.893906 7.373L2.23691 6.047C3.54591 7.441 5.33091 9.413 6.52091 10.705V0.114H8.52691Z" fill="white"/></svg></span>
     </button>
   </div>
-
 </aside>
 
 <style lang="scss">
@@ -487,4 +197,3 @@ const items = [
 
 }
 </style>
-

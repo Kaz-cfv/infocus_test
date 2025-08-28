@@ -1,0 +1,76 @@
+---
+
+---
+<div class="c-newsletter">
+  <div class="c-newsletter__title">NEWS LETTER</div>
+  <form class="c-newsletter__form">
+    <input type="email" placeholder="Enter Your email" class="c-newsletter__input">
+    <button type="button" class="c-newsletter__button">Subscribe</button>
+  </form>
+</div>
+
+<style lang="scss">
+@use '../assets/scss/mediaquery' as me;
+@use '../assets/scss/mixin' as mi;
+
+.c-newsletter {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 16px;
+  @include me.pc {
+    width: 454px;
+  }
+  @include me.sp {
+    row-gap: 10px;
+  }
+
+  &__title {
+    color: var(--c-white);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 2.2;
+    @include me.sp {
+      font-size: 1.8rem;
+    }
+  }
+
+  &__form {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    display: flex;
+    align-items: stretch;
+    position: relative;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0;
+    padding-block-end: 9px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid var(--c-white);
+    color: var(--c-gray);
+    font-family: var(--f-en);
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 2.2rem;
+  }
+
+  &__button {
+    height: 40px;
+    padding-inline: 21.42px;
+    background-color: var(--c-white);
+    color: #1A1A1A;
+    font-family: var(--f-en);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 2.2rem;
+    @include me.sp {
+      padding-inline: 17.42px;
+    }
+  }
+}
+</style>

@@ -1,0 +1,13 @@
+/*
+ * マウスオーバー
+ */
+.js-hover {
+
+  &-item {
+    transition: opacity .3s var(--ease-in-out-quad);
+
+    &.is-dimmed {
+      opacity: 0.3 !important;
+    }
+  }
+}

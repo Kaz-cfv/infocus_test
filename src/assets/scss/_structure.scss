@@ -1,4 +1,5 @@
 @use 'font.scss' as *;
+@use 'mediaquery' as me;
 
 html {
   width: 100%;
@@ -75,6 +76,11 @@ figure {
   margin: 0;
   padding: 0;
 }
+
+video {
+  max-width: 100%;
+}
+
 input, select, button {
   color: var(--c-black);
 }
@@ -101,6 +107,18 @@ button, select {
 a:focus,
 input:focus,
 button:focus {
-  outline: 0;
-  box-shadow: 0 0 4px .2rem var(--c-focus);
+  // outline: 0;
+  // box-shadow: 0 0 4px .2rem var(--c-focus);
+}
+
+.pc {
+  @include me.sp {
+    display: none !important;
+  }
+}
+
+.sp {
+  @include me.pc {
+    display: none !important;
+  }
 }

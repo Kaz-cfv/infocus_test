@@ -1,0 +1,163 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Meta from './Meta.astro';
+import type { MetaProps } from './Meta.astro';
+
+interface Props {
+  title: string;
+  pageName: string;
+  meta?: MetaProps;
+}
+
+const { title, pageName, meta } = Astro.props;
+
+// Taxonomy data from WordPress API
+let taxonomyData = {};
+try {
+  const response = await fetch('https://infocus.wp.site-prev2.com/api/taxonomy.json');
+  if (response.ok) {
+    taxonomyData = await response.json();
+  } else {
+    console.warn('Failed to fetch taxonomy data:', response.status);
+  }
+} catch (error) {
+  console.error('Error fetching taxonomy data:', error);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="generator" content={Astro.generator}>
+    <link rel="stylesheet" href="https://use.typekit.net/bwe8xqb.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+    <style lang="scss" is:global>
+      @use '../assets/scss/styles' as *;
+
+      /* Lenis */
+      html.lenis {
+        height: auto;
+      }
+
+      .lenis.lenis-smooth {
+        scroll-behavior: auto;
+      }
+
+      .lenis.lenis-smooth [data-lenis-prevent] {
+        overscroll-behavior: contain;
+      }
+
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+
+      .lenis.lenis-scrolling iframe {
+        pointer-events: none;
+      }
+    </style>
+
+    <Meta title={title} pageMeta={meta} />
+  </head>
+
+  <body data-page={pageName} class={`p-${pageName}`}>
+    <div class="l-container">
+
+      <Header />
+
+      <main class="l-main">
+        <slot />
+      </main>
+
+      <Footer />
+
+    </div>
+  </body>
+</html>
+
+<script define:vars={{ taxonomyData }}>
+  // Make taxonomy data globally available
+  window.taxonomyData = taxonomyData;
+</script>
+
+<script>
+import '../assets/js/main.js';
+</script>
+
+<style>
+:root {
+  /* Color */
+  --c-black: #000000;
+  --c-black-base: #1A1A1A;
+  --c-white: #FFFFFF;
+  --c-gray: #AAAAAA;
+  --c-gray02: #606060;
+  --c-gray03: #828282;
+  --c-gray04: #616161;
+  --c-focus: #7E7E7E;
+
+  --c-input-bg: #222222;
+  --c-input-error: #ff6b6b;
+
+  --c-awards-caption: #888888;
+
+  /* Fonts */
+  --f-en: acumin-pro, sans-serif;
+  --f-jp: "Noto Sans JP", sans-serif;
+
+  /* Header */
+  --hd-height-pc: 53.40px;
+  --hd-height-pc-scrolled: 53.40px;
+  /* --hd-height-pc-scrolled: 53.40px; */
+  --hd-height-sp: 72px;
+
+  /* Components */
+  --cp-menu-bg: #DDDDDD;
+
+  /* Transition */
+  --ease-in-quad:      cubic-bezier(0.550, 0.085, 0.680, 0.530);
+  --ease-in-cubic:     cubic-bezier(0.550, 0.055, 0.675, 0.190);
+  --ease-in-quart:     cubic-bezier(0.895, 0.030, 0.685, 0.220);
+  --ease-in-quint:     cubic-bezier(0.755, 0.050, 0.855, 0.060);
+  --ease-in-sine:      cubic-bezier(0.470, 0.000, 0.745, 0.715);
+  --ease-in-expo:      cubic-bezier(0.950, 0.050, 0.795, 0.035);
+  --ease-in-circ:      cubic-bezier(0.600, 0.040, 0.980, 0.335);
+  --ease-in-back:      cubic-bezier(0.600, -0.280, 0.735, 0.045);
+
+  --ease-out-quad:     cubic-bezier(0.250, 0.460, 0.450, 0.940);
+  --ease-out-cubic:    cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  --ease-out-quart:    cubic-bezier(0.165, 0.840, 0.440, 1.000);
+  --ease-out-quint:    cubic-bezier(0.230, 1.000, 0.320, 1.000);
+  --ease-out-sine:     cubic-bezier(0.390, 0.575, 0.565, 1.000);
+  --ease-out-expo:     cubic-bezier(0.190, 1.000, 0.220, 1.000);
+  --ease-out-circ:     cubic-bezier(0.075, 0.820, 0.165, 1.000);
+  --ease-out-back:     cubic-bezier(0.175, 0.885, 0.320, 1.275);
+
+  --ease-in-out-quad:  cubic-bezier(0.455, 0.030, 0.515, 0.955);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1.000);
+  --ease-in-out-quart: cubic-bezier(0.770, 0.000, 0.175, 1.000);
+  --ease-in-out-quint: cubic-bezier(0.860, 0.000, 0.070, 1.000);
+  --ease-in-out-sine:  cubic-bezier(0.445, 0.050, 0.550, 0.950);
+  --ease-in-out-expo:  cubic-bezier(1.000, 0.000, 0.000, 1.000);
+  --ease-in-out-circ:  cubic-bezier(0.785, 0.135, 0.150, 0.860);
+  --ease-in-out-back:  cubic-bezier(0.680, -0.550, 0.265, 1.550);
+
+  [data-main-content] {
+    opacity: 0;
+    transition: opacity .8s var(--ease-in-out-quad);
+    pointer-events: none;
+  }
+
+  [data-main-content][data-view="true"] {
+    opacity: 1;
+    pointer-events: unset;
+  }
+}
+</style>

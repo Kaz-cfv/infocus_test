@@ -3,10 +3,12 @@
  * トップページでのみ動作するWordPress API取得クラス
  */
 
+import { ApiClient } from '../modules/ApiClient.js';
+
 export class Home {
   constructor() {
-    this.apiEndpoint = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects';
     this.isHomePage = this.checkHomePage();
+    this.apiClient = new ApiClient();
 
     if (this.isHomePage) {
       this.init();
@@ -28,33 +30,26 @@ export class Home {
   /**
    * 初期化処理
    */
-  init() {
-    // this.fetchProjects();
+  async init() {
+    await this.fetchHomeData();
   }
 
   /**
-   * プロジェクトデータを取得
+   * Homeページのデータを取得
    */
-  async fetchProjects() {
+  async fetchHomeData() {
     try {
-      const response = await fetch(this.apiEndpoint);
+      const homeData = await this.apiClient.getHomeData();
+      console.log('Home data:', homeData);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const projects = await response.json();
-
-      console.log('取得したプロジェクト数:', projects.length);
-      console.log('プロジェクトデータ:', projects);
-
-      return projects;
+      // カスタムイベントで他のコンポーネントにデータを配信
+      const event = new CustomEvent('homeDataLoaded', {
+        detail: homeData
+      });
+      document.dispatchEvent(event);
 
     } catch (error) {
-      console.error('エラー詳細:', {
-        message: error.message,
-        endpoint: this.apiEndpoint
-      });
+      console.error('Failed to fetch home data:', error);
     }
   }
 }

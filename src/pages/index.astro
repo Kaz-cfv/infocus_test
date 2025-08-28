@@ -1,9 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Kv from '../components/home/sections/Kv.astro';
-import Intro from '../components/home/sections/Intro.astro';
-import Projects from '../components/home/sections/Projects.astro';
-import Asides from '../components/home/sections/Asides.astro';
+import Layout from '@layouts/LayoutEn.astro';
+import Kv from '@components/home/sections/Kv.astro';
+import Intro from '@components/home/sections/Intro.astro';
+import Projects from '@components/home/sections/Projects.astro';
+import Asides from '@components/home/sections/Asides.astro';
 
 const pageMeta = {
   title: "HOME",
@@ -17,56 +17,14 @@ const pageMeta = {
   meta={pageMeta}
 >
 
-<Kv />
-<Intro />
-<Projects />
-<Asides />
+<div class="l-main-content" data-main-content>
+  <Kv />
+  <Intro />
+  <Projects />
+  <Asides />
+</div>
 
 </Layout>
-
-<!-- 開発時のデバッグ用スクリプト -->
-<script>
-  // モジュールインポート（開発環境でのデバッグ用）
-  import { HomeDataDebugger } from '../assets/js/utils/homeDataDebugger.js';
-
-  // DOMContentLoaded後にデバッグ実行
-  document.addEventListener('DOMContentLoaded', async () => {
-    // デバッグ実行（環境問わず）
-    try {
-      // console.log('🔍 Current environment mode:', import.meta.env.MODE);
-
-      // 静的JSONファイルの読み込み検証
-      const response = await fetch('https://infocus.wp.site-prev2.com/api/home.json');
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const jsonData = await response.json();
-      console.log('✅ Static JSON file loaded successfully:');
-      console.log(jsonData);
-
-      // ホームデータをデバッグ出力
-      // await HomeDataDebugger.fetchAndDebugHomeData();
-
-      // グローバル関数として利用可能にする
-      // console.log('💡 Debug functions available:');
-      // console.log('- debugHomeData() - 全データを出力');
-      // console.log('- debugHomeSection("heros") - ヒーロー動画のみ');
-      // console.log('- debugHomeSection("categories") - カテゴリのみ');
-      // console.log('- debugHomeSection("pickup") - ピックアップのみ');
-      // console.log('- debugHomeSection("banners") - バナーのみ');
-
-    } catch (error) {
-      console.error('🚨 Failed to load static JSON file:', error);
-      console.error('🔍 Error details:', {
-        name: error.name,
-        message: error.message,
-        status: error.status || 'N/A'
-      });
-    }
-  });
-</script>
 
 <style lang="scss" is:global>
 @use '../assets/scss/mediaquery' as me;

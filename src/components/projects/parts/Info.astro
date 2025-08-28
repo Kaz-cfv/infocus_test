@@ -6,17 +6,20 @@ export interface Props {
 const { count } = Astro.props;
 ---
 <div class="p-project-info l-content">
-  <div class="p-project-info__title">
+  <!-- 未フィルタリング状態（初期状態） -->
+  <div class="p-project-info__title" data-state="true" data-filter-type="default">
     <span class="p-project-info__title-name">ALL PROJECTS</span>
     -
     <span class="p-project-info__title-num">({count})</span>
   </div>
-  <!-- <div class="p-project-info__title">
-    <span class="p-project-info__title-name">Search results for “LOEWE”</span>
+
+  <!-- フィルタリング状態（絞り込み時） -->
+  <div class="p-project-info__title" data-state="false" data-filter-type="filtered">
+    <span class="p-project-info__title-name"></span>
     <a href="/projects/" class="p-project-info__title-back">
       <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.18328 0.697925L10.1346 1.64926L6.42134 5.36253L10.1346 9.0758L9.18328 10.0271L5.47001 6.31386L1.64933 10.1345L0.697996 9.18321L4.51867 5.36253L0.820748 1.6646L1.77208 0.713269L5.47001 4.41119L9.18328 0.697925Z" fill="white"/></svg>
     </a>
-  </div> -->
+  </div>
 
   <div class="p-project-info-switch">
     <button class="js-project-info-toggle" data-columns="5">5
@@ -52,6 +55,13 @@ const { count } = Astro.props;
     color: var(--c-white);
     font-size: 1.2rem;
     font-weight: 600;
+
+    &[data-state="false"] {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
     &-name {
 

@@ -51,20 +51,20 @@ const address = [
         </div>
       </div>
       <div class="l-footer__content-inner --right">
-        <div class="l-footer__nav">
+        <div class="l-footer__nav js-hover">
           <ul class="l-footer__nav-list">
-            <li class="l-footer__nav-item"><a href="/projects">PROJECTS</a></li>
-            <li class="l-footer__nav-item"><a href="/news">NEWS</a></li>
-            <li class="l-footer__nav-item"><a href="/about">ABOUT</a></li>
-            <li class="l-footer__nav-item"><a href="/team">TEAM</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/projects">PROJECTS</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/news">NEWS</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/about">ABOUT</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/team">TEAM</a></li>
           </ul>
           <ul class="l-footer__nav-list">
-            <li class="l-footer__nav-item"><a href="/careers">CAREERS</a></li>
-            <li class="l-footer__nav-item"><a href="/contact">CONTACT</a></li>
-            <li class="l-footer__nav-item"><a href="/privacy-policy">PRIVACY POLICY</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/careers">CAREERS</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/contact">CONTACT</a></li>
+            <li class="l-footer__nav-item js-hover-item"><a href="/privacy-policy">PRIVACY POLICY</a></li>
             <li class="l-footer__nav-item l-footer__sns">
               {sns.map((item) => (
-                <a href={item.url} class="l-footer__sns-link" data-sns={item.name}>{item.name}</a>
+                <a href={item.url} class="l-footer__sns-link js-hover-item" data-sns={item.name}>{item.name}</a>
               ))}
             </li>
           </ul>
@@ -174,6 +174,7 @@ const address = [
     column-gap: 8px;
     @include me.pc {
       width: 338px;
+      row-gap: 12px;
     }
     @include me.sp {
       row-gap: 10px;

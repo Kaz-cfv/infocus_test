@@ -1,53 +1,39 @@
 ---
 import InterviewCard from "../parts/InterviewCard.astro";
+
+interface Props {
+  interviews: any[];
+}
+
+const { interviews } = Astro.props;
+
+// 6件以上の場合にVIEW ALLボタンを表示
+const showViewAll = interviews.length >= 6;
 ---
 
 <section id="interview" class="p-career-interview">
   <h2 class="p-career-interview__title">STAFF INTERVIEWS</h2>
   <div class="p-career-interview__content">
     <ul class="p-career-interview__list js-more-content">
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
-      <li class="p-career-interview__list-item js-more-item">
-        <InterviewCard />
-      </li>
+      {interviews.map((interview, index) => (
+        <li class="p-career-interview__list-item js-more-item">
+          <InterviewCard
+            title={interview.title.rendered}
+            image={interview.acfs.image?.url}
+            name={interview.acfs.name || ''}
+            position={interview.acfs.position || ''}
+            url={interview.acfs.url}
+          />
+        </li>
+      ))}
     </ul>
-    <div class="p-career-interview__btn">
-      <button class="js-more">
-        <span>VIEW MORE</span>
-      </button>
-    </div>
+    {showViewAll && (
+      <div class="p-career-interview__btn">
+        <button class="js-more">
+          <span>VIEW MORE</span>
+        </button>
+      </div>
+    )}
   </div>
 </section>
 

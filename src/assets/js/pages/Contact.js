@@ -5,7 +5,7 @@ class Contact {
 
     // フォームのエンドポイント
     this.formEndpoints = {
-      'inquiryForm': 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL1qTB3vVyWZ4mIUfVOFbdFarZ9NQ/formResponse',
+      'inquiryForm': 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSd-SYX3CfyqBZSFt7gOhcRx-Q1itfNDqnAySlLdK-VCLWpc4g/formResponse',
     };
 
     // フォーム要素の特定

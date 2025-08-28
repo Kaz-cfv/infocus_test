@@ -14,7 +14,7 @@ try {
   const teamData = await response.json();
   const teamArray = Array.isArray(teamData) ? teamData : [teamData];
 
-  console.log('📊 Team items count:', teamArray.length);
+  // console.log('📊 Team items count:', teamArray.length);
 
   // チームデータを処理
   items = teamArray
@@ -23,7 +23,7 @@ try {
       const teamMember = {
         id: item.id || index + 1,
         name: item.title.trim(),
-        pic: item.acfs?.thumbnail?.url || '/common/images/team/default.png',
+        pic: item.acfs?.thumbnail?.url,
         url: `/team/${item.slug}/`,
         tags: []
       };
@@ -50,15 +50,23 @@ try {
         tags.push(...positionTags);
       }
 
+      // position-tagのslugを抽出してpositionSlugsとして保存
+      const positionSlugs = item.acfs?.['position-tag']
+        ? item.acfs['position-tag']
+            .filter(tag => tag.slug) // slugが存在するもののみ
+            .map(tag => tag.slug)
+        : [];
+
       teamMember.tags = tags;
+      teamMember.positionSlugs = positionSlugs; // position絞り込み用のslug配列を追加
 
       return teamMember;
     });
 
-  console.log('✅ Team data loaded successfully:', {
-    total: items.length,
-    membersWithTags: items.filter(item => item.tags.length > 0).length
-  });
+  // console.log('✅ Team data loaded successfully:', {
+  //   total: items.length,
+  //   membersWithTags: items.filter(item => item.tags.length > 0).length
+  // });
 
 } catch (error) {
   console.error('❌ Failed to fetch team data:', error);
@@ -70,10 +78,17 @@ try {
 }
 ---
 
-<div class="p-team-content">
+<div class="p-team-content" data-main-content>
   <ul class="p-team-content__list">
-    {items.map((item => (
-      <li class="p-team-content__list-item" data-item={item.id}>
+    {items.map((item) => {
+    const positionSlugs = item.positionSlugs || [];
+
+    return (
+      <li
+        class="p-team-content__list-item"
+        data-item={item.id}
+        data-positions={positionSlugs.join(',')}
+      >
         <TeamCard
           id={item.id}
           name={item.name}
@@ -82,7 +97,8 @@ try {
           tags={item.tags}
         />
       </li>
-    )))}
+      );
+    })}
   </ul>
 
   <!-- SP時の2カラムレイアウト用 -->

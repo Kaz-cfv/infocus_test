@@ -1,0 +1,94 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const pageMeta = {
+  title: "API Test",
+};
+---
+
+<Layout
+  title=""
+  pageName=""
+  meta={pageMeta}
+>
+
+  <div class="result">
+    <h1>API Test</h1>
+    <button id="testApiButton">Test API Endpoint</button>
+    <div id="result"></div>
+  </div>
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../assets/scss/mediaquery' as me;
+@use '../../assets/scss/mixin' as mi;
+
+.result {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+
+  h1 {
+    color: var(--c-white);
+    margin-bottom: 20px;
+    font-size: 3.6rem;
+    text-align: center;
+  }
+
+  #testApiButton {
+    display: block;
+    margin: 0 auto 30px;
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #0056b3;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  #result {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    min-height: 100px;
+    padding: 8px;
+    background: #f8f9fa;
+
+    pre {
+      margin: 0;
+      font-size: 1.4rem;
+      line-height: 1.5;
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    p {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    &:empty::before {
+      content: "テスト結果がここに表示されます...";
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+}
+</style>

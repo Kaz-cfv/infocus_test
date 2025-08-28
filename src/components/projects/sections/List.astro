@@ -1,102 +1,173 @@
 ---
-import ProjectCard from "../../ProjectCard.astro";
+import Card from "../parts/Card.astro";
 import Info from "../parts/Info.astro";
 
-// CMSのProjectsデータを取得
-let projects = [];
-
-try {
-  const response = await fetch('https://infocus.wp.site-prev2.com/api/projects.json');
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  // レスポンステキストを取得してJSONをパース
-  const responseText = await response.text();
-
-  let projectsData;
-  try {
-    projectsData = JSON.parse(responseText);
-  } catch (parseError) {
-    console.error('❌ JSON Parse Error:', parseError);
-    console.log('🔍 First 200 chars of response:', responseText.substring(0, 200));
-    throw parseError;
-  }
-
-  const projectsArray = Array.isArray(projectsData) ? projectsData : [projectsData];
-
-  // console.log('📊 Projects items count:', projectsArray.length);
-
-  // 既存のProjectCardインターフェースに合わせてデータを変換
-  projects = projectsArray
-    .filter(item => {
-      const hasTitle = !!item.title;
-      const hasSlug = !!item.slug;
-
-      return hasTitle && hasSlug;
-    })
-    .map((item, index) => {
-      // tagsの構造を確認して適切に抽出
-      let tags = [];
-      if (item.acfs?.tags && Array.isArray(item.acfs.tags)) {
-        tags = item.acfs.tags.filter(tag => tag.terms && tag.terms.name).map(tag => ({
-          name: tag.terms.name,
-          url: `/projects/?category=${tag.terms.term_id || ''}`
-        }));
-      }
-
-      // サムネイル画像のみを使用
-      const imageSrc = item.acfs?.thumbnail?.image?.url;
-
-      return {
-        id: item.id || index + 1,
-        title: item.title.trim(),
-        tags: tags,
-        imageSrc: imageSrc,
-        url: `/projects/${item.slug}/`,
-        type: "default" // 既存のtype属性を維持
-      };
-    })
-    .sort((a, b) => b.id - a.id); // IDの降順でソート（新しい順）
-
-  // console.log('✅ Projects data loaded successfully:', {
-  //   total: projects.length,
-  //   projectsWithImages: projects.filter(item => item.imageSrc).length,
-  //   projectsWithTags: projects.filter(item => item.tags.length > 0).length
-  // });
-
-} catch (error) {
-  console.error('❌ Failed to fetch projects data:', error);
-  console.error('❌ Error details:', {
-    name: error.name,
-    message: error.message,
-    stack: error.stack?.substring(0, 200)
-  });
-}
+// Props型定義 - 空のPropsでクライアントサイドで動的に設定
+export interface Props {}
 ---
 
-<Info count={projects.length} />
+<Info count={0} />
 
-<div class="p-project-layout l-content" data-columns="5">
-  <ul class="p-project-list">
-    {projects.map((project) => (
-      <li class="p-project-list__item">
-        <ProjectCard
-          id={project.id}
-          title={project.title}
-          tags={project.tags}
-          imageSrc={project.imageSrc}
-          url={project.url}
-        />
-      </li>
-    ))}
+<div class="p-project-layout l-content" data-columns="5" data-main-content>
+  <ul class="p-project-list" id="projectsList">
+    <!-- プロジェクトはクライアントサイドで動的に追加 -->
   </ul>
 
   <div class="p-project-list__btn">
-    <button class="js-more-btn">ARCHIVED PROJECTS</button>
+    <a href="/projects/?archived=true">ARCHIVED PROJECTS</a>
   </div>
 </div>
+
+<!-- クライアントサイドでAPIデータを受け取る -->
+<script>
+
+  // カスタムイベントでAPIデータを受け取る
+  document.addEventListener('projectsDataLoaded', (event) => {
+    const projectsData = (event as CustomEvent).detail;
+
+
+    // プロジェクトデータを処理
+    let projects = [];
+    let tagMap = {};
+
+    if (Array.isArray(projectsData)) {
+
+      // JSONファイルのデータ形式に対応
+      projects = projectsData
+        .filter(item => {
+          const hasTitle = !!item.title;
+          const hasSlug = !!item.slug;
+          return hasTitle && hasSlug;
+        })
+        .map((item, index) => {
+          let categories = [];
+
+          // カテゴリー情報
+          if (item.taxonomy?.projects && Array.isArray(item.taxonomy.projects)) {
+            categories = item.taxonomy.projects.map(category => ({
+              name: category.name,
+              url: `/projects/?category=${category.slug}`
+            }));
+          }
+
+          // 画像URL取得
+          const imageSrc = item.acfs?.thumbnail?.image?.url || '';
+
+          // カテゴリースラッグの配列を作成
+          const categorySlugs = (item.taxonomy?.projects && Array.isArray(item.taxonomy.projects))
+            ? item.taxonomy.projects.map(tag => tag.slug)
+            : [];
+
+          // タグスラッグの配列を作成
+          const tagSlugs = (item.acfs?.tags && Array.isArray(item.acfs.tags))
+            ? item.acfs.tags.filter(tag => tag.terms?.slug).map(tag => tag.terms.slug)
+            : [];
+
+          // アーカイブフラグの取得
+          const isArchived = item.acfs?.is_archived || false;
+
+          return {
+            id: item.id || index + 1,
+            title: item.title || 'No Title',
+            tags: categories,
+            imageSrc: imageSrc,
+            url: `/projects/${item.slug}/`,
+            type: "default",
+            categorySlugs: categorySlugs,
+            tagSlugs: tagSlugs,
+            isArchived: isArchived
+          };
+        })
+        .sort((a, b) => b.id - a.id);
+
+    }
+
+    // プロジェクト数をInfoコンポーネントに更新
+    const countElements = document.querySelectorAll('.p-project-info__title-num');
+    countElements.forEach(element => {
+      element.textContent = `(${projects.length})`;
+    });
+
+    // プロジェクトリストを動的に追加
+    const projectsList = document.getElementById('projectsList');
+    if (projectsList && projects.length > 0) {
+      projectsList.innerHTML = projects.map(project => {
+        const tagsHtml = project.tags.map((category, index) => {
+          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator">,</span>' : '';
+          return `<a href="${category.url}" class="c-project-card__category js-hover-item">${category.name}</a>${separator}`;
+        }).join('');
+
+        return `
+          <li class="p-project-list__item"
+            data-categories="${project.categorySlugs.join(',')}"
+            data-tags="${project.tagSlugs.join(',')}"
+            data-project-id="${project.id}"
+            data-archived="${project.isArchived}"
+          >
+            <div class="c-project-card" data-id="${project.id}" data-type="${project.type}">
+              <a href="${project.url}" class="c-project-card__image-wrapper">
+                <img src="${project.imageSrc}" alt="${project.title}" class="c-project-card__image" />
+              </a>
+              <div class="c-project-card__content">
+                <h3 class="c-project-card__title">${project.title}</h3>
+                <div class="c-project-card__tags js-hover">
+                  ${tagsHtml}
+                </div>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      // タグマッピング情報をグローバルに保存
+      window.projectTagMap = tagMap;
+    }
+
+    // DOM生成完了後にNavigationHoverを適用
+    setTimeout(() => {
+      // NavigationHoverの再初期化イベントを発火
+      const hoverEvent = new CustomEvent('reinitializeHover', {
+        detail: { element: projectsList }
+      });
+      document.dispatchEvent(hoverEvent);
+
+      // グローバルなNavigationHoverインスタンスが存在する場合、直接初期化
+      if (window.navigationHover && typeof window.navigationHover.initializeInElement === 'function') {
+        window.navigationHover.initializeInElement(projectsList);
+      }
+
+      // 手動でホバー処理を追加
+      const hoverContainers = projectsList.querySelectorAll('.js-hover');
+      hoverContainers.forEach((container) => {
+        const items = container.querySelectorAll('.js-hover-item');
+        items.forEach((item) => {
+          item.addEventListener('mouseenter', (e) => {
+            const hoveredItem = e.currentTarget as HTMLElement;
+            hoveredItem.classList.add('is-hovered');
+
+            items.forEach(siblingItem => {
+              if (siblingItem !== hoveredItem) {
+                (siblingItem as HTMLElement).classList.add('is-dimmed');
+              }
+            });
+          });
+
+          item.addEventListener('mouseleave', (e) => {
+            const leftItem = e.currentTarget as HTMLElement;
+            leftItem.classList.remove('is-hovered');
+
+            items.forEach(siblingItem => {
+              if (siblingItem !== leftItem) {
+                (siblingItem as HTMLElement).classList.remove('is-dimmed');
+              }
+            });
+          });
+        });
+      });
+
+    }, 100);
+  });
+</script>
 
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
@@ -165,7 +236,8 @@ try {
       margin-block-start: 120px;
     }
 
-    button {
+    a {
+      display: inline-block;
       color: var(--c-white);
       font-size: 2.4rem;
       font-weight: 600;
@@ -177,6 +249,119 @@ try {
       }
     }
   }
+}
 
+.c-project-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: opacity 0.3s ease-out;
+  height: 100%;
+
+  &[data-type="cover"] {
+    height: 100%;
+  }
+
+  &__image-wrapper {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    flex: 1;
+    @include me.sp {
+      height: 56.1904%;
+    }
+    @at-root [data-type="pickup"] & {
+      @include me.pc {
+        margin-top: 30px;
+        margin-inline: 30px;
+      }
+    }
+    @at-root [data-type="cover"] & {
+      aspect-ratio: 1 / 1;
+      flex: 1;
+      @include me.sp {
+        aspect-ratio: unset;
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+  }
+
+  &__image {
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+  }
+
+  &__video {
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+    z-index: 1;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 16px;
+    @include me.pc {
+      row-gap: 8px;
+    }
+    @at-root [data-type="cover"] & {
+      display: none;
+    }
+  }
+
+  &__title {
+    color: var(--c-white);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 2.32rem;
+    @include me.sp {
+      font-size: 1.6rem;
+    }
+    @at-root [data-type="pickup"] & {
+      font-size: 2rem;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+  }
+
+  &__tags {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 2.32rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+    @at-root [data-type="pickup"] & {
+      font-size: 1.4rem;
+      @include me.sp {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__category {
+    display: inline-block;
+    color: var(--c-gray);
+  }
+
+  &__separator {
+    color: var(--c-gray);
+    margin-inline-end: 4px;
+  }
 }
 </style>

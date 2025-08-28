@@ -22,14 +22,55 @@ const {
   imageSrc,
   videoSrc,
   imageAlt = "Projects Image",
-  url = "#",
-  type = ""
+  url,
+  type = "",
 } = Astro.props;
+
+// urlがオブジェクトの場合はその中身を確認し、文字列として取得
+let safeUrl = '#';
+let linkTarget = null;
+
+if (typeof url === 'string' && url) {
+  safeUrl = url;
+} else if (url && typeof url === 'object') {
+  // オブジェクトの場合、href/url とtarget情報を取得
+  if ('href' in url) {
+    safeUrl = url.href;
+  } else if ('url' in url) {
+    safeUrl = url.url;
+  }
+
+  // target情報があれば取得
+  if ('target' in url) {
+    linkTarget = url.target;
+  }
+}
+
+// 外部リンクかどうかを判定（http/httpsで始まり、かつ現在のサイトのドメインでない場合）
+const isExternalLink = (safeUrl.startsWith('http://') || safeUrl.startsWith('https://')) &&
+                      !safeUrl.startsWith(Astro.site?.href || '');
+
+// linkTargetが'_blank'の場合も外部リンクとして扱う
+const shouldOpenInNewTab = isExternalLink || linkTarget === '_blank';
+
+const linkProps = shouldOpenInNewTab
+  ? { href: safeUrl, target: '_blank', rel: 'noopener noreferrer' }
+  : { href: safeUrl };
+
+// デバッグ用ログ（問題解決後に削除予定）
+// console.log('🔍 ProjectCard URL Debug:', {
+//   originalUrl: url,
+//   urlType: typeof url,
+//   safeUrl: safeUrl,
+//   isExternalLink: isExternalLink
+// });
 ---
 
 <div class="c-project-card" data-id={id} data-type={type}>
-  <a href={url} class="c-project-card__image-wrapper">
-    <img src={imageSrc} alt={imageAlt} class="c-project-card__image">
+  <a {...linkProps} class="c-project-card__image-wrapper">
+    {imageSrc && (
+      <img src={imageSrc} alt={imageAlt} class="c-project-card__image" />
+    )}
     {videoSrc && (
       <video
         src={videoSrc}
@@ -43,10 +84,10 @@ const {
   </a>
   <div class="c-project-card__content">
     <h3 class="c-project-card__title">{title}</h3>
-    <div class="c-project-card__tags">
+    <div class="c-project-card__tags js-hover">
       {tags.map((tag, index) => (
         <>
-          <a href={tag.url} class="c-project-card__category">{tag.name}</a>
+          <a href={tag.url} class="c-project-card__category js-hover-item">{tag.name}</a>
           {index < tags.length - 1 && <span class="c-project-card__separator">,</span>}
         </>
       ))}
@@ -68,6 +109,7 @@ const {
   &[data-type="cover"] {
     height: 100%;
   }
+
   &:not([data-type="cover"]) {
     @include me.pc {
       padding-bottom: 78px;
@@ -90,10 +132,6 @@ const {
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    flex: 1;
-    @include me.sp {
-      height: 56.1904%;
-    }
     @at-root [data-type="pickup"] & {
       @include me.pc {
         margin-top: 30px;
@@ -102,17 +140,13 @@ const {
     }
     @at-root [data-type="cover"] & {
       aspect-ratio: 1 / 1;
-      flex: 1;
+      @include me.pc {
+        flex: 1;
+      }
       @include me.sp {
-        aspect-ratio: unset;
         height: 100%;
         min-height: 100%;
         width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
       }
     }
   }
@@ -123,11 +157,12 @@ const {
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease-out;
+    @include me.sp {
+      aspect-ratio: 16 / 9;
+    }
   }
 
   &__video {
-    opacity: 0;
-    visibility: hidden;
     @include mi.absolute-all;
     width: 100%;
     height: 100%;

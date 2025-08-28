@@ -1,1 +1,0 @@
-// インタビューモデルクラス - infocus_interview.jsonのデータを扱う

@@ -1,227 +1,11 @@
 ---
 import ProjectCard from "../parts/ProjectCard.astro";
 
-const pickup = [
-  {
-    id: 1,
-    title: 'LAMBDA',
-    tags: [
-      { name: 'Graphic', url: '/category/graphic' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/pickup01.jpg',
-    type: 'pickup',
-    url: '/projects/detail/'
-  },
-  {
-    id: 2,
-    title: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
-    tags: [
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' },
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/pickup02.jpg',
-    type: 'pickup',
-    url: '/projects/detail/'
-  },
-];
-
-const projects = [
-  {
-    id: 1,
-    title: 'LOEWE x GR8L',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/01.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 2,
-    title: 'HUMAN MADE',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/02.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 3,
-    title: 'Adobe Photoshop',
-    tags: [
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/03.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 4,
-    title: 'KEI Collection PARIS',
-    tags: [
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/04.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 5,
-    title: 'uka Regenerative Good',
-    tags: [
-      { name: 'Movie', url: '/category/movie' },
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/05.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 6,
-    title: 'TOGA ARCHIVES',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/06.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 7,
-    title: 'CANADA GOOSE',
-    tags: [
-      { name: 'Movie', url: '/category/movie' },
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/07.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 8,
-    title: 'BLUE NOTE PLACE',
-    tags: [
-      { name: 'Graphic', url: '/category/graphic' },
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/08.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 9,
-    title: 'Lyquor Labs',
-    tags: [
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/09.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 10,
-    title: 'FRAGMENT UNIVERSITY',
-    tags: [
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/10.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 11,
-    title: 'NOW HIRING',
-    tags: [
-      { name: '', url: '/category/' }
-    ],
-    imageSrc: '/common/images/home/projects/11.jpg',
-    videoSrc: 'https://infocus.wp.site-prev2.com/wp-content/themes/infocus/astro/movies/now_hiring_14sec.mp4',
-    url: '/projects/detail/',
-    type: 'cover'
-  },
-  {
-    id: 12,
-    title: 'HUGO BOSS',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/12.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 13,
-    title: 'CLINIQUE',
-    tags: [
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/13.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 14,
-    title: 'LOEWE x Studio Ghibli',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/14.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 15,
-    title: 'エリエール ロイヤルタッチ',
-    tags: [
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/15.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 16,
-    title: 'NETFLIX',
-    tags: [
-      { name: 'Edit', url: '/category/edit' }
-    ],
-    imageSrc: '/common/images/home/projects/16.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 17,
-    title: '',
-    tags: [
-      { name: '', url: '/category/' }
-    ],
-    imageSrc: '/common/images/home/projects/17.jpg',
-    url: '/projects/detail/',
-    type: 'cover'
-  },
-  {
-    id: 18,
-    title: 'NEWoMan',
-    tags: [
-      { name: 'Graphic', url: '/category/graphic' }
-    ],
-    imageSrc: '/common/images/home/projects/18.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 19,
-    title: 'BLUE YARD',
-    tags: [
-      { name: 'Web', url: '/category/web' },
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/19.jpg',
-    url: '/projects/detail/'
-  },
-  {
-    id: 20,
-    title: 'adiCLUB',
-    tags: [
-      { name: 'Movie', url: '/category/movie' }
-    ],
-    imageSrc: '/common/images/home/projects/20.jpg',
-    url: '/projects/detail/'
-  }
-];
+// Props型定義 - 空のPropsでクライアントサイドで動的に設定
+export interface Props {}
 ---
 <section class="p-home-projects">
-  <ul class="p-home-projects__list --pickup">
+  <!-- <ul class="p-home-projects__list --pickup">
     {pickup.map((project) => (
       <li class="p-home-projects__card">
         <ProjectCard
@@ -234,29 +18,198 @@ const projects = [
         />
       </li>
     ))}
-  </ul>
-  <ul class="p-home-projects__list">
-    {projects.map((project) => (
-      <li class="p-home-projects__card">
-        <ProjectCard
-          id={project.id}
-          title={project.title}
-          tags={project.tags}
-          imageSrc={project.imageSrc}
-          videoSrc={project.videoSrc}
-          url={project.url}
-          type={project.type}
-        />
-      </li>
-    ))}
+  </ul> -->
+  <ul class="p-home-projects__list" id="projectsList">
+    <!-- プロジェクトはクライアントサイドで動的に追加される前の初期表示 -->
   </ul>
   <div class="p-home-projects__link">
-    <a href="/">
+    <a href="/projects/">
       ALL PROJECTS
       <span><svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 14.1601L23.7876 14.1601C20.713 11.3362 15.4539 6.21272 12.177 3.02567L15.2111 0L32 16.4193V16.5L15.2111 33L12.177 29.813C15.4539 26.6663 20.713 21.5024 23.7876 18.6785H0L0 14.1601Z" fill="white"/></svg></span>
     </a>
   </div>
 </section>
+
+<!-- クライアントサイドでAPIデータを受け取る -->
+<script>
+  // カスタムイベントでAPIデータを受け取る
+  document.addEventListener('homeDataLoaded', (event) => {
+    const homeData = (event as CustomEvent).detail;
+
+    // プロジェクトデータを処理
+    let projectsData = [];
+
+    // データ構造に応じて柔軟に対応
+    let pickupData = null;
+    if (homeData?.projects?.pickup) {
+      pickupData = homeData.projects.pickup;
+    } else if (homeData?.home?.projects?.pickup) {
+      pickupData = homeData.home.projects.pickup;
+    }
+
+    if (pickupData && Array.isArray(pickupData)) {
+      // 仕様に基づいてデータを整形（pickup使用 - acf_fc_layout別対応）
+      projectsData = pickupData.map((pickupItem, index) => {
+        let mappedData = {
+          cardType: pickupItem.acf_fc_layout || 'unknown',
+          id: 0,
+          url: '#',
+          title: '',
+          imageSrc: '',
+          videoSrc: '',
+          tags: [],
+          isMobile: pickupItem.is_mobile !== false
+        };
+
+        if (pickupItem.acf_fc_layout === 'post') {
+          // post タイプの処理
+          const post = pickupItem.post || {};
+          const acfs = post.acfs || {};
+
+          // タグ情報の処理
+          const tags = [];
+          if (acfs.tags && Array.isArray(acfs.tags)) {
+            acfs.tags.forEach(tagItem => {
+              if (tagItem.terms && tagItem.terms.name) {
+                tags.push({
+                  name: tagItem.terms.name,
+                  url: `/projects/?tag=${tagItem.terms.slug || ''}`
+                });
+              }
+            });
+          }
+
+          mappedData = {
+            cardType: 'post',
+            id: post.ID || 0,
+            url: `/projects/${post.post_name || ''}`,
+            title: post.post_title || '',
+            imageSrc: post.acfs?.main?.image?.url || '',
+            videoSrc: '',
+            tags: tags,
+            isMobile: pickupItem.is_mobile !== false
+          };
+
+        } else if (pickupItem.acf_fc_layout === 'image') {
+          // image タイプの処理
+          mappedData = {
+            cardType: 'image',
+            id: pickupItem.image?.ID || 0,
+            url: pickupItem.link || '#',
+            title: pickupItem.image?.title || '',
+            imageSrc: pickupItem.image?.url || '',
+            videoSrc: '',
+            tags: [],
+            type: 'cover',
+            isMobile: pickupItem.is_mobile !== false
+          };
+
+        } else if (pickupItem.acf_fc_layout === 'movie') {
+          // movie タイプの処理
+          mappedData = {
+            cardType: 'movie',
+            id: pickupItem.image?.ID || 0,
+            url: pickupItem.link || '#',
+            title: pickupItem.image?.title || '',
+            imageSrc: '',
+            videoSrc: pickupItem.file || '',
+            tags: [],
+            type: 'cover',
+            isMobile: pickupItem.is_mobile !== false
+          };
+        }
+
+        return mappedData;
+      });
+
+      // console.log('🚀 プロジェクトデータ取得:', projectsData.length + '件');
+    }
+
+    // プロジェクトデータをグローバルに保存
+    window.homeProjectsData = projectsData;
+
+    // カスタムイベントでプロジェクトデータ更新を通知
+    const projectEvent = new CustomEvent('projectsDataLoaded', {
+      detail: projectsData
+    });
+    document.dispatchEvent(projectEvent);
+
+    // プロジェクトリストを動的に追加（ProjectCardコンポーネントの構造に準拠）
+    const projectsList = document.getElementById('projectsList');
+    if (projectsList && projectsData.length > 0) {
+      projectsList.innerHTML = projectsData.map(project => {
+        const mobileClass = project.isMobile ? '' : 'sp-hidden';
+        const tagsHtml = project.tags.map((tag, index) => {
+          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator">,</span>' : '';
+          return `<a href="${tag.url}" class="c-project-card__category js-hover-item">${tag.name}</a>${separator}`;
+        }).join('');
+
+        return `
+          <li class="p-home-projects__card ${mobileClass}">
+            <div class="c-project-card" data-id="${project.id}" data-type="${project.type || project.cardType}">
+              <a href="${project.url}" class="c-project-card__image-wrapper">
+                ${project.videoSrc ?
+                  `<video src="${project.videoSrc}" class="c-project-card__video" muted loop playsinline preload="metadata"></video>` :
+                  `<img src="${project.imageSrc}" alt="${project.title}" class="c-project-card__image" />`
+                }
+              </a>
+              <div class="c-project-card__content">
+                <h3 class="c-project-card__title">${project.title}</h3>
+                <div class="c-project-card__tags js-hover">
+                  ${tagsHtml}
+                </div>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join('');
+
+      // DOM生成完了後にNavigationHoverを適用
+      setTimeout(() => {
+        // NavigationHoverの再初期化イベントを発火
+        const hoverEvent = new CustomEvent('reinitializeHover', {
+          detail: { element: projectsList }
+        });
+        document.dispatchEvent(hoverEvent);
+
+        // グローバルなNavigationHoverインスタンスが存在する場合、直接初期化
+        if (window.navigationHover && typeof window.navigationHover.initializeInElement === 'function') {
+          window.navigationHover.initializeInElement(projectsList);
+        }
+
+        // 手動でホバー処理を追加
+        const hoverContainers = projectsList.querySelectorAll('.js-hover');
+        hoverContainers.forEach((container) => {
+          const items = container.querySelectorAll('.js-hover-item');
+          items.forEach((item) => {
+            item.addEventListener('mouseenter', (e) => {
+              const hoveredItem = e.currentTarget as HTMLElement;
+              hoveredItem.classList.add('is-hovered');
+
+              items.forEach(siblingItem => {
+                if (siblingItem !== hoveredItem) {
+                  (siblingItem as HTMLElement).classList.add('is-dimmed');
+                }
+              });
+            });
+
+            item.addEventListener('mouseleave', (e) => {
+              const leftItem = e.currentTarget as HTMLElement;
+              leftItem.classList.remove('is-hovered');
+
+              items.forEach(siblingItem => {
+                if (siblingItem !== leftItem) {
+                  (siblingItem as HTMLElement).classList.remove('is-dimmed');
+                }
+              });
+            });
+          });
+        });
+
+      }, 100);
+    }
+  });
+</script>
 
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
@@ -285,6 +238,12 @@ const projects = [
     border-right: solid 1px var(--c-gray02);
     border-bottom: solid 1px var(--c-gray02);
     border-left: solid 1px var(--c-gray02);
+
+    &.sp-hidden {
+      @include me.sp {
+        display: none;
+      }
+    }
 
     &:nth-child(4n) {
       @include me.pc {
@@ -331,4 +290,134 @@ const projects = [
   }
 }
 
+.c-project-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: opacity 0.3s ease-out;
+  height: 100%;
+
+  &[data-type="cover"] {
+    height: 100%;
+  }
+
+  &:not([data-type="cover"]) {
+    @include me.pc {
+      padding-bottom: 78px;
+    }
+    @include me.sp {
+      padding-bottom: 7.701vw;
+    }
+    &[data-type="pickup"] {
+      @include me.pc {
+        padding-bottom: 50px;
+      }
+      @include me.sp {
+        padding-bottom: 25px;
+      }
+    }
+  }
+
+  &__image-wrapper {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    @at-root [data-type="pickup"] & {
+      @include me.pc {
+        margin-top: 30px;
+        margin-inline: 30px;
+      }
+    }
+    @at-root [data-type="cover"] & {
+      aspect-ratio: 1 / 1;
+      @include me.pc {
+        flex: 1;
+      }
+      @include me.sp {
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  &__image {
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+    @include me.sp {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  &__video {
+    @include mi.absolute-all;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+    z-index: 2;
+    @at-root .c-project-card.is-play & {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    margin-top: 16px;
+    padding-inline: 30px;
+    @include me.sp {
+      row-gap: 0;
+      margin-top: 8px;
+      padding-inline: 16px;
+    }
+    @at-root [data-type="cover"] & {
+      display: none;
+    }
+  }
+
+  &__title {
+    color: var(--c-white);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 2.32rem;
+    @include me.sp {
+      font-size: 1.4rem;
+    }
+    @at-root [data-type="pickup"] & {
+      font-size: 2rem;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+  }
+
+  &__tags {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 2.32rem;
+    @at-root [data-type="pickup"] & {
+      font-size: 1.4rem;
+      @include me.sp {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__category {
+    display: inline-block;
+    color: var(--c-gray);
+  }
+
+  &__separator {
+    color: var(--c-gray);
+    margin-inline-end: 4px;
+  }
+}
 </style>

@@ -2,14 +2,15 @@
  * メインJavaScriptファイル
  */
 
+import { ViewManager } from './modules/ViewManager.js';
 import { SliderManager } from './modules/SliderManager.js';
 import { SearchManager } from './modules/SearchManager.js';
 import { SearchUIManager } from './modules/SearchUIManager.js';
 import { MenuManager } from './modules/MenuManager.js';
-import { VideoManager } from './modules/VideoManager.js';
 import { VideoScrollController } from './modules/VideoScrollController.js';
 import { ShareButton } from './modules/ShareButton.js';
 import { LenisManager } from './modules/LenisManager.js';
+import { NavigationHover } from './modules/NavigationHover.js';
 import AnchorLink from './modules/AnchorLink.js';
 import { Home } from './pages/Home.js';
 import { About } from './pages/About.js';
@@ -17,7 +18,11 @@ import { TeamDetail } from './pages/TeamDetail.js';
 import { Career } from './pages/Career.js';
 import { Jobs } from './pages/Jobs.js';
 import Contact from './pages/Contact.js';
-// import { News } from './pages/News.js';
+import { News } from './pages/News.js';
+import { Projects } from './pages/Projects.js';
+import { ProjectDetail } from './pages/ProjectDetail.js';
+import { Team } from './pages/Team.js';
+import { ApiTest } from './modules/ApiTest.js';
 
 class App {
   constructor() {
@@ -35,13 +40,15 @@ class App {
 
   initializeComponents() {
     try {
+      this.initViewManager();
       this.initLenis();
       this.initSliders();
       this.initSearch();
       this.initSearchUI();
       this.initMenu();
-      this.initVideo();
+      this.initVideoScrollController();
       this.initShareButtons();
+      this.initNavigationHover();
       this.initAnchorLink();
       this.initHome();
       this.initAbout();
@@ -49,9 +56,21 @@ class App {
       this.initCareer();
       this.initJobs();
       this.initContact();
-      // this.initNews();
+      this.initNews();
+      this.initProjects();
+      this.initProjectDetail();
+      this.initTeam();
+      this.initApiTest();
     } catch (error) {
       console.error('Error initializing components:', error);
+    }
+  }
+
+  initViewManager() {
+    // ページ内にメインコンテンツが存在する場合のみ初期化
+    const mainContent = document.querySelector('[data-main-content]');
+    if (mainContent) {
+      this.components.set('viewManager', new ViewManager());
     }
   }
 
@@ -93,11 +112,7 @@ class App {
     }
   }
 
-  initVideo() {
-    const videoElements = document.querySelectorAll('[data-video]');
-    if (videoElements.length > 0) {
-      this.components.set('video', new VideoManager());
-    }
+  initVideoScrollController() {
     // 動画カードのスクロール監視システムを初期化
     const videoCards = document.querySelectorAll('.c-project-card');
     if (videoCards.length > 0) {
@@ -112,43 +127,62 @@ class App {
     }
   }
 
+  initNavigationHover() {
+    const hoverContainer = document.querySelector('.js-hover');
+    if (hoverContainer) {
+      this.components.set('navigationHover', new NavigationHover());
+    }
+  }
+
   initAnchorLink() {
     this.components.set('anchorLink', new AnchorLink());
   }
 
   initHome() {
-    // Home API Manager - トップページでのみ動作
     this.components.set('home', new Home());
   }
 
   initAbout() {
-    // About Page Manager - Aboutページでのみ動作
     this.components.set('about', new About());
   }
 
   initTeamDetail() {
-    // TeamDetail Page Manager - チーム詳細ページでのみ動作
     this.components.set('teamDetail', new TeamDetail());
   }
 
   initCareer() {
-    // Career Page Manager - キャリアページでのみ動作
     this.components.set('career', new Career());
   }
 
   initJobs() {
-    // Jobs Page Manager - CEOインタビューページでのみ動作
     this.components.set('jobs', new Jobs());
   }
 
   initContact() {
-    // Contact Page Manager - お問い合わせページでのみ動作
     this.components.set('contact', new Contact());
   }
 
   initNews() {
-    // News Page Manager - ニュースページでのみ動作
     this.components.set('news', new News());
+  }
+
+  initProjects() {
+    this.components.set('projects', new Projects());
+  }
+
+  initProjectDetail() {
+    this.components.set('projectDetail', new ProjectDetail());
+  }
+
+  initTeam() {
+    this.components.set('team', new Team());
+  }
+
+  initApiTest() {
+    const apiTestButton = document.getElementById('testApiButton');
+    if (apiTestButton) {
+      this.components.set('apiTest', new ApiTest());
+    }
   }
 }
 

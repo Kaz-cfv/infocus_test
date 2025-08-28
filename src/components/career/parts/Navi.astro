@@ -58,9 +58,9 @@ const navi = {
     <ButtonJoin />
   </div>
 
-  <ul class="career-navi__sns">
+  <ul class="career-navi__sns js-hover">
     {navi.sns.map((item => (
-      <li class="career-navi__sns-item">
+      <li class="career-navi__sns-item js-hover-item">
         <a href={item.url} target="_blank" rel="noopener noreferrer" class="career-navi__sns-icon" data-sns={item.name}>{item.name}</a>
       </li>
     )))}

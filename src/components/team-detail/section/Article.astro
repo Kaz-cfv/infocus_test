@@ -29,12 +29,20 @@ interface Props {
   description: string;
   links: Links[];
   interview?: InterviewData;
+  prevMember?: {
+    slug: string;
+    name: string;
+  } | null;
+  nextMember?: {
+    slug: string;
+    name: string;
+  } | null;
 }
 
-const { pic, name, position, description, links, interview } = Astro.props;
+const { pic, name, position, description, links, interview, prevMember = null, nextMember = null } = Astro.props;
 ---
 
-<article class="p-team-detail-article">
+<article class="p-team-detail-article" data-main-content>
   <section class="p-team-detail-article__head">
     <figure class="p-team-detail-article__pic">
       <img src={pic} alt={name}>
@@ -46,17 +54,17 @@ const { pic, name, position, description, links, interview } = Astro.props;
       links={links}
     />
   </section>
-  <Projects />
-  {interview && interview.title && (
+  <!-- <Projects /> -->
+  {interview && (interview.title || interview.description) && (
     <Interview
-      title={interview.title}
-      description={interview.description}
+      title={interview.title || ''}
+      description={interview.description || ''}
       pic={interview.pic}
       url={interview.url}
     />
   )}
   <div class="p-team-detail-article__navi">
-    <FixedNavi />
+    <FixedNavi prevMember={prevMember} nextMember={nextMember} />
   </div>
 </article>
 

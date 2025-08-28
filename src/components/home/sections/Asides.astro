@@ -1,21 +1,6 @@
 ---
-const slides = [
-  {
-    id: 1,
-    imageAlt: 'CONTRAST',
-    src: '/common/images/home/slide/slide01.png'
-  },
-  {
-    id: 2,
-    imageAlt: 'CONTRAST',
-    src: '/common/images/home/slide/slide02.png'
-  },
-  {
-    id: 3,
-    imageAlt: 'CONTRAST',
-    src: '/common/images/home/slide/slide03.png'
-  }
-]
+// Props型定義 - 空のPropsでクライアントサイドで動的に設定
+export interface Props {}
 ---
 
 <aside class="p-home-aside">
@@ -31,10 +16,8 @@ const slides = [
     </div>
     <div class="p-home-aside__head-slide" data-slider="layer-slider">
       <div class="swiper">
-        <div class="swiper-wrapper">
-          {slides.map((slide) => (
-            <div class="swiper-slide"><img src={slide.src} alt={slide.imageAlt} /></div>
-          ))}
+        <div class="swiper-wrapper" id="asidesSlideWrapper">
+          <!-- スライドはクライアントサイドで動的に追加 -->
         </div>
       </div>
     </div>
@@ -61,6 +44,41 @@ const slides = [
     <span class="p-home-aside__elm-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.323671 13.3237L10.9172 2.73023C8.28681 2.83833 3.65666 2.89238 0.774076 2.92841L0.774073 0.225988L15.5834 0.0818583L15.6194 0.11789L15.5113 14.9632L12.7368 14.8911C12.7909 12.0266 12.8269 7.3784 12.935 4.74804L2.34148 15.3415L0.323671 13.3237Z" fill="#1A1A1A"/></svg></span>
   </a>
 </aside>
+
+<!-- クライアントサイドでAPIデータを受け取る -->
+<script>
+  // カスタムイベントでAPIデータを受け取る
+  document.addEventListener('homeDataLoaded', (event) => {
+    const homeData = (event as CustomEvent).detail;
+
+    // コントラストバナーのデータを処理
+    let contrastBanners = [];
+
+    // データ構造に応じて柔軟に対応
+    let bannersData = null;
+    if (homeData?.contrast_banners) {
+      bannersData = homeData.contrast_banners;
+    } else if (homeData?.home?.contrast_banners) {
+      bannersData = homeData.home.contrast_banners;
+    }
+
+    if (bannersData && Array.isArray(bannersData)) {
+      contrastBanners = bannersData.map((banner, index) => ({
+        id: index + 1,
+        imageAlt: 'CONTRAST',
+        src: banner.image?.url || banner.src || ''
+      })).filter(banner => banner.src);
+    }
+
+    // スライドを動的に追加
+    const slideWrapper = document.getElementById('asidesSlideWrapper');
+    if (slideWrapper && contrastBanners.length > 0) {
+      slideWrapper.innerHTML = contrastBanners.map(slide =>
+        `<div class="swiper-slide"><img src="${slide.src}" alt="${slide.imageAlt}" /></div>`
+      ).join('');
+    }
+  });
+</script>
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;
