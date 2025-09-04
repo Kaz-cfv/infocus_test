@@ -9,7 +9,6 @@ export interface Props {}
       id="kvVideo"
       autoplay
       muted
-      loop
       playsinline
       class="p-home-kv__video"
     >
@@ -24,9 +23,6 @@ export interface Props {}
     const homeData = (event as CustomEvent).detail;
 
     // ヒーロー動画のデータを処理
-    let heroMovie = null;
-
-    // データ構造に応じて柔軟に対応
     let herosData = null;
     if (homeData?.heros) {
       herosData = homeData.heros;
@@ -34,32 +30,51 @@ export interface Props {}
       herosData = homeData.home.heros;
     }
 
-    if (herosData && Array.isArray(herosData) && herosData.length > 0) {
-      // 複数の動画からランダムに1つを選択
-      const randomIndex = Math.floor(Math.random() * herosData.length);
-      const selectedHero = herosData[randomIndex];
-
-      // movieプロパティから動画URLを取得
-      heroMovie = selectedHero.movie || null;
-      // console.log('🎥 動画URLを取得:', heroMovie);
-    }
-
-    // 動画URLをvideoタグに設定
     const videoElement = document.getElementById('kvVideo');
-    if (videoElement && heroMovie) {
-      // HTMLVideoElementとして型キャスト
-      const video = videoElement as HTMLVideoElement;
-      video.src = heroMovie;
+    if (!videoElement) {
+      console.warn('⚠️ 動画要素が見つかりませんでした');
+      return;
+    }
+    const video = videoElement as HTMLVideoElement;
 
+    if (herosData && Array.isArray(herosData) && herosData.length > 0) {
+      // 全動画のURLを配列に格納
+      const videoUrls = herosData.map(hero => hero.movie).filter(url => url);
+      let currentIndex = 0; // ここを0に固定
+
+      // ロード時にランダムな開始位置を設定
+      // **この部分を削除**
+      // const randomIndex = Math.floor(Math.random() * videoUrls.length);
+      // currentIndex = randomIndex;
+
+      // 動画再生の関数
+      const playNextVideo = () => {
+        if (videoUrls.length === 0) return;
+        const currentUrl = videoUrls[currentIndex];
+        // console.log(`🎥 再生動画: ${currentUrl}`);
+        video.src = currentUrl;
+        video.load();
+        video.play();
+
+        video.removeEventListener('ended', onVideoEnd);
+        video.addEventListener('ended', onVideoEnd);
+      };
+      // 動画終了時の処理
+      const onVideoEnd = () => {
+        currentIndex = (currentIndex + 1) % videoUrls.length;
+        playNextVideo();
+      };
+
+      // エラーハンドリング
       video.addEventListener('error', (e) => {
         console.error('❌ 動画の読み込みエラー:', e);
+        // エラー発生時も次の動画へ
+        onVideoEnd();
       });
-
+      // 最初の動画を再生
+      playNextVideo();
     } else {
-      console.warn('⚠️ 動画URLが取得できませんでした', {
-        videoElement: !!videoElement,
-        heroMovie: heroMovie
-      });
+      console.warn('⚠️ 動画データが取得できませんでした');
     }
   });
 </script>

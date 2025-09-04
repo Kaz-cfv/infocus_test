@@ -36,7 +36,33 @@ export class ApiClient {
    */
   async getProjectsData() {
     try {
-      const url = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects';
+      const url = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects?per_page=100';
+      console.log('API Request:', url);
+
+      const response = await fetch(url);
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // console.log('API Response:', data);
+
+      return data;
+
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * チーム一覧データを取得
+   */
+  async getTeamData() {
+    try {
+      const url = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/team?per_page=50';
       console.log('API Request:', url);
 
       const response = await fetch(url);

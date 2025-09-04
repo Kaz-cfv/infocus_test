@@ -1,104 +1,11 @@
 ---
 import TeamCard from '../parts/TeamCard.astro';
 
-// 静的JSONファイルからチームデータを取得
-let items = [];
-
-try {
-  const response = await fetch('https://infocus.wp.site-prev2.com/api/team.json');
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const teamData = await response.json();
-  const teamArray = Array.isArray(teamData) ? teamData : [teamData];
-
-  // console.log('📊 Team items count:', teamArray.length);
-
-  // チームデータを処理
-  items = teamArray
-    .filter(item => item.title && item.slug)
-    .map((item, index) => {
-      const teamMember = {
-        id: item.id || index + 1,
-        name: item.title.trim(),
-        pic: item.acfs?.thumbnail?.url,
-        url: `/team/${item.slug}/`,
-        tags: []
-      };
-
-      // positionとposition-tagを処理
-      const tags = [];
-
-      // acfs.positionが存在し、空でない場合は最初にpタグとして追加
-      if (item.acfs && item.acfs.position && item.acfs.position.trim() !== '') {
-        tags.push({
-          name: item.acfs.position.trim(),
-          url: '#', // pタグで表示するためのマーカー
-          isPosition: true
-        });
-      }
-
-      // position-tagを追加（リンク付き）
-      if (item.acfs && item.acfs['position-tag'] && Array.isArray(item.acfs['position-tag'])) {
-        const positionTags = item.acfs['position-tag'].map(tag => ({
-          name: tag.name || '',
-          url: `/team/?position=${tag.slug || ''}`,
-          isPosition: false
-        }));
-        tags.push(...positionTags);
-      }
-
-      // position-tagのslugを抽出してpositionSlugsとして保存
-      const positionSlugs = item.acfs?.['position-tag']
-        ? item.acfs['position-tag']
-            .filter(tag => tag.slug) // slugが存在するもののみ
-            .map(tag => tag.slug)
-        : [];
-
-      teamMember.tags = tags;
-      teamMember.positionSlugs = positionSlugs; // position絞り込み用のslug配列を追加
-
-      return teamMember;
-    });
-
-  // console.log('✅ Team data loaded successfully:', {
-  //   total: items.length,
-  //   membersWithTags: items.filter(item => item.tags.length > 0).length
-  // });
-
-} catch (error) {
-  console.error('❌ Failed to fetch team data:', error);
-  console.error('❌ Error details:', {
-    name: error.name,
-    message: error.message,
-    stack: error.stack?.substring(0, 200)
-  });
-}
 ---
 
 <div class="p-team-content" data-main-content>
-  <ul class="p-team-content__list">
-    {items.map((item) => {
-    const positionSlugs = item.positionSlugs || [];
-
-    return (
-      <li
-        class="p-team-content__list-item"
-        data-item={item.id}
-        data-positions={positionSlugs.join(',')}
-      >
-        <TeamCard
-          id={item.id}
-          name={item.name}
-          pic={item.pic}
-          url={item.url}
-          tags={item.tags}
-        />
-      </li>
-      );
-    })}
+  <ul class="p-team-content__list" id="teamList">
+    <!-- チームデータがロードされると動的に表示されます -->
   </ul>
 
   <!-- SP時の2カラムレイアウト用 -->
@@ -108,7 +15,7 @@ try {
   </div>
 </div>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -148,15 +55,82 @@ try {
     row-gap: 50px;
   }
 }
+
+.c-team-card {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  row-gap: 18px;
+
+  &__thumb {
+    display: block;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 100%;
+    align-content: flex-start;
+    row-gap: 22px;
+    @include me.sp {
+      row-gap: 12px;
+    }
+  }
+
+  &__name {
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 0.78;
+    letter-spacing: .02rem;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 4px;
+    row-gap: 8px;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      column-gap: 4px;
+      color: var(--c-gray);
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 0.80;
+      &::after {
+        content: "/";
+        display: inline-block;
+      }
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
+
+      a {
+        color: var(--c-gray);
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 0.80;
+      }
+    }
+  }
+}
 </style>
 
 <script>
 class TeamLayoutManager {
   constructor() {
+    this.teamData = [];
     this.init();
   }
 
   init() {
+    // APIデータの受信待ち
+    document.addEventListener('teamDataLoaded', (event) => {
+      this.handleTeamData(event.detail);
+    });
+
     if (window.innerWidth <= 768) {
       this.setupMobileLayout();
     }
@@ -168,6 +142,119 @@ class TeamLayoutManager {
         this.setupDesktopLayout();
       }
     });
+  }
+
+  /**
+   * APIから取得したチームデータを処理
+   */
+  handleTeamData(teamData) {
+    // console.log('👥 Content.astro: チームデータを受信:', teamData);
+
+    this.teamData = teamData;
+    this.renderTeamCards();
+  }
+
+  /**
+   * チームカードを動的に生成・表示
+   */
+  renderTeamCards() {
+    const teamList = document.getElementById('teamList');
+    if (!teamList) return;
+
+    // 既存の要素をクリア
+    teamList.innerHTML = '';
+
+    // チームデータをループして表示
+    this.teamData.forEach((member) => {
+      const listItem = this.createTeamListItem(member);
+      teamList.appendChild(listItem);
+    });
+
+    // カード生成完了をフィルタリングシステムに通知
+    const event = new CustomEvent('teamCardsRendered');
+    document.dispatchEvent(event);
+
+    // レスポンシブレイアウトの再適用
+    if (window.innerWidth <= 768) {
+      this.setupMobileLayout();
+    }
+  }
+
+  /**
+  * 個別のチームリストアイテムを作成
+  */
+  createTeamListItem(member) {
+  const li = document.createElement('li');
+  li.className = 'p-team-content__list-item';
+  li.setAttribute('data-item', member.id);
+
+  // ポジションスラッグの取得（taxonomy.positionから）
+  const positions = member.taxonomy?.position || [];
+  const positionSlugs = positions.map(pos => pos.slug || '').filter(slug => slug);
+  li.setAttribute('data-positions', positionSlugs.join(','));
+
+  // チームカードのHTML生成
+  const teamCard = this.createTeamCardHTML(member);
+  li.innerHTML = teamCard;
+
+  return li;
+  }
+
+  /**
+   * チームカードのHTMLを生成
+   */
+  createTeamCardHTML(member) {
+    const name = member.title || 'No Name';
+    const pic = member.acfs?.thumbnail?.url || '';
+    const slug = member.slug || '#';
+    const url = slug !== '#' ? `/team/${slug}` : '#';
+
+    // タグ情報の処理
+    const tags = this.processTeamTags(member);
+    const tagsHTML = tags.map(tag => {
+      // 全てのタグをaタグでラップし、positionフィルターのリンクを設定
+      const filterUrl = tag.slug ? `/team/?position=${tag.slug}` : '/team/';
+      return `<li class="c-team-card__tags-item js-hover-item"><a href="${filterUrl}">${tag.name}</a></li>`;
+    }).join('');
+
+    return `
+      <div class="c-team-card">
+        <a href="${url}" class="c-team-card__thumb">
+          <img src="${pic}" alt="${name}">
+        </a>
+        <div class="c-team-card__info">
+          <h3 class="c-team-card__name">${name}</h3>
+          <ul class="c-team-card__tags js-hover">
+            ${tagsHTML}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * チームメンバーのタグ情報を処理
+   */
+  processTeamTags(member) {
+    const tags = [];
+
+    // ポジション情報をtaxonomy.positionから取得
+    const positions = member.taxonomy?.position || [];
+    positions.forEach(position => {
+      if (position.name) {
+        tags.push({
+          name: position.name,
+          slug: position.slug,
+          url: '#',
+          isPosition: true
+        });
+      }
+    });
+
+    // その他のタグが必要な場合はここで追加
+    // 例：スキル、専門分野など
+
+    return tags;
   }
 
   setupMobileLayout() {

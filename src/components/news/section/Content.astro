@@ -2,108 +2,6 @@
 import NewsCard from "../parts/NewsCard.astro";
 import Pagination from '../parts/Pagination.astro';
 
-// カテゴリー情報を取得するヘルパー関数
-function getCategoryInfo(taxonomyNews) {
-  if (!taxonomyNews || !Array.isArray(taxonomyNews) || taxonomyNews.length === 0) {
-    return { name: 'News', slug: 'news' }; // デフォルト
-  }
-
-  // 最初のカテゴリー情報を使用（通常は1つのみ）
-  const category = taxonomyNews[0];
-
-  if (category && category.name && category.slug) {
-    return { name: category.name, slug: category.slug };
-  }
-
-  // フォールバック
-  return { name: 'News', slug: 'news' };
-}
-
-// 静的JSONファイルからニュースデータを取得
-let allNews = [];
-let pickupNews = [];
-let regularNews = [];
-
-try {
-  const response = await fetch('https://infocus.wp.site-prev2.com/api/news.json');
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  // レスポンステキストを取得してJSONをパース
-  const responseText = await response.text();
-
-  let newsData;
-  try {
-    newsData = JSON.parse(responseText);
-  } catch (parseError) {
-    console.error('❌ JSON Parse Error:', parseError);
-    console.log('🔍 First 200 chars of response:', responseText.substring(0, 200));
-    throw parseError;
-  }
-
-  // データが配列かどうかチェック
-  const newsArray = Array.isArray(newsData) ? newsData : [newsData];
-
-  // ニュースデータを日付順にソート（新しい順）
-  const sortedNews = newsArray
-    .filter(item => {
-      const hasTitle = item.title;
-      const hasDate = item.date;
-      if (!hasTitle || !hasDate) {
-        // console.log('⚠️ Filtering out item:', { id: item.id, hasTitle, hasDate });
-      }
-      return hasTitle && hasDate;
-    })
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .map((item, index) => {
-      const categoryInfo = getCategoryInfo(item.taxonomy?.news);
-      const newsItem = {
-        id: item.id || index,
-        slug: item.slug || '',
-        title: item.title || '',
-        date: new Date(item.date).toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-        }).replace(/\//g, '.'),
-        category: categoryInfo.name,        // 表示用カテゴリー名
-        categorySlug: categoryInfo.slug,    // フィルタリング用スラッグ
-        url: `/news/${item.slug}/`,
-        pic: item.acfs?.news_eyecatch?.url || item.acfs?.news_mv?.url
-      };
-
-      // デバッグ用ログ（開発時のみ）
-      // console.log(`📄 Processed item ${index}:`, {
-      //   title: newsItem.title,
-      //   category: newsItem.category,
-      //   categorySlug: newsItem.categorySlug,
-      //   rawTaxonomy: item.taxonomy?.news
-      // });
-
-      return newsItem;
-    });
-
-  allNews = sortedNews;
-  pickupNews = sortedNews.slice(0, 3); // 最新3件
-  regularNews = sortedNews.slice(3, 17); // 4件目から17件目まで（14件）
-
-  // console.log('✅ News data loaded successfully:', {
-  //   total: allNews.length,
-  //   pickup: pickupNews.length,
-  //   regular: regularNews.length
-  // });
-
-} catch (error) {
-  console.error('❌ Failed to fetch news data:', error);
-  console.error('❌ Error details:', {
-    name: error.name,
-    message: error.message,
-    stack: error.stack?.substring(0, 200)
-  });
-}
-
 ---
 
 <section class="p-news-content" data-main-content>
@@ -114,21 +12,19 @@ try {
           PICK UP
           <span><svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_240_384)"><path d="M11 11.7419V10.0008L9.19249 6.95043L10.6127 0H0.387324L1.81397 6.95043L0 10.0008V11.7419H11Z" fill="white"/><path d="M6.10035 8.13477H4.89964V17.0004H6.10035V8.13477Z" fill="white"/></g><defs><clipPath id="clip0_240_384"><rect width="11" height="17" fill="white"/></clipPath></defs></svg></span>
         </h2>
-        {pickupNews.length > 0 && (
-          <NewsCard
-            id={1}
-            title="「光」を中心とした世界を体験。Ted Söderbergによる展覧会「WE-WANT-YU」をCONTRASTで開催"
-            date="2025.04.18"
-            category="Project"
-            categorySlug="project"
-            url="/news/detail"
-            pic="/common/images/news/01.png"
-          />
-        )}
+        <NewsCard
+          id={1}
+          title=""
+          date=""
+          category=""
+          categorySlug=""
+          url=""
+          pic=""
+        />
       </div>
     </div>
     <ul class="p-news-pickup__list-index">
-      {pickupNews.map((item) => (
+      <!-- {pickupNews.map((item) => (
         <li class="p-news-pickup__list-item" data-category={item.categorySlug}>
           <NewsCard
             id={item.id}
@@ -140,13 +36,13 @@ try {
             pic={item.pic}
           />
         </li>
-      ))}
+      ))} -->
     </ul>
   </div>
 
   <div class="p-news-content__list">
     <ul class="p-news-content__list-index" data-index="news">
-      {regularNews.map((item) => (
+      <!-- {regularNews.map((item) => (
         <li class="p-news-content__list-item" data-news-item="regular" data-category={item.categorySlug}>
           <NewsCard
             id={item.id}
@@ -158,9 +54,9 @@ try {
             pic={item.pic}
           />
         </li>
-      ))}
+      ))} -->
       <!-- 絞り込み時用の全件データ -->
-      {allNews.map((item) => (
+      <!-- {allNews.map((item) => (
         <li class="p-news-content__list-item" data-news-item="all" data-category={item.categorySlug} style="display: none;">
           <NewsCard
             id={item.id}
@@ -172,11 +68,14 @@ try {
             pic={item.pic}
           />
         </li>
-      ))}
+      ))} -->
     </ul>
   </div>
 
-  {allNews.length > 17 && <Pagination />}
+  <!-- {allNews.length > 17 && <Pagination />} -->
+   <div class="pagination-container" style="display: none;">
+    <Pagination />
+  </div>
 </section>
 
 <style lang="scss" is:global>
@@ -302,4 +201,5 @@ try {
     }
   }
 }
+
 </style>

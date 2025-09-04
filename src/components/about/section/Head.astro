@@ -34,7 +34,7 @@ const info = {
     caption: 'CAPITAL',
     list: [
       {
-        text: '10,000,000 yen',
+        text: '¥10,000,000',
       },
     ],
   },
@@ -49,10 +49,10 @@ const info = {
         text: 'Art Direction',
       },
       {
-        text: 'Consulting',
+        text: 'Photo Direction',
       },
       {
-        text: 'Photo Direction',
+        text: 'Localization',
       },
     ],
   },
@@ -79,7 +79,7 @@ const info = {
     caption: 'EXTRAS',
     list: [
       {
-        text: 'Product Development & Sales',
+        text: 'Social Media Management',
       },
       {
         text: 'Creative Space Management',
@@ -97,7 +97,7 @@ const info = {
   <div class="p-about-head__content">
     <p class="p-about-head__content-description">
       IN FOCUSは、東京とニューヨークを拠点に活動するデジタルブランディングスタジオです。<br>
-      専門性の高いメンバー達が企業やブランドの核にあるストーリーをコンセプトに、Web、映像、グラフィック、写真といったデジタル領域を横断し、新しい視点を提案します。
+      多様な専門性を持つメンバーが企業やブランドの核にあるストーリーや独自性をコンセプトに、Web、映像、グラフィック、写真といった領域を横断し、新しい視点を提案します。
     </p>
     <figure class="p-about-head__content-pic">
       <img src="/common/images/about/graph.png" alt="">
@@ -200,6 +200,9 @@ const info = {
       font-family: var(--f-jp);
       font-size: 1.5rem;
       line-height: 1.8;
+      @include me.pc {
+        max-width: 793px;
+      }
       @include me.sp {
         font-size: 1.4rem;
       }
@@ -243,7 +246,7 @@ const info = {
     @include me.pc {
       &[data-item="company"],
       &[data-item="branding"] {
-        width: 126px;
+        width: 127px;
         margin-inline-end: 115px;
       }
       &[data-item="ceo"],

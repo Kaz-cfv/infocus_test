@@ -8,13 +8,14 @@ interface Link {
 interface Props {
   id: number;
   name: string;
+  sub: string;
   address: string;
   link: Link[];
   description: string;
   pic: string;
 }
 
-const { id, name, address, link, description, pic } = Astro.props;
+const { id, name, sub, address, link, description, pic } = Astro.props;
 ---
 
 <div class="c-business-item" data-item={id}>
@@ -23,6 +24,10 @@ const { id, name, address, link, description, pic } = Astro.props;
   </figure>
   <div class="c-business-item__info">
     <h3 class="c-business-item__name">{name}</h3>
+    <span class="c-business-item__sub">{sub}</span>
+    <div class="c-business-item__description">
+      <p set:html={description}></p>
+    </div>
     <p class="c-business-item__address" set:html={address}></p>
     <div class="c-business-item__link">
       {link.map((linkItem) => (
@@ -33,13 +38,10 @@ const { id, name, address, link, description, pic } = Astro.props;
         )
       ))}
     </div>
-    <div class="c-business-item__description">
-      <p>{description}</p>
-    </div>
   </div>
 </div>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -66,6 +68,7 @@ const { id, name, address, link, description, pic } = Astro.props;
   &__info {
     display: grid;
     @include me.pc {
+      row-gap: 16px;
       max-width: 560px;
     }
     @include me.sp {
@@ -87,28 +90,48 @@ const { id, name, address, link, description, pic } = Astro.props;
     }
   }
 
+  &__sub {
+    margin-block-start: -8px;
+    color: var(--c-gray);
+    font-size: 1.4rem;
+    line-height: 2.2;
+    @include me.sp {
+      margin-block-start: 2px;
+    }
+  }
+
+  &__description {
+    display: grid;
+    row-gap: 16px;
+    font-size: 1.4rem;
+    line-height: 1.8;
+    @include me.sp {
+      margin-block-start: 24px;
+    }
+
+    p {
+
+    }
+  }
+
   &__address {
     color: var(--c-gray);
     font-size: 1.4rem;
     line-height: 1.6;
-    @include me.pc {
-      grid-row: 3;
-      margin-block-start: 24px;
-    }
     @include me.sp {
-      margin-block-start: 8px;
+      margin-block-start: 32px;
+    }
+    a {
+      color: var(--c-gray);
+      text-decoration: underline;
     }
   }
 
   &__link {
     font-size: 1.4rem;
     line-height: 0.6363;
-    @include me.pc {
-      grid-row: 4;
-      margin-block-start: 16px;
-    }
     @include me.sp {
-      margin-block-start: 16px;
+      margin-block-start: 8px;
       line-height: 1.8;
     }
 
@@ -130,24 +153,5 @@ const { id, name, address, link, description, pic } = Astro.props;
       }
     }
   }
-
-  &__description {
-    display: grid;
-    row-gap: 16px;
-    font-size: 1.4rem;
-    line-height: 1.8;
-    @include me.pc {
-      grid-row: 2;
-      margin-block-start: 26px;
-    }
-    @include me.sp {
-      margin-block-start: 40px;
-    }
-
-    p {
-
-    }
-  }
-
 }
 </style>

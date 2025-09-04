@@ -6,6 +6,7 @@
 import URLUtils from '../modules/URLUtils.js';
 import { TeamPosition } from '../modules/TeamPosition.js';
 import { TeamDisplay } from '../modules/TeamDisplay.js';
+import { ApiClient } from '../modules/ApiClient.js';
 
 export class Team {
   constructor() {
@@ -13,6 +14,7 @@ export class Team {
       return;
     }
 
+    this.apiClient = new ApiClient();
     this.positionManager = new TeamPosition();
     this.displayManager = new TeamDisplay();
     this.currentPosition = null;
@@ -31,7 +33,10 @@ export class Team {
   /**
    * 初期化処理
    */
-  init() {
+  async init() {
+    // APIからチームデータを取得
+    await this.fetchTeamData();
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         this.setupTeamFiltering();
@@ -42,21 +47,54 @@ export class Team {
   }
 
   /**
-   * チーム絞り込み機能のセットアップ
+   * チームデータを取得
+   */
+  async fetchTeamData() {
+    try {
+      const teamData = await this.apiClient.getTeamData();
+      // console.log('👥 Team.js: APIデータ取得完了:', teamData);
+
+      // カスタムイベントで他のコンポーネントにデータを配信
+      const event = new CustomEvent('teamDataLoaded', {
+        detail: teamData
+      });
+      document.dispatchEvent(event);
+
+    } catch (error) {
+      console.error('❌ Failed to fetch team data:', error);
+    }
+  }
+
+  /**
+   * チームフィルタリングのセットアップ
    */
   setupTeamFiltering() {
     // URLパラメーターの処理
     this.handleURLParameters();
+
+    // チームカード生成完了イベントのリスナー設定
+    document.addEventListener('teamCardsRendered', () => {
+      this.refreshFilteringSystem();
+    });
 
     // 役職変更と表示制御の同期設定
     this.setupPositionDisplaySync();
 
     // グローバルにアクセス可能にする（外部連携用）
     this.exposeGlobalInterface();
+  }
 
-    console.log('👥 Team一覧ページ: 初期化完了', {
-      position: this.currentPosition,
-    });
+  /**
+   * フィルタリングシステムの再初期化
+   */
+  refreshFilteringSystem() {
+    // 表示マネージャーのチームカード情報を更新
+    this.displayManager.getTeamCards();
+
+    // 現在のポジションフィルターを再適用
+    if (this.currentPosition) {
+      this.displayManager.updateDisplayByPosition(this.currentPosition);
+    }
   }
 
   /**
@@ -175,4 +213,12 @@ export class Team {
       display: this.displayManager
     };
   }
+}
+
+// ページ読み込み時の自動初期化
+// DOMContentLoadedイベントでTeamクラスを自動初期化
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    new Team();
+  });
 }
