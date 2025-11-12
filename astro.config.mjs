@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-
+import glsl from 'vite-plugin-glsl'
 import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
@@ -23,6 +23,7 @@ export default defineConfig({
   },
   // 開発時の設定
   vite: {
+    plugins: [glsl()],
     // 開発サーバーでのAPI呼び出し最適化
     server: {
       cors: true
