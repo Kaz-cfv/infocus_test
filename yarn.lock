@@ -1618,16 +1618,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 24.10.1
-  resolution: "@types/node@npm:24.10.1"
-  dependencies:
-    undici-types: ~7.16.0
-  checksum: c2f370ae7a97c04991e0eee6b57e588a2abef0814a5f6e41fda5a9200cf02ae6654fad51c8372ee203ae4134bab80f5bf441c586f7f50e0fda3ba422f35eb3c0
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.15.18":
+"@types/node@npm:*, @types/node@npm:^22.15.18":
   version: 22.19.1
   resolution: "@types/node@npm:22.19.1"
   dependencies:
@@ -3078,8 +3069,8 @@ __metadata:
   linkType: hard
 
 "lenis@npm:^1.3.4":
-  version: 1.3.4
-  resolution: "lenis@npm:1.3.4"
+  version: 1.3.15
+  resolution: "lenis@npm:1.3.15"
   peerDependencies:
     "@nuxt/kit": ">=3.0.0"
     react: ">=17.0.0"
@@ -3091,7 +3082,7 @@ __metadata:
       optional: true
     vue:
       optional: true
-  checksum: 5f46fa08215469e387e3c43a3d373ebdfb5878c3874f6a2eb3a668ece07545c3fe8accc44f2d765e1c1c6baa5ae73b376c335e539fe56bab96742c503b4263f9
+  checksum: 380a06becb6914c57081447a9d2dec02d4ca81cc90c979be4b346ba638011f91e699ed844cee7ed4e5d5105dc433a40b1bf80f819b4349ff97b30e9f9977d1f7
   languageName: node
   linkType: hard
 
@@ -5181,13 +5172,6 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 46331c7d6016bf85b3e8f20c159d62f5ae471aba1eb3dc52fff35a0259d58dcc7d592d4cc4f00c5f9243fa738a11cfa48bd20203040d4a9e6bc25e807fab7ab3
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~7.16.0":
-  version: 7.16.0
-  resolution: "undici-types@npm:7.16.0"
-  checksum: 1ef68fc6c5bad200c8b6f17de8e5bc5cfdcadc164ba8d7208cd087cfa8583d922d8316a7fd76c9a658c22b4123d3ff847429185094484fbc65377d695c905857
   languageName: node
   linkType: hard
 
