@@ -18,7 +18,18 @@ try {
   if (!response.ok) {
     throw new Error(`API取得失敗: ${response.status}`);
   }
-  homeData = await response.json();
+
+  // テキストとしてまず受信
+  let responseText = await response.text();
+
+  // BOM（\uFEFF）を検知して除去
+  if (responseText.startsWith('\uFEFF')) {
+    responseText = responseText.substring(1);
+  }
+
+  // 浄化されたテキストをパース
+  homeData = JSON.parse(responseText);
+
 } catch (error) {
   console.error('❌ HomeデータAPI取得エラー:', error);
 }
