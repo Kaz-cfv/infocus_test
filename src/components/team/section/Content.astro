@@ -1,15 +1,28 @@
 ---
 import TeamCard from '../parts/TeamCard.astro';
 
+// スケルトンカードの枚数
+const SKELETON_COUNT = 15;
 ---
 
 <div class="p-team-content" data-main-content>
   <ul class="p-team-content__list" id="teamList">
-    <!-- チームデータがロードされると動的に表示されます -->
+    {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+      <li class="p-team-content__list-item skeleton-item" data-skeleton="true">
+        <div class="c-team-card skeleton">
+          <div class="c-team-card__thumb skeleton-shimmer">
+          </div>
+          <div class="c-team-card__info">
+            <div class="skeleton-name skeleton-shimmer"></div>
+            <div class="skeleton-tags skeleton-shimmer"></div>
+          </div>
+        </div>
+      </li>
+    ))}
   </ul>
 
-  <!-- SP時の2カラムレイアウト用 -->
-  <div class="p-team-content__columns" style="display: none;">
+  <!-- モバイル用カラムレイアウト -->
+  <div class="p-team-content__columns">
     <div class="p-team-content__column" data-column="left"></div>
     <div class="p-team-content__column" data-column="right"></div>
   </div>
@@ -24,7 +37,7 @@ import TeamCard from '../parts/TeamCard.astro';
   padding-inline: 30px;
   padding-block-end: 107px;
   @include me.sp {
-    margin-block-start: 60px;
+    margin-block-start: 40px;
     padding-inline: 20px;
     padding-block-end: 80px;
   }
@@ -35,14 +48,68 @@ import TeamCard from '../parts/TeamCard.astro';
     column-gap: 25px;
     row-gap: 50px;
     @include me.sp {
-      display: none;
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 16px;
+      row-gap: 24px;
+    }
+
+    // チームカード出現アニメーション
+    &-item {
+      // スケルトンアイテムは除外
+      &:not(.skeleton-item) {
+        opacity: 0;
+
+        // PC版（5カラム）: 奇数番目は下から、偶数番目は上から
+        @include me.pc {
+          // 奇数番目: 下から出現
+          &:nth-child(odd) {
+            animation: fadeInFromBottom 0.6s ease-out forwards;
+          }
+
+          // 偶数番目: 上から出現
+          &:nth-child(even) {
+            animation: fadeInFromTop 0.6s ease-out forwards;
+          }
+
+          // 順次表示のための遅延
+          @for $i from 1 through 100 {
+            &:nth-child(#{$i}) {
+              animation-delay: #{($i - 1) * 0.05}s;
+            }
+          }
+        }
+
+        // SP版（2カラム）: 2つごとに下・上のパターン
+        @include me.sp {
+          // 左カラム（1, 3, 5, 7...）: 下から出現
+          &:nth-child(2n+1) {
+            animation: fadeInFromBottom 0.6s ease-out forwards;
+          }
+
+          // 右カラム（2, 4, 6, 8...）: 上から出現
+          &:nth-child(2n) {
+            animation: fadeInFromTop 0.6s ease-out forwards;
+          }
+
+          // 順次表示のための遅延（2カラムなので2で割った商で行を判定）
+          @for $i from 1 through 100 {
+            &:nth-child(#{$i}) {
+              // 行番号を計算（0始まり）
+              $row: floor(($i - 1) / 2);
+              // 列番号を計算（0: 左, 1: 右）
+              $col: ($i - 1) % 2;
+              // 行ごとに0.1秒、列ごとに0.05秒の遅延
+              animation-delay: #{$row * 0.1 + $col * 0.05}s;
+            }
+          }
+        }
+      }
     }
   }
 
   &__columns {
     display: none;
     @include me.sp {
-      display: flex;
       column-gap: 20px;
       align-items: flex-start;
     }
@@ -53,7 +120,142 @@ import TeamCard from '../parts/TeamCard.astro';
     display: flex;
     flex-direction: column;
     row-gap: 50px;
+
+    // モバイル用カラムレイアウトのアニメーション
+    .p-team-content__list-item {
+      &:not(.skeleton-item) {
+        opacity: 0;
+      }
+    }
+
+    // 左カラム: 全て下から出現
+    &[data-column="left"] {
+      .p-team-content__list-item:not(.skeleton-item) {
+        animation: fadeInFromBottom 0.6s ease-out forwards;
+
+        // 順次表示のための遅延
+        @for $i from 1 through 50 {
+          &:nth-child(#{$i}) {
+            animation-delay: #{($i - 1) * 0.1}s;
+          }
+        }
+      }
+    }
+
+    // 右カラム: 全て上から出現
+    &[data-column="right"] {
+      .p-team-content__list-item:not(.skeleton-item) {
+        animation: fadeInFromTop 0.6s ease-out forwards;
+
+        // 順次表示のための遅延
+        @for $i from 1 through 50 {
+          &:nth-child(#{$i}) {
+            animation-delay: #{($i - 1) * 0.1}s;
+          }
+        }
+      }
+    }
   }
+}
+
+// 下から出現するアニメーション
+@keyframes fadeInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 上から出現するアニメーション
+@keyframes fadeInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ★ スケルトンカードのスタイル
+.skeleton-item {
+  pointer-events: none;
+  user-select: none;
+}
+
+.c-team-card.skeleton {
+  .c-team-card__thumb {
+    aspect-ratio: 1 / 1;
+    background: #1a1a1a;
+    border-radius: 0;
+
+    &.skeleton-shimmer {
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.03) 50%,
+          transparent 100%
+        );
+        animation: shimmer 1.5s infinite;
+      }
+    }
+  }
+
+  .c-team-card__info {
+    row-gap: 18px;
+  }
+}
+
+.skeleton-name {
+  height: 1.8rem;
+  width: 70%;
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.skeleton-tags {
+  height: 1.2rem;
+  width: 50%;
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// フェードアウトアニメーション
+@keyframes skeleton-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.skeleton-item.fade-out {
+  animation: skeleton-fade-out 0.3s ease-out forwards;
 }
 
 .c-team-card {
@@ -62,8 +264,33 @@ import TeamCard from '../parts/TeamCard.astro';
   align-content: flex-start;
   row-gap: 18px;
 
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-team-card__thumb {
+          clip-path: inset(7px);
+        }
+
+        .c-team-card__thumb img {
+          // transform: scale(1.0222);
+        }
+      }
+    }
+  }
+
   &__thumb {
     display: block;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
+
+    img {
+      transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
+    }
+    picture {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__info {
@@ -81,6 +308,10 @@ import TeamCard from '../parts/TeamCard.astro';
     font-weight: 600;
     line-height: 0.78;
     letter-spacing: .02rem;
+
+    a {
+      color: var(--c-white);
+    }
   }
 
   &__tags {
@@ -117,189 +348,3 @@ import TeamCard from '../parts/TeamCard.astro';
   }
 }
 </style>
-
-<script>
-class TeamLayoutManager {
-  constructor() {
-    this.teamData = [];
-    this.init();
-  }
-
-  init() {
-    // APIデータの受信待ち
-    document.addEventListener('teamDataLoaded', (event) => {
-      this.handleTeamData(event.detail);
-    });
-
-    if (window.innerWidth <= 768) {
-      this.setupMobileLayout();
-    }
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth <= 768) {
-        this.setupMobileLayout();
-      } else {
-        this.setupDesktopLayout();
-      }
-    });
-  }
-
-  /**
-   * APIから取得したチームデータを処理
-   */
-  handleTeamData(teamData) {
-    // console.log('👥 Content.astro: チームデータを受信:', teamData);
-
-    this.teamData = teamData;
-    this.renderTeamCards();
-  }
-
-  /**
-   * チームカードを動的に生成・表示
-   */
-  renderTeamCards() {
-    const teamList = document.getElementById('teamList');
-    if (!teamList) return;
-
-    // 既存の要素をクリア
-    teamList.innerHTML = '';
-
-    // チームデータをループして表示
-    this.teamData.forEach((member) => {
-      const listItem = this.createTeamListItem(member);
-      teamList.appendChild(listItem);
-    });
-
-    // カード生成完了をフィルタリングシステムに通知
-    const event = new CustomEvent('teamCardsRendered');
-    document.dispatchEvent(event);
-
-    // レスポンシブレイアウトの再適用
-    if (window.innerWidth <= 768) {
-      this.setupMobileLayout();
-    }
-  }
-
-  /**
-  * 個別のチームリストアイテムを作成
-  */
-  createTeamListItem(member) {
-  const li = document.createElement('li');
-  li.className = 'p-team-content__list-item';
-  li.setAttribute('data-item', member.id);
-
-  // ポジションスラッグの取得（taxonomy.positionから）
-  const positions = member.taxonomy?.position || [];
-  const positionSlugs = positions.map(pos => pos.slug || '').filter(slug => slug);
-  li.setAttribute('data-positions', positionSlugs.join(','));
-
-  // チームカードのHTML生成
-  const teamCard = this.createTeamCardHTML(member);
-  li.innerHTML = teamCard;
-
-  return li;
-  }
-
-  /**
-   * チームカードのHTMLを生成
-   */
-  createTeamCardHTML(member) {
-    const name = member.title || 'No Name';
-    const pic = member.acfs?.thumbnail?.url || '';
-    const slug = member.slug || '#';
-    const url = slug !== '#' ? `/team/${slug}` : '#';
-
-    // タグ情報の処理
-    const tags = this.processTeamTags(member);
-    const tagsHTML = tags.map(tag => {
-      // 全てのタグをaタグでラップし、positionフィルターのリンクを設定
-      const filterUrl = tag.slug ? `/team/?position=${tag.slug}` : '/team/';
-      return `<li class="c-team-card__tags-item js-hover-item"><a href="${filterUrl}">${tag.name}</a></li>`;
-    }).join('');
-
-    return `
-      <div class="c-team-card">
-        <a href="${url}" class="c-team-card__thumb">
-          <img src="${pic}" alt="${name}">
-        </a>
-        <div class="c-team-card__info">
-          <h3 class="c-team-card__name">${name}</h3>
-          <ul class="c-team-card__tags js-hover">
-            ${tagsHTML}
-          </ul>
-        </div>
-      </div>
-    `;
-  }
-
-  /**
-   * チームメンバーのタグ情報を処理
-   */
-  processTeamTags(member) {
-    const tags = [];
-
-    // ポジション情報をtaxonomy.positionから取得
-    const positions = member.taxonomy?.position || [];
-    positions.forEach(position => {
-      if (position.name) {
-        tags.push({
-          name: position.name,
-          slug: position.slug,
-          url: '#',
-          isPosition: true
-        });
-      }
-    });
-
-    // その他のタグが必要な場合はここで追加
-    // 例：スキル、専門分野など
-
-    return tags;
-  }
-
-  setupMobileLayout() {
-    const list = document.querySelector('.p-team-content__list');
-    const columns = document.querySelector('.p-team-content__columns');
-    const leftColumn = document.querySelector('[data-column="left"]');
-    const rightColumn = document.querySelector('[data-column="right"]');
-
-    if (!list || !columns) return;
-
-    // リストを非表示にし、カラムを表示
-    list.style.display = 'none';
-    columns.style.display = 'flex';
-
-    // カラムをクリア
-    leftColumn.innerHTML = '';
-    rightColumn.innerHTML = '';
-
-    // アイテムを左右に振り分け
-    const items = list.querySelectorAll('.p-team-content__list-item');
-    items.forEach((item, index) => {
-      const clonedItem = item.cloneNode(true);
-      if (index % 2 === 0) {
-        leftColumn.appendChild(clonedItem);
-      } else {
-        rightColumn.appendChild(clonedItem);
-      }
-    });
-  }
-
-  setupDesktopLayout() {
-    const list = document.querySelector('.p-team-content__list');
-    const columns = document.querySelector('.p-team-content__columns');
-
-    if (!list || !columns) return;
-
-    list.style.display = 'grid';
-    columns.style.display = 'none';
-  }
-}
-
-// ページ読み込み時に実行
-if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    new TeamLayoutManager();
-  });
-}
-</script>

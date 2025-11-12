@@ -1,0 +1,189 @@
+---
+const data = [
+  {
+    id: 1,
+    slug: '',
+    title: 'San Francisco Design Talk',
+    date: '2025.05',
+    href: 'https://open.spotify.com/episode/6p0z9EfPQzI2gLYEOOfSBj?si=5add98cf621c43cc&nd=1&dlsi=421ca09a4d81407a',
+  },
+  {
+    id: 2,
+    slug: '',
+    title: 'AdverTimes. -「相鐵創業60周年記念コミュニケーション」',
+    date: '2024.06',
+    href: 'https://www.advertimes.com/20240612/article463374/',
+  },
+  {
+    id: 3,
+    slug: '',
+    title: 'デジタルメディアデザイン見本帳 -「MARNON」',
+    date: '2023.06',
+    href: 'https://infocusinc.com/news/digital-media-design-sample-book/',
+  },
+  {
+    id: 4,
+    slug: '',
+    title: 'The Webby Awards - CRAFTED WITH CODE [kaonavi Town]',
+    date: '2023.05',
+    href: 'https://www.webbyawards.com/crafted-with-code/kaonavi-town/',
+  },
+  {
+    id: 5,
+    slug: '',
+    title: 'CINRA.JOB - 設立10年を迎えたIN FOCUSのいま。「王道ではない、自分たちだけの戦い方」を追い求めた軌跡',
+    date: '2023.01 ',
+    href: 'https://job.cinra.net/article/feature/infocus3/',
+  },
+  {
+    id: 6,
+    slug: '',
+    title: 'CINRAJOB -「新しい視点でクリエイティブを。IN FOCUS独自の「チーム編成」とは？」',
+    date: '2019.10',
+    href: 'https://job.cinra.net/article/feature/infocus2/',
+  },
+  {
+    id: 7,
+    slug: '',
+    title: '月刊ブレーン5月号 - 森下仁丹株式会社「第四新卒採用広告」',
+    date: '2017.04',
+    href: '#',
+  },
+  {
+    id: 8,
+    slug: '',
+    title: 'キャリアハック - 世界を相手に戦えるか？海外志向のデザイナーへの助言',
+    date: '2016.11',
+    href: 'https://careerhack.en-japan.com/report/detail/731',
+  },
+  {
+    id: 9,
+    slug: '',
+    title: 'btrax- デザイナーに必要なのはセンスか努力か',
+    date: '2016.06',
+    href: '#',
+  },
+  {
+    id: 10,
+    slug: '',
+    title: 'Awwwards - [Digital Agencies in Tokyo: A Look at Japanese Web Design]',
+    date: '2015.05',
+    href: 'https://www.awwwards.com/digital-agencies-in-tokyo-a-look-at-japanese-web-design.html',
+  },
+  {
+    id: 11,
+    slug: '',
+    title: '月刊ブレーン2月号 -「niko and... TOKYO」',
+    date: '2015.01',
+    href: '#',
+  },
+  {
+    id: 12,
+    slug: '',
+    title: '月刊ブレーン11月号 -「相鐵50周年プロジェクト」',
+    date: '2014.10',
+    href: '#',
+  },
+  {
+    id: 13,
+    slug: '',
+    title: 'CINRAJOB-「王道ではない、自分たちだけの戦いかた」',
+    date: '2014.09',
+    href: 'https://job.cinra.net/article/feature/infocus/',
+  }
+]
+
+---
+
+<section class="p-about-press">
+  <div class="p-about-press__content">
+    <h2 class="p-about-press__title">Press &amp; Media</h2>
+    <div class="p-about-press__list">
+      {data.map((item => (
+        <dl class="p-about-press__item" data-id={item.id}>
+          <dt class="p-about-press__item-date">{item.date}</dt>
+          <dd class="p-about-press__item-content">
+            <a href={item.href} target="_blank" rel="noopener noreferrer">{item.title}</a>
+          </dd>
+        </dl>
+      )))}
+    </div>
+  </div>
+</section>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-about-press {
+  @include me.pc {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 30px;
+  }
+
+  &__content {
+    border-top: solid 1px var(--c-gray);
+    @include me.pc {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 240px;
+      padding-block: 160px 145px;
+    }
+    @include me.sp {
+      padding-inline: 20px;
+      padding-block: 100px;
+    }
+  }
+
+  &__title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 0.96;
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: 100%;
+    row-gap: 32px;
+    @include me.sp {
+      margin-block-start: 50px;
+    }
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: flex-start;
+    column-gap: 65px;
+    @include me.sp {
+      column-gap: 27px;
+    }
+
+    &-date {
+      color: var(--c-gray);
+      font-size: 1.6rem;
+      line-height: 1.6;
+    }
+
+    &-content {
+
+      a {
+        color: var(--c-white);
+        font-size: 1.6rem;
+        line-height: 1.6;
+        text-decoration: underline;
+        @include me.pc {
+          &:hover {
+            text-decoration: none;
+          }
+        }
+        &[href="#"] {
+          pointer-events: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
+</style>

@@ -1,7 +1,6 @@
 /**
  * News Pagination Manager
  * ニュース一覧のページネーション機能を管理
- * 公安の情報管理システムのように精密かつ確実に
  */
 
 export class NewsPaginationManager {
@@ -9,88 +8,121 @@ export class NewsPaginationManager {
     this.apiManager = apiManager;
     this.currentPage = 1;
     this.totalItems = 0;
+    this.totalPages = 0;
     this.paginationContainer = null;
-    
-    // ページネーション設定（APIManagerと同期）
+
+    // 検索状態
+    this.isSearchMode = false;
+    this.currentSearchQuery = '';
+
+    // ページネーション設定
     this.config = {
-      pickupCount: 3,
-      mainPageSize: 14,
-      totalPerPage: 17,
-      maxVisiblePages: 5 // 表示する最大ページ数
+      itemsPerPage: 14,
+      maxVisiblePages: 5,
+      skipCount: 4 // 先頭から除外する件数
     };
-    
+
     this.init();
   }
 
   /**
    * 初期化処理
-   * まるで捜査の準備をするように慎重に
    */
   init() {
     this.paginationContainer = document.querySelector('.pagination-container');
     this.bindEvents();
-    console.log('📄 NewsPaginationManager: 初期化完了');
   }
 
   /**
    * イベントリスナーの設定
-   * 各種操作への対応を準備
    */
   bindEvents() {
-    // ページネーションクリックイベントの委譲
     document.addEventListener('click', (e) => {
-      if (e.target.closest('[data-pagination-page]')) {
+      const pageButton = e.target.closest('[data-pagination-page]');
+      if (pageButton) {
         e.preventDefault();
-        const page = parseInt(e.target.closest('[data-pagination-page]').dataset.paginationPage);
+        const page = parseInt(pageButton.dataset.paginationPage);
         this.goToPage(page);
-      } else if (e.target.closest('[data-pagination="prev"]')) {
+        return;
+      }
+
+      const arrowButton = e.target.closest('[data-pagination]');
+      if (arrowButton) {
         e.preventDefault();
-        this.goToPreviousPage();
-      } else if (e.target.closest('[data-pagination="next"]')) {
-        e.preventDefault();
-        this.goToNextPage();
+        const direction = arrowButton.dataset.pagination;
+
+        if (direction === 'prev') {
+          this.hidePickupArea();
+          this.goToPreviousPage();
+        } else if (direction === 'next') {
+          this.hidePickupArea();
+          this.goToNextPage();
+        }
       }
     });
   }
 
   /**
-   * ページネーションの表示状態を更新
-   * データ量に基づいて表示/非表示を制御
+   * 総ページ数を取得
+   * 先頭4件を除いた計算
    */
-  updatePaginationDisplay(newsData) {
-    this.totalItems = newsData.length;
-    const totalPages = this.calculateTotalPages();
-    
-    console.log('🔢 ページネーション更新:', {
-      totalItems: this.totalItems,
-      totalPages,
-      currentPage: this.currentPage
-    });
+  async fetchTotalPages() {
+    try {
+      const testEndpoint = `${this.apiManager.baseEndpoint}?lang=${this.apiManager.currentLanguage}&per_page=1&page=1`;
 
-    if (totalPages <= 1) {
-      // 1ページ以下の場合は非表示
-      this.hidePagination();
-    } else {
-      // 複数ページの場合は表示
-      this.showPagination();
-      this.renderPagination(totalPages);
+      const response = await fetch(testEndpoint, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const totalItems = parseInt(response.headers.get('X-WP-Total') || '0');
+
+      // 先頭4件を除いた実際のページネーション対象件数
+      const paginationItems = Math.max(0, totalItems - this.config.skipCount);
+
+      // ページ数を計算
+      const totalPages = Math.ceil(paginationItems / this.config.itemsPerPage);
+
+      this.totalItems = totalItems;
+      this.totalPages = Math.max(1, totalPages);
+
+      return {
+        totalItems: this.totalItems,
+        totalPages: this.totalPages,
+        paginationItems
+      };
+
+    } catch (error) {
+      console.error('❌ 総ページ数取得エラー:', error);
+      this.totalItems = 18;
+      this.totalPages = 1;
+      return {
+        totalItems: this.totalItems,
+        totalPages: this.totalPages,
+        paginationItems: 14
+      };
     }
   }
 
   /**
-   * 総ページ数を計算
-   * まるで証拠の総数を正確に把握するように
+   * ページネーションの表示状態を更新
    */
-  calculateTotalPages() {
-    if (this.totalItems <= this.config.totalPerPage) {
-      return 1;
+  async updatePaginationDisplay(newsData = []) {
+    const { totalItems, totalPages, paginationItems } = await this.fetchTotalPages();
+
+    if (totalPages <= 1) {
+      this.hidePagination();
+    } else {
+      this.showPagination();
+      this.renderPagination(totalPages);
     }
-    
-    // 1ページ目の17件を除いた残り
-    const remainingItems = this.totalItems - this.config.totalPerPage;
-    const additionalPages = Math.ceil(remainingItems / this.config.mainPageSize);
-    
-    return 1 + additionalPages;
   }
 
   /**
@@ -113,7 +145,6 @@ export class NewsPaginationManager {
 
   /**
    * ページネーションのHTML構造を動的に生成
-   * コナンのトリック解明のような精密さで
    */
   renderPagination(totalPages) {
     const paginationNav = document.querySelector('.c-pagination');
@@ -125,25 +156,22 @@ export class NewsPaginationManager {
     const paginationList = paginationNav.querySelector('.c-pagination__index');
     if (!paginationList) return;
 
-    // 既存のリストをクリア
     paginationList.innerHTML = '';
+    this.createModernPagination(paginationList, totalPages);
+  }
 
-    // Prevボタン
-    const prevItem = this.createPrevButton();
-    paginationList.appendChild(prevItem);
+  /**
+   * モダンなページネーションUIを生成
+   */
+  createModernPagination(container, totalPages) {
+    const prevButton = this.createPrevButton();
+    container.appendChild(prevButton);
 
-    // ページ番号を生成
-    const pageItems = this.generatePageNumbers(totalPages);
-    pageItems.forEach(item => paginationList.appendChild(item));
+    const pageNumbers = this.generateSmartPageNumbers(totalPages);
+    pageNumbers.forEach(item => container.appendChild(item));
 
-    // Nextボタン
-    const nextItem = this.createNextButton(totalPages);
-    paginationList.appendChild(nextItem);
-
-    console.log('✨ ページネーション描画完了:', {
-      currentPage: this.currentPage,
-      totalPages
-    });
+    const nextButton = this.createNextButton(totalPages);
+    container.appendChild(nextButton);
   }
 
   /**
@@ -152,10 +180,17 @@ export class NewsPaginationManager {
   createPrevButton() {
     const li = document.createElement('li');
     li.setAttribute('data-pagination', 'prev');
-    
-    const isDisabled = this.currentPage <= 1;
-    li.innerHTML = `<a href="#" ${isDisabled ? 'style="opacity: 0.3; pointer-events: none;"' : ''}>Prev</a>`;
-    
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.textContent = 'Prev';
+
+    if (this.currentPage <= 1) {
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.3';
+    }
+
+    li.appendChild(link);
     return li;
   }
 
@@ -165,51 +200,55 @@ export class NewsPaginationManager {
   createNextButton(totalPages) {
     const li = document.createElement('li');
     li.setAttribute('data-pagination', 'next');
-    
-    const isDisabled = this.currentPage >= totalPages;
-    li.innerHTML = `<a href="#" ${isDisabled ? 'style="opacity: 0.3; pointer-events: none;"' : ''}>Next</a>`;
-    
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.textContent = 'Next';
+
+    if (this.currentPage >= totalPages) {
+      link.style.pointerEvents = 'none';
+      link.style.opacity = '0.3';
+    }
+
+    li.appendChild(link);
     return li;
   }
 
   /**
-   * ページ番号のリストを生成
-   * 公安の資料整理のように系統立てて
+   * 賢いページ番号生成ロジック
    */
-  generatePageNumbers(totalPages) {
+  generateSmartPageNumbers(totalPages) {
     const pages = [];
-    
-    if (totalPages <= this.config.maxVisiblePages) {
-      // 全ページを表示
+    const current = this.currentPage;
+
+    if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(this.createPageItem(i));
       }
     } else {
-      // 省略表示のロジック
-      pages.push(this.createPageItem(1));
-      
-      if (this.currentPage > 3) {
-        pages.push(this.createDottedItem());
-      }
-      
-      const start = Math.max(2, this.currentPage - 1);
-      const end = Math.min(totalPages - 1, this.currentPage + 1);
-      
-      for (let i = start; i <= end; i++) {
-        if (i !== 1 && i !== totalPages) {
+      if (current <= 4) {
+        for (let i = 1; i <= 5; i++) {
           pages.push(this.createPageItem(i));
         }
-      }
-      
-      if (this.currentPage < totalPages - 2) {
         pages.push(this.createDottedItem());
-      }
-      
-      if (totalPages > 1) {
+        pages.push(this.createPageItem(totalPages));
+      } else if (current >= totalPages - 3) {
+        pages.push(this.createPageItem(1));
+        pages.push(this.createDottedItem());
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(this.createPageItem(i));
+        }
+      } else {
+        pages.push(this.createPageItem(1));
+        pages.push(this.createDottedItem());
+        for (let i = current - 1; i <= current + 1; i++) {
+          pages.push(this.createPageItem(i));
+        }
+        pages.push(this.createDottedItem());
         pages.push(this.createPageItem(totalPages));
       }
     }
-    
+
     return pages;
   }
 
@@ -218,68 +257,146 @@ export class NewsPaginationManager {
    */
   createPageItem(pageNumber) {
     const li = document.createElement('li');
-    
+
     if (pageNumber === this.currentPage) {
       li.setAttribute('data-pagination', 'current');
-      li.innerHTML = `<span>${pageNumber}</span>`;
+      const span = document.createElement('span');
+      span.textContent = pageNumber;
+      li.appendChild(span);
     } else {
       li.setAttribute('data-pagination-page', pageNumber);
-      li.innerHTML = `<a href="#">${pageNumber}</a>`;
+      const link = document.createElement('a');
+      link.href = '#';
+      link.textContent = pageNumber;
+      li.appendChild(link);
     }
-    
+
     return li;
   }
 
   /**
-   * 省略記号アイテムを作成
+   * 省略記号を作成
    */
   createDottedItem() {
     const li = document.createElement('li');
     li.setAttribute('data-pagination', 'dotted');
-    li.innerHTML = '<span>...</span>';
+    const span = document.createElement('span');
+    span.textContent = '...';
+    li.appendChild(span);
     return li;
   }
 
   /**
+   * 検索モードを設定
+   * @param {string} query - 検索クエリ
+   * @param {Object} searchResult - 検索結果
+   */
+  setSearchMode(query, searchResult) {
+    this.isSearchMode = true;
+    this.currentSearchQuery = query;
+    this.totalItems = searchResult.totalItems;
+    this.totalPages = searchResult.totalPages;
+    this.currentPage = searchResult.currentPage;
+
+    // console.log('🔍 検索モードを設定:', {
+    //   query,
+    //   totalItems: this.totalItems,
+    //   totalPages: this.totalPages,
+    //   currentPage: this.currentPage
+    // });
+
+    // ページネーションを表示・更新
+    if (this.totalPages > 1) {
+      this.showPagination();
+      this.renderPagination(this.totalPages);
+    } else {
+      this.hidePagination();
+    }
+  }
+
+  /**
+   * 検索モードを解除
+   */
+  clearSearchMode() {
+    this.isSearchMode = false;
+    this.currentSearchQuery = '';
+
+    // console.log('🔄 検索モードを解除');
+  }
+
+  /**
    * 指定ページに移動
-   * 公安の機密情報アクセスのような慎重さで
    */
   async goToPage(page) {
-    const totalPages = this.calculateTotalPages();
-    
-    if (page < 1 || page > totalPages || page === this.currentPage) {
-      console.log('🚫 無効なページ番号:', page);
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
       return;
     }
 
-    console.log('📖 ページ移動開始:', this.currentPage, '→', page);
-    
     try {
-      // ローディング状態を表示
       this.showLoading();
-      
-      // 現在のページを更新
-      this.currentPage = page;
-      
-      // APIManagerを使ってコンテンツを更新
-      const newsData = this.apiManager.cache.get('newsData') || [];
-      await this.apiManager.renderNewsComponents(newsData, page);
-      
-      // ページネーションを再描画
-      this.renderPagination(totalPages);
-      
-      // URLを更新（履歴管理）
+
+      // 検索モードか通常モードかで処理を分岐
+      if (this.isSearchMode) {
+        // 検索結果のページング
+        await this.goToSearchPage(page);
+      } else {
+        // 通常のページング
+        await this.goToNormalPage(page);
+      }
+
+      this.renderPagination(this.totalPages);
       this.updateURL(page);
-      
-      // ページトップへスクロール
       this.scrollToTop();
-      
-      console.log('✅ ページ移動完了:', page);
-      
+
     } catch (error) {
       console.error('❌ ページ移動エラー:', error);
     } finally {
       this.hideLoading();
+    }
+  }
+
+  /**
+   * 検索結果のページ移動
+   * @param {number} page - ページ番号
+   */
+  async goToSearchPage(page) {
+    // console.log(`🔍 検索結果のページ${page}に移動`);
+
+    const searchResult = await this.apiManager.fetchSearchResults(
+      this.currentSearchQuery,
+      page,
+      this.config.itemsPerPage
+    );
+
+    this.currentPage = page;
+
+    // 検索結果を表示
+    await this.apiManager.renderNewsComponents(searchResult.data);
+
+    // ピックアップエリアを非表示に保つ
+    this.hidePickupArea();
+  }
+
+  /**
+   * 通常のページ移動
+   * @param {number} page - ページ番号
+   */
+  async goToNormalPage(page) {
+    this.apiManager.paginationConfig.currentPage = page;
+    this.apiManager.apiEndpoint = this.apiManager.buildAPIEndpoint();
+    this.currentPage = page;
+
+    const newsData = await this.apiManager.fetchNewsData();
+    await this.apiManager.renderNewsComponents(newsData);
+  }
+
+  /**
+   * ピックアップエリアを非表示
+   */
+  hidePickupArea() {
+    const pickupSection = document.querySelector('[data-pickup-section]');
+    if (pickupSection) {
+      pickupSection.style.display = 'none';
     }
   }
 
@@ -296,14 +413,13 @@ export class NewsPaginationManager {
    * 次のページに移動
    */
   async goToNextPage() {
-    const totalPages = this.calculateTotalPages();
-    if (this.currentPage < totalPages) {
+    if (this.currentPage < this.totalPages) {
       await this.goToPage(this.currentPage + 1);
     }
   }
 
   /**
-   * URLを更新（ブラウザ履歴管理）
+   * URLを更新
    */
   updateURL(page) {
     const url = new URL(window.location);
@@ -319,16 +435,56 @@ export class NewsPaginationManager {
    * ページトップへスクロール
    */
   scrollToTop() {
-    // Lenisを使ったスムーススクロール
-    if (window.lenis) {
-      window.lenis.scrollTo(0, {
-        duration: 1,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
-      });
+    // メインコンテンツリストの要素を取得
+    const mainContentList = document.querySelector('.p-news-content__list');
+
+    if (mainContentList) {
+      // ヘッダー高さを取得（レスポンシブ対応）
+      const headerOffset = this.getHeaderOffset();
+
+      if (window.lenis) {
+        // Lenisを使ったスムーススクロール
+        window.lenis.scrollTo(mainContentList, {
+          duration: 1,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          offset: -headerOffset
+        });
+      } else {
+        // フォールバック: 要素の位置を計算してスクロール
+        const elementTop = mainContentList.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementTop - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
     } else {
-      // フォールバック
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // フォールバック: ヘッダー高さ分だけ下げてスクロール
+      const headerOffset = this.getHeaderOffset();
+
+      if (window.lenis) {
+        window.lenis.scrollTo(headerOffset, {
+          duration: 1,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        });
+      } else {
+        window.scrollTo({ top: headerOffset, behavior: 'smooth' });
+      }
     }
+  }
+
+  /**
+   * 現在のブレイクポイントに応じたヘッダーオフセットを取得
+   */
+  getHeaderOffset() {
+    // ウィンドウ幅でPC/SP判定
+    const windowWidth = window.innerWidth;
+
+    // SPブレイクポイント（通常768px以下）
+    const isSmartPhone = windowWidth <= 768;
+
+    return isSmartPhone ? 72 : 53.41;
   }
 
   /**
@@ -354,30 +510,32 @@ export class NewsPaginationManager {
   }
 
   /**
+   * URLパラメータから初期ページを設定
+   */
+  initializeFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageParam = urlParams.get('page');
+
+    if (pageParam) {
+      const page = parseInt(pageParam);
+      if (!isNaN(page) && page > 0) {
+        this.currentPage = page;
+        this.apiManager.paginationConfig.currentPage = page;
+        this.apiManager.apiEndpoint = this.apiManager.buildAPIEndpoint();
+      }
+    }
+  }
+
+  /**
    * 現在の状態を取得
    */
   getCurrentState() {
     return {
       currentPage: this.currentPage,
       totalItems: this.totalItems,
-      totalPages: this.calculateTotalPages(),
+      totalPages: this.totalPages,
+      skipCount: this.config.skipCount,
       timestamp: new Date().toISOString()
     };
-  }
-
-  /**
-   * URLパラメータから初期ページを設定
-   */
-  initializeFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const pageParam = urlParams.get('page');
-    
-    if (pageParam) {
-      const page = parseInt(pageParam);
-      if (!isNaN(page) && page > 0) {
-        this.currentPage = page;
-        console.log('🔗 URLからページを復元:', page);
-      }
-    }
   }
 }

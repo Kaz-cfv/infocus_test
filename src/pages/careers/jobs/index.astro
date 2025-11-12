@@ -1,8 +1,8 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import CeoArticle from '../../../components/career/section/CeoArticle.astro';
-import AsideInterview from '../../../components/career/section/AsideInterview.astro';
-import Navi from '../../../components/career/parts/Navi.astro';
+import Layout from '@layouts/Layout.astro';
+import CeoArticle from '@components/career/section/CeoArticle.astro';
+import AsideInterview from '@components/career/section/AsideInterview.astro';
+import Navi from '@components/career/parts/Navi.astro';
 
 const pageMeta = {
   title: "CEO Message",
@@ -18,8 +18,7 @@ try {
   console.error('Career data fetch error:', error);
 }
 
-// インタビューデータを抽出
-const interviewData = careerData?.interview || [];
+// インタビューデータはクライアントサイド(Jobs.js)で取得・レンダリング
 ---
 
 <Layout
@@ -32,7 +31,7 @@ const interviewData = careerData?.interview || [];
   <div class="p-jobs-content__left" data-main-content>
     <div class="p-jobs-content__left-inner">
       <CeoArticle />
-      <AsideInterview interviews={interviewData} />
+      <AsideInterview />
     </div>
   </div>
   <div class="p-jobs-content__right">

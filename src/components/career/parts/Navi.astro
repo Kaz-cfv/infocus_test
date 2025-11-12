@@ -1,6 +1,12 @@
 ---
 import ButtonJoin from "./ButtonJoin.astro";
 
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
 const navi = {
   anchor: [
     {
@@ -16,12 +22,12 @@ const navi = {
       caption: 'CEO MESSAGE'
     },
     {
-      slug: 'interview',
-      caption: 'STAFF INTERVIEWS'
-    },
-    {
       slug: 'our_data',
       caption: 'OUR DATA'
+    },
+    {
+      slug: 'interview',
+      caption: 'STAFF INTERVIEWS'
     },
   ],
   sns: [
@@ -49,13 +55,13 @@ const navi = {
   <ul class="career-navi__anchor">
     {navi.anchor.map((item => (
       <li class="career-navi__anchor-item" data-anchor={item.slug}>
-        <a href={`/careers/?id=${item.slug}`}>{item.caption}</a>
+        <a href={`${currentUrl}careers/?id=${item.slug}`}>{item.caption}</a>
       </li>
     )))}
   </ul>
 
   <div class="career-navi__btn">
-    <ButtonJoin />
+    <ButtonJoin lang={lang} />
   </div>
 
   <ul class="career-navi__sns js-hover">
@@ -67,7 +73,7 @@ const navi = {
   </ul>
 </nav>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -77,10 +83,6 @@ const navi = {
   position: sticky;
   top: var(--hd-height-pc-scrolled);
   right: 0;
-
-  a {
-    color: var(--c-white);
-  }
 }
 
 .career-navi__anchor {
@@ -88,18 +90,55 @@ const navi = {
   &-item {
     border-bottom: solid 1px var(--c-gray02);
 
+    @at-root .p-jobs &[data-anchor="message"] {
+      a {
+        position: relative;
+        &::before {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 8px;
+          transform: translateY(-50%);
+          width: 0;
+          height: 0;
+          border-top: solid 3px transparent;
+          border-bottom: solid 3px transparent;
+          border-left: solid 6px var(--c-white);
+          transition: border-left .3s var(--ease-out-quad);
+        }
+        @include me.pc {
+          &:hover {
+            &::before {
+              border-left: solid 6px var(--c-black-base);
+            }
+          }
+        }
+      }
+    }
+
     a {
       display: block;
       padding-inline: 20px;
       padding-block: 18px;
+      color: var(--c-white);
       font-size: 1.4rem;
       font-weight: 700;
+      @include me.pc {
+        transition: color .3s var(--ease-out-quad), background-color .3s var(--ease-out-quad);
+        &:hover {
+          color: var(--c-black-base);
+          background-color: var(--c-white);
+        }
+      }
     }
   }
 }
 
 .career-navi__btn {
-  padding-inline: 20px;
+  // padding-inline: 20px;
+  overflow: hidden;
+  margin-inline: 20px;
+  border-radius: 2px;
 }
 
 .career-navi__sns {

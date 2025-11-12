@@ -12,7 +12,7 @@ interface Props {
 const { id, title, date, category, categorySlug, url, pic } = Astro.props;
 ---
 
-<a href={url} class="c-news-card" data-card={id} data-category={categorySlug}>
+<a href={url} class="c-news-card mouse-over" data-card={id} data-category={categorySlug}>
   <figure class="c-news-card__pic">
     <img src={pic} alt={title}>
   </figure>
@@ -35,6 +35,20 @@ const { id, title, date, category, categorySlug, url, pic } = Astro.props;
   @include me.pc {
     grid-template-columns: 389px 1fr;
     column-gap: 40px;
+
+    &.mouse-over {
+      &:hover {
+        .c-news-card__pic {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(7px);
+        }
+
+        .c-news-card__pic img {
+          // 画像自体を拡大（360px → 368px相当）
+          // transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
   }
   @include me.sp {
     grid-template-columns: 100%;
@@ -43,6 +57,12 @@ const { id, title, date, category, categorySlug, url, pic } = Astro.props;
 
   &__pic {
     aspect-ratio: 389 / 218.64;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
+
+    img {
+      transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
+    }
   }
 
   &__info {

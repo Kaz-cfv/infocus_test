@@ -220,67 +220,48 @@ const awards_sp = [
 
 const summary = [
   {
-    id: 1,
     slug: 'human_made',
     name: 'HUMAN MADE Inc.',
     year: '2024',
     awards: [
       {
-        caption: 'HUMAN  MADE',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
-      },
-      {
-        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
-      },
-      {
+        id: 1,
         caption: '相鐵60周年',
         content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
+        pic: '/common/images/dummy/dummy_about_summary.png',
+      },
+      {
+        id: 2,
+        caption: 'HUMAN  MADE',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+        pic: 'https://dummyimage.com/440x246/606060/000000',
+      },
+      {
+        id: 3,
+        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
+        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+        pic: 'https://dummyimage.com/440x246/606060/000000',
       },
     ],
-    pic: '/common/images/dummy/dummy_about_summary.png',
   },
   {
-    id: 2,
     slug: 'human_made',
     name: 'HUMAN MADE Inc.',
     year: '2023',
     awards: [
       {
-        caption: 'HUMAN  MADE',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
+        id: 4,
+        caption: 'PSY-CLONE',
+        content: '<p>FWA OF THE DAY - FWA</p><p>WEBSITE OF THE DAY WEBSITE OF THE MONTH (nominated) - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>Nominated in "Best Visual Design – Function" - The Webby Awards</p>',
+        pic: 'https://dummyimage.com/440x246/606060/000000',
       },
       {
-        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
-      },
-      {
-        caption: '相鐵60周年',
-        content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
+        id: 5,
+        caption: 'kaonavi Town',
+        content: '<p>FWA OF THE DAY - FWA</p><p>WEBSITE OF THE DAY WEBSITE OF THE MONTH (nominated) - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>Honoree in "Best Visual Design – Function" Honoree in "Corporate Communications" - The Webby Awards</p>',
+        pic: '/common/images/dummy/dummy_about_summary.png',
       },
     ],
-    pic: '/common/images/dummy/dummy_about_summary.png',
-  },
-  {
-    id: 3,
-    slug: 'human_made',
-    name: 'HUMAN MADE Inc.',
-    year: '2022',
-    awards: [
-      {
-        caption: 'HUMAN  MADE',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
-      },
-      {
-        caption: 'Häagen-Dazs ICE CREAM FACTORY TOUR',
-        content: '<p>FWA OF THE DAY - FWA</p><p>Special Kudos - CSS Design Awards</p><p>Honorable Mention - AWWWARDS</p><p>FWA OF THE DAY - FWA</p>',
-      },
-      {
-        caption: '相鐵60周年',
-        content: '<p>アニバーサリー部門最優秀賞 - 第73回 日経広告賞</p>',
-      },
-    ],
-    pic: '/common/images/dummy/dummy_about_summary.png',
   },
 ]
 ---
@@ -321,18 +302,16 @@ const summary = [
   </div>
 
   <div class="p-about-awards__summary js-awards-summary-content">
-    {summary.map((summary, index) => (
+    <!-- {summary.map((summary, index) => (
       <div class={`p-about-awards__summary-item ${index > 0 ? 'js-awards-hidden' : ''}`}>
         <Summary
-          id={summary.id}
           slug={summary.slug}
           name={summary.name}
           head={summary.year}
           awards={summary.awards}
-          pic={summary.pic}
         />
       </div>
-    ))}
+    ))} -->
   </div>
 
   <div class="p-about-awards__more js-awards-more">
@@ -343,12 +322,18 @@ const summary = [
   </div>
 </section>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
 .p-about-awards {
-  padding-block-end: 149px;
+  position: relative;
+  padding-block-end: calc(150px - 40px);
+  @include me.pc {
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 30px;
+  }
   @include me.sp {
     padding-inline: 20px;
     padding-block-end: 100px;
@@ -367,6 +352,9 @@ const summary = [
 
   &__content {
     margin-block-start: 60px;
+    @include me.sp {
+      margin-block-start: 30px;
+    }
 
     &-list {
       @include me.pc {
@@ -407,15 +395,19 @@ const summary = [
     margin-block-start: 60px;
     padding-block-start: 40px;
     border-top: solid 1px var(--c-gray02);
-    @include me.pc {
-      margin-inline: 30px;
-    }
     @include me.sp {
-      margin-block-start: 66px;
+      row-gap: 30px;
+      margin-block-start: 60px;
+      padding-block-start: 30px;
     }
 
     &.is-collapsed {
-      max-height: var(--collapsed-awards-height);
+      @include me.pc {
+        max-height: 2639px;
+      }
+      @include me.sp {
+        max-height: 3579px;
+      }
 
       &::after {
         content: '';
@@ -446,9 +438,13 @@ const summary = [
 
     &-item {
       transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      border-bottom: solid 1px var(--c-gray02);
+      &:last-child {
+        border-bottom: unset;
+      }
 
       &.js-awards-hidden {
-        opacity: 0.1;
+        opacity: 0.5;
         pointer-events: none;
       }
     }
@@ -497,6 +493,102 @@ const summary = [
       width: 15px;
       height: 24px;
       flex-shrink: 0;
+    }
+  }
+}
+
+.c-summary {
+  position: relative;
+  padding-block-end: 40px;
+  @include me.pc {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__year {
+    color: var(--c-gray02);
+    font-size: 4.8rem;
+    font-weight: 700;
+    @include me.sp {
+      font-size: 3.2rem;
+    }
+  }
+
+  &__info {
+    display: grid;
+    row-gap: 40px;
+    @include me.pc {
+      width: 61.2318%;
+    }
+    @include me.sp {
+      margin-block-start: 29px;
+    }
+
+    &-wrapper {
+      display: grid;
+      grid-template-columns: 203px 1fr;
+      column-gap: 32px;
+      @include me.sp {
+        grid-template-columns: 41.7989% 1fr;
+        column-gap: 22px;
+      }
+    }
+
+    &-item {
+      display: grid;
+      grid-template-columns: 100%;
+      row-gap: 24px;
+      @include me.pc {
+        border-bottom: solid 1px var(--c-gray02);
+        padding-block-end: 24px;
+        &:last-child {
+          border-bottom-color: transparent;
+        }
+      }
+    }
+
+    &-caption {
+      color: var(--c-white);
+      font-size: 1.8rem;
+      font-weight: 700;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+
+      a {
+        color: var(--c-white);
+        @include me.pc {
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    &-content {
+      display: grid;
+      row-gap: 20px;
+
+      a {
+        color: var(--c-white);
+        font-size: 1.4rem;
+        text-decoration: underline;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+    p {
+      font-size: 1.4rem;
+      line-height: 1.4;
+    }
+  }
+
+  &__pic {
+    figure {
+      width: 100%;
+      height: 100%;
     }
   }
 }

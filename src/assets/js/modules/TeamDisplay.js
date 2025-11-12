@@ -23,7 +23,7 @@ export class TeamDisplay {
    */
   getTeamCards() {
     this.teamCards = document.querySelectorAll('.p-team-content__list-item');
-    console.log(`🃏 Found ${this.teamCards.length} team cards`);
+    // console.log(`🃏 Found ${this.teamCards.length} team cards`);
   }
 
   /**
@@ -63,7 +63,7 @@ export class TeamDisplay {
     // モバイルレイアウトの更新
     this.updateMobileLayout();
 
-    console.log(`✅ Display updated: ${visibleCount} visible, ${hiddenCount} hidden`);
+    // console.log(`✅ Display updated: ${visibleCount} visible, ${hiddenCount} hidden`);
 
     return {
       visible: visibleCount,

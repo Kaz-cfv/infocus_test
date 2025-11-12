@@ -3,14 +3,47 @@ import RelatedCard from "../../ProjectCard.astro";
 
 export interface Props {
   projects: any[];
+  lang?: 'en' | 'ja';
 }
 
-const { projects } = Astro.props;
+const { projects, lang = 'ja' } = Astro.props;
+
+/**
+ * 言語に応じたプロジェクトURLを生成
+ */
+function getLocalizedProjectURL(slug: string, language: string): string {
+  if (language === 'en') {
+    return `/en/projects/${slug}/`;
+  } else {
+    return `/projects/${slug}/`;
+  }
+}
+
+// プロジェクトデータを言語対応版に変換
+const localizedProjects = projects.map(project => {
+  // slugが直接あるかurlからslugを抽出するかを判定
+  let projectSlug = project.slug;
+
+  if (!projectSlug && project.url) {
+    // urlから slug を抽出 (例: /projects/sample-project/ → sample-project)
+    const urlMatch = project.url.match(/\/projects\/([^\/]+)\//);
+    if (urlMatch) {
+      projectSlug = urlMatch[1];
+    }
+  }
+
+  return {
+    ...project,
+    url: projectSlug ? getLocalizedProjectURL(projectSlug, lang) : project.url,
+    language: lang // デバッグ用に言語情報を追加
+  };
+});
 ---
+
 <aside class="p-project-detail-related">
   <div class="p-project-detail-related__title">RELATED PROJECTS</div>
   <ul class="p-project-detail-related__list">
-    {projects.map((project) => (
+    {localizedProjects.map((project) => (
       <li class="p-project-detail-related__list-item">
         <RelatedCard
           id={project.id}
@@ -24,26 +57,26 @@ const { projects } = Astro.props;
   </ul>
 </aside>
 
-
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
 .p-project-detail-related {
-  border-top: solid 2px var(--c-white);
-  @include me.pc {
-    border-bottom: solid 2px var(--c-white);
+  margin-block-start: -1px;
+  @include me.sp {
+    border-top: solid 1px var(--c-white);
   }
+
 
   &__title {
     padding-block: 70px 60px;
     border-bottom: solid 1px var(--c-gray);
     font-size: 2.2rem;
+    font-weight: 600;
     text-align: center;
     @include me.sp {
       padding-block: 50px;
       font-size: 2rem;
-      font-weight: 600;
     }
   }
 
@@ -67,11 +100,31 @@ const { projects } = Astro.props;
         &:nth-child(2n) {
           border-right: none;
         }
+        &:nth-child(7),
+        &:last-child {
+          border-bottom: none;
+        }
       }
     }
 
     .c-project-card {
       padding-block-end: 78px;
+      @include me.pc {
+        &.mouse-over {
+          &:hover {
+            .c-project-card__image-wrapper {
+              // 各辺から10px内側にクリップ（360px → 340px相当）
+              clip-path: inset(7px);
+            }
+
+            .c-project-card__image,
+            .c-project-card__video {
+              // 画像自体を拡大（360px → 368px相当）
+              // transform: scale(1.0222); // 368/360 = 1.0222
+            }
+          }
+        }
+      }
       @include me.sp {
         padding-block-end: 32px;
       }
@@ -84,8 +137,5 @@ const { projects } = Astro.props;
       }
     }
   }
-
 }
-
-
 </style>

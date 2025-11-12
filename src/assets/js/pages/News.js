@@ -1,7 +1,6 @@
 /**
  * News Page Manager
  * ニュース一覧ページの機能を統合管理する
- * 各専門モジュールを直接制御する起点クラス
  */
 
 import URLUtils from '../modules/URLUtils.js';
@@ -12,6 +11,9 @@ import { NewsPaginationManager } from '../modules/NewsPaginationManager.js';
 
 export class News {
   constructor() {
+    if (News.instance) {
+      return News.instance;
+    }
     if (!this.isNewsPage()) {
       return;
     }
@@ -23,6 +25,8 @@ export class News {
     this.currentCategory = null;
     this.newsData = [];
 
+    News.instance = this;
+
     this.init();
   }
 
@@ -30,15 +34,24 @@ export class News {
    * ニュースページかどうかを判定
    */
   isNewsPage() {
-    // ニュース一覧のピックアップセクションが存在するかで判定
-    return document.querySelector('[data-pickup-section]') !== null;
+    const pickupSection = document.querySelector('[data-pickup-section]');
+    const newsIndex = document.querySelector('.p-news-content__list-index[data-index="news"]');
+
+    // console.log('🔍 ニュースページ判定:', {
+    //   pickupSection: !!pickupSection,
+    //   newsIndex: !!newsIndex,
+    //   currentPath: window.location?.pathname || 'unknown'
+    // });
+
+    // より柔軟な判定に変更
+    return !!pickupSection || !!newsIndex;
   }
 
   /**
    * 初期化処理
-   * まるで事件現場の証拠を整理するような手順で
    */
   async init() {
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         this.setupNewsSystem();
@@ -50,36 +63,32 @@ export class News {
 
   /**
    * ニュースシステム全体のセットアップ
-   * 公安の情報管理システムのように統合的に
    */
   async setupNewsSystem() {
     try {
       // まずは WordPress API からデータを取得
-      console.log('🔍 API データ取得を開始...');
       this.newsData = await this.apiManager.init();
-      
+
       // ページネーションマネージャーを初期化
       this.paginationManager = new NewsPaginationManager(this.apiManager);
-      
+
       // URLパラメータから初期ページを設定
       this.paginationManager.initializeFromURL();
-      
+
       // ページネーション表示を更新
       this.paginationManager.updatePaginationDisplay(this.newsData);
-      
+
       // データ取得後にフィルタリングシステムを初期化
       this.setupNewsFiltering();
-      
-      console.log('✅ ニュースシステム初期化完了:', {
-        dataCount: this.newsData.length,
-        currentPage: this.paginationManager.currentPage
-      });
-      
+
     } catch (error) {
       console.error('❌ ニュースシステム初期化エラー:', error);
+
       // エラーが発生してもフィルタリングは動作させる
       this.setupNewsFiltering();
     }
+
+    console.groupEnd();
   }
 
   /**
@@ -95,11 +104,6 @@ export class News {
 
     // グローバルにアクセス可能にする（外部連携用）
     this.exposeGlobalInterface();
-
-    console.log('📄 News一覧ページ: フィルタリング初期化完了', {
-      category: this.currentCategory,
-      dataCount: this.newsData.length
-    });
   }
 
   /**
@@ -109,10 +113,8 @@ export class News {
     const categoryParam = URLUtils.getURLParameter('category');
 
     if (categoryParam) {
-      console.log(`🎯 Filtering by category: \"${categoryParam}\"`);
       this.currentCategory = categoryParam;
     } else {
-      console.log('📁 Showing all news');
       this.currentCategory = null;
     }
 
@@ -189,15 +191,12 @@ export class News {
    */
   async refetchNews() {
     try {
-      console.log('🔄 ニュースデータ再取得開始...');
       this.newsData = await this.apiManager.init();
-      
+
       // フィルタリング状態をリセットして再適用
       this.setupNewsFiltering();
-      
-      console.log('✅ ニュースデータ再取得完了:', this.newsData.length, '件');
       return this.newsData;
-      
+
     } catch (error) {
       console.error('❌ ニュースデータ再取得エラー:', error);
       throw error;
@@ -216,3 +215,9 @@ export class News {
     };
   }
 }
+
+// デバッグ用: 即座に実行テスト
+document.addEventListener('DOMContentLoaded', () => {
+  const testNews = new News();
+  // console.log('📋 Newsインスタンス作成結果:', testNews);
+});

@@ -4,25 +4,25 @@ const partners = [
     id: 'actuel_img',
     name: 'Actuel img.',
     pic: '/common/images/common/logo_actuelimg.png',
-    url: '#'
+    url: 'https://nori-inoue.com/'
   },
   {
     id: 'cfv',
     name: 'CREBAR FLAVOR.',
     pic: '/common/images/common/logo_cfv.png',
-    url: '#'
+    url: 'https://cfv.co.jp/'
   },
   {
     id: 'the_saime_inc',
     name: 'THE SAIME. INC',
     pic: '/common/images/common/logo_thesaime_inc.png',
-    url: '#'
+    url: 'https://www.saime.co.jp/'
   },
   {
     id: 'shootinglife',
     name: 'shootinglife',
     pic: '/common/images/common/logo_shootinglife.png',
-    url: '#'
+    url: 'https://shootinglife.net/'
   },
 ]
 
@@ -32,9 +32,9 @@ const partners = [
   <div class="p-team-partner__title">CREATIVE PARTNERS</div>
   <div class="p-team-partner__list">
     {partners.map((partner => (
-      <figure class="p-team-partner__list-item" data-item={partner.id}>
+      <a href={partner.url} target="_blank" rel="noopener noreferrer" class="p-team-partner__list-item" data-item={partner.id}>
         <img src={partner.pic} alt={partner.name} />
-      </figure>
+      </a>
     )))}
   </div>
 </div>
@@ -46,7 +46,7 @@ const partners = [
 
 .p-team-partner {
   padding-block: 100px;
-  border-top: solid 2px var(--c-white);
+  border-top: solid 1px var(--c-white);
   @include me.sp {
     padding-inline: 30px;
     padding-block: 60px 50px;
@@ -87,6 +87,11 @@ const partners = [
       @include me.pc {
         width: 200px;
         height: 100px;
+        transition: opacity .3s var(--ease-out-quad);
+
+        &:hover {
+          opacity: 0.5;
+        }
       }
       @include me.sp {
         height: 72px;

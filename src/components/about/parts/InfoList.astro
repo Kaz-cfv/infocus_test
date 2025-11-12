@@ -12,7 +12,9 @@ const { caption, list } = Astro.props;
 ---
 
 <dl class="c-infoList">
-  <dt class="c-infoList__caption">{caption}</dt>
+  <dt class="c-infoList__caption">
+    {caption && caption.trim() !== '' ? caption : <Fragment set:html="&nbsp;" />}
+  </dt>
   <dd class="c-infoList__content">
     {list.map((item => (
       <span>{item.text}</span>
@@ -41,11 +43,20 @@ const { caption, list } = Astro.props;
     display: grid;
     grid-template-columns: 100%;
     // font-family: var(--f-jp);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     line-height: 3rem;
     letter-spacing: -.02rem;
     @include me.sp {
-      line-height: 2.5rem;
+      line-height: 2rem;
+    }
+
+    span {
+      display: inline-block;
+      @include me.sp {
+        & + span {
+          margin-block-start: 10px;
+        }
+      }
     }
   }
 

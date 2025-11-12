@@ -38,20 +38,26 @@ export interface Props {}
     const video = videoElement as HTMLVideoElement;
 
     if (herosData && Array.isArray(herosData) && herosData.length > 0) {
-      // 全動画のURLを配列に格納
-      const videoUrls = herosData.map(hero => hero.movie).filter(url => url);
-      let currentIndex = 0; // ここを0に固定
+      // デバイス判定
+      const isSP = window.innerWidth <= 768;
 
-      // ロード時にランダムな開始位置を設定
-      // **この部分を削除**
-      // const randomIndex = Math.floor(Math.random() * videoUrls.length);
-      // currentIndex = randomIndex;
+      // デバイスに応じて適切な動画URLを選択
+      const videoUrls = herosData.map(hero => {
+        // SP用の動画がある場合はデバイスに応じて切り替え
+        if (isSP && hero.movie_sp) {
+          return hero.movie_sp;
+        }
+        // PC用またはSP用動画がない場合はmovieを使用
+        return hero.movie;
+      }).filter(url => url);
+
+      let currentIndex = 0;
 
       // 動画再生の関数
       const playNextVideo = () => {
         if (videoUrls.length === 0) return;
         const currentUrl = videoUrls[currentIndex];
-        // console.log(`🎥 再生動画: ${currentUrl}`);
+        // console.log(`🎥 再生動画: ${currentUrl} (${isSP ? 'SP' : 'PC'})`);
         video.src = currentUrl;
         video.load();
         video.play();
@@ -59,11 +65,25 @@ export interface Props {}
         video.removeEventListener('ended', onVideoEnd);
         video.addEventListener('ended', onVideoEnd);
       };
+
       // 動画終了時の処理
       const onVideoEnd = () => {
         currentIndex = (currentIndex + 1) % videoUrls.length;
         playNextVideo();
       };
+
+      // リサイズ時の処理
+      let resizeTimer: number;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => {
+          const newIsSP = window.innerWidth <= 768;
+          // デバイスが変わった場合
+          if (newIsSP !== isSP) {
+            location.reload(); // 簡単な実装として再読み込み
+          }
+        }, 300);
+      });
 
       // エラーハンドリング
       video.addEventListener('error', (e) => {
@@ -71,6 +91,7 @@ export interface Props {}
         // エラー発生時も次の動画へ
         onVideoEnd();
       });
+
       // 最初の動画を再生
       playNextVideo();
     } else {
@@ -85,16 +106,23 @@ export interface Props {}
 
 .p-home-kv {
   overflow: hidden;
+  position: relative;
+  min-height: 660px;
+  @include me.sp {
+    min-height: 446.33px;
+  }
 
   &__item {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     @include me.pc {
-      aspect-ratio: 1440 / 563;
-      width: 100%;
+      // aspect-ratio: 1440 / 563;
     }
     @include me.sp {
-      aspect-ratio: 4 / 5;
-      width: 100%;
+      // aspect-ratio: 4 / 5;
     }
   }
 

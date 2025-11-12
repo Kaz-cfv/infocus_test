@@ -67,9 +67,11 @@ export class NewsCategory {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
         this.updateCategoryButtons(this.currentCategory);
+        this.bindCategoryClickEvents();
       });
     } else {
       this.updateCategoryButtons(this.currentCategory);
+      this.bindCategoryClickEvents();
     }
 
     window.addEventListener('popstate', () => {
@@ -78,6 +80,31 @@ export class NewsCategory {
     });
 
     this.isInitialized = true;
+  }
+
+  /**
+   * カテゴリーボタンのクリックイベントをバインド
+   */
+  bindCategoryClickEvents() {
+    if (!this.categoryButtons) {
+      this.categoryButtons = document.querySelectorAll('.p-news-head__category-item > a');
+    }
+
+    this.categoryButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        // 検索状態をリセット
+        const searchManager = window.searchManager;
+        const paginationManager = window.newsManager?.getPaginationManager();
+
+        if (searchManager && typeof searchManager.resetSearch === 'function') {
+          searchManager.resetSearch();
+        }
+
+        if (paginationManager) {
+          paginationManager.clearSearchMode();
+        }
+      });
+    });
   }
 
   /**

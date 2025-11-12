@@ -1,30 +1,16 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Intro from '../../components/career/section/Intro.astro';
-import Position from '../../components/career/section/Position.astro';
-import ButtonJoin from '../../components/career/parts/ButtonJoin.astro';
-import CeoMessage from '../../components/career/section/CeoMessage.astro';
-import Interview from '../../components/career/section/Interview.astro';
-import OurData from '../../components/career/section/OurData.astro';
-import Navi from '../../components/career/parts/Navi.astro';
+import Layout from '@layouts/Layout.astro';
+import Intro from '@components/career/section/Intro.astro';
+import Position from '@components/career/section/Position.astro';
+import ButtonJoin from '@components/career/parts/ButtonJoin.astro';
+import CeoMessage from '@components/career/section/CeoMessage.astro';
+import Interview from '@components/career/section/Interview.astro';
+import OurData from '@components/career/section/OurData.astro';
+import Navi from '@components/career/parts/Navi.astro';
 
 const pageMeta = {
   title: "Career",
 };
-
-// Career APIデータを取得
-let careerData = null;
-try {
-  const response = await fetch('https://infocus.wp.site-prev2.com/api/career.json');
-  const data = await response.json();
-  careerData = data[0]; // 配列の最初の要素を取得
-} catch (error) {
-  console.error('Career data fetch error:', error);
-}
-
-// インタビューデータを抽出
-const interviewData = careerData?.interview || [];
-const careerPositions = careerData?.career || [];
 ---
 
 <Layout
@@ -37,14 +23,14 @@ const careerPositions = careerData?.career || [];
   <div class="p-career-content__left" data-main-content>
     <div class="p-career-content__left-inner">
       <Intro />
-      <Position positions={careerPositions} />
+      <Position />
       <div class="sticky-btn">
         <ButtonJoin />
       </div>
     </div>
     <CeoMessage />
     <OurData />
-    <Interview interviews={interviewData} />
+    <Interview />
   </div>
   <div class="p-career-content__right">
     <Navi />
@@ -90,10 +76,13 @@ const careerPositions = careerData?.career || [];
 }
 
 .sticky-btn {
+  overflow: hidden;
   position: sticky;
-  bottom: 100px;
+  bottom: 30px;
   left: 20px;
+  @include mi.z-contents(1);
   max-width: calc(100% - (20px * 2));
+  border-radius: 2px;
   @include me.pc {
     display: none;
     opacity: 0;

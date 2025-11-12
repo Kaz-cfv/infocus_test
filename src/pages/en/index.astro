@@ -5,6 +5,8 @@ import Intro from '@components/home/sections/Intro.astro';
 import Projects from '@components/home/sections/Projects.astro';
 import Asides from '@components/home/sections/Asides.astro';
 
+const lang = 'en';
+
 const pageMeta = {
   title: "HOME",
   ogpType: "website"
@@ -19,8 +21,8 @@ const pageMeta = {
 
 <div class="l-main-content" data-main-content>
   <Kv />
-  <Intro />
-  <Projects />
+  <Intro lang={lang} />
+  <Projects lang={lang} />
   <Asides />
 </div>
 

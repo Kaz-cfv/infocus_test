@@ -13,16 +13,18 @@ const { title, image, name, position, url } = Astro.props;
 const positions = position ? position.split('/').map(p => p.trim()) : [];
 ---
 
-<div class="c-interview-card">
+<div class="c-interview-card mouse-over">
   <a href={url} target="_blank" rel="noopener noreferrer" class="c-interview-card__thumb">
     <figure>
       <img src={image} alt={title}>
     </figure>
   </a>
   <div class="c-interview-card__info">
-    <div class="c-interview-card__info-title">{title}</div>
+    <div class="c-interview-card__info-title">
+      <a href={url} target="_blank" rel="noopener noreferrer">{title}</a>
+    </div>
     {name && (
-      <span class="c-interview-card__info-staff">{name}</span>
+      <a href={url} target="_blank" rel="noopener noreferrer" class="c-interview-card__info-staff">{name}</a>
     )}
     {positions.length > 0 && (
       <ul class="c-interview-card__info-tags">
@@ -36,7 +38,7 @@ const positions = position ? position.split('/').map(p => p.trim()) : [];
   </div>
 </div>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -44,9 +46,31 @@ const positions = position ? position.split('/').map(p => p.trim()) : [];
   display: grid;
   row-gap: 12px;
 
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-interview-card__thumb {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(3px);
+        }
+
+        .c-interview-card__thumb img {
+          // 画像自体を拡大（360px → 368px相当）
+          transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
+  }
+
   &__thumb {
     display: block;
     aspect-ratio: 340 / 192;
+    clip-path: inset(0px);
+    transition: clip-path 0.3s cubic-bezier(0, 0, 0.17, 1);
+
+    img {
+      transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
+    }
   }
 
   &__info {
@@ -54,10 +78,12 @@ const positions = position ? position.split('/').map(p => p.trim()) : [];
     row-gap: 10px;
 
     &-title {
-      color: var(--c-white);
-      font-size: 1.6rem;
-      font-weight: 600;
-      line-height: 1.7;
+      a {
+        color: var(--c-white);
+        font-size: 1.6rem;
+        font-weight: 600;
+        line-height: 1.7;
+      }
     }
 
     &-staff {

@@ -1,0 +1,181 @@
+---
+import Layout from '@layouts/LayoutEn.astro';
+import Article from '@components/projects-detail/section/Article.astro';
+import Related from '@components/projects-detail/section/Related.astro';
+
+const lang = 'en';
+
+export async function getStaticPaths() {
+  try {
+    let allProjects = [];
+    let currentPage = 1;
+    let hasMorePages = true;
+
+    while (hasMorePages) {
+      const response = await fetch(
+        `https://infocus.wp.site-prev2.com/api/rest/?path=wp/v2/projects&lang=en&per_page=100&page=${currentPage}`
+      );
+
+      if (!response.ok) {
+        console.error(`❌ ページ${currentPage}でAPIエラー:`, response.status);
+        break;
+      }
+
+      const pageData = JSON.parse(await response.text());
+      const pageArray = Array.isArray(pageData) ? pageData : [pageData];
+
+      // console.log(`📊 ページ${currentPage}で取得: ${pageArray.length}件`);
+
+      if (pageArray.length === 0) {
+        hasMorePages = false;
+      } else {
+        allProjects = [...allProjects, ...pageArray];
+
+        if (pageArray.length < 100) {
+          hasMorePages = false;
+        } else {
+          currentPage++;
+        }
+      }
+
+      if (currentPage > 10) {
+        console.warn('⚠️ ページ数上限に達しました');
+        break;
+      }
+    }
+
+    // console.log('📊 全体で取得したプロジェクト数:', allProjects.length);
+
+    // 有効なデータのみをフィルタリング
+    const validProjects = allProjects.filter(item => {
+      const hasTitle = item.title && (typeof item.title === 'string' ? item.title.trim() : item.title.rendered);
+      const hasSlug = item.slug;
+      return hasTitle && hasSlug;
+    });
+
+    // console.log('✅ 有効なプロジェクト数:', validProjects.length);
+
+    return validProjects.map((project) => ({
+      params: { slug: project.slug },
+      props: { project, allProjects: validProjects } // 全プロジェクトデータも渡す
+    }));
+
+  } catch (error) {
+    console.error('❌ エラー発生:', error);
+    return [];
+  }
+}
+
+const { project, allProjects } = Astro.props;
+
+// 前後の記事を取得
+let prevProject = null;
+let nextProject = null;
+
+try {
+  // 日付順でソート（降順 = 新しい順）
+  const sortedProjects = [...allProjects].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // 現在のプロジェクトのインデックスを特定
+  const currentIndex = sortedProjects.findIndex(p => p.slug === project.slug);
+
+  // console.log('🎯 現在のプロジェクト:', project.slug, 'インデックス:', currentIndex);
+
+  if (currentIndex !== -1) {
+    // 前の記事（より新しい記事）
+    if (currentIndex > 0) {
+      const prev = sortedProjects[currentIndex - 1];
+      prevProject = {
+        slug: prev.slug,
+        title: typeof prev.title === 'string' ? prev.title : prev.title.rendered
+      };
+    }
+
+    // 次の記事（より古い記事）
+    if (currentIndex < sortedProjects.length - 1) {
+      const next = sortedProjects[currentIndex + 1];
+      nextProject = {
+        slug: next.slug,
+        title: typeof next.title === 'string' ? next.title : next.title.rendered
+      };
+    }
+  }
+} catch (error) {
+  console.error('❌ 前後記事の取得でエラー:', error);
+}
+
+// 関連プロジェクト用のデータ（現在のプロジェクトを除外）
+const relatedProjects = allProjects
+  .filter(item => item.slug !== project.slug)
+  .map((item, index) => {
+    // 新しいAPI構造に合わせてタグを抽出
+    let tags = [];
+
+    if (item.taxonomy?.projects && Array.isArray(item.taxonomy.projects)) {
+      tags = item.taxonomy.projects.map(tag => ({
+        name: tag.name,
+        url: `/projects/?category=${tag.slug || tag.term_id || ''}`
+      }));
+    }
+
+    // 新しいAPI構造に合わせて画像を抽出
+    const acfsData = item.acfs || item.acf;
+    const imageSrc = acfsData?.main?.image?.url || acfsData?.thumbnail?.image?.url;
+
+    // console.log('🔍 関連プロジェクト処理:', {
+    //   slug: item.slug,
+    //   tagsCount: tags.length,
+    //   hasImage: !!imageSrc,
+    //   imageUrl: imageSrc?.substring(0, 50) + '...'
+    // });
+
+    return {
+      id: item.id || index + 1,
+      title: (typeof item.title === 'string' ? item.title : item.title.rendered).trim(),
+      tags: tags,
+      imageSrc: imageSrc,
+      url: `/projects/${item.slug}/`,
+      type: "default"
+    };
+  })
+  .sort((a, b) => b.id - a.id) // IDの降順でソート（新しい順）
+  .slice(0, 8); // 関連プロジェクトは最大8件まで表示
+
+// メタデータの設定
+const title = typeof project.title === 'string' ? project.title : project.title.rendered;
+const acfData = project.acf || project.acfs;
+const description = acfData?.outline ? acfData.outline.replace(/<[^>]*>/g, '').substring(0, 160) : '';
+
+const pageMeta = {
+  title: title,
+  ogpType: "website"
+};
+---
+
+<Layout
+  title={title}
+  pageName="project-detail"
+  meta={pageMeta}
+>
+
+<Article
+  lang={lang}
+  project={project}
+  prevProject={prevProject}
+  nextProject={nextProject}
+/>
+
+{relatedProjects.length > 0 && (
+  <Related
+    lang={lang}
+    projects={relatedProjects}
+  />
+)}
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+</style>

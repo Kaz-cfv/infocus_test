@@ -75,6 +75,7 @@ const name = id;
   }
 
   &__field {
+    appearance: none;
     width: 100%;
     padding: 16px;
     background-color: var(--c-input-bg);
@@ -83,6 +84,16 @@ const name = id;
     color: var(--c-white);
     font-size: 1.6rem;
     font-weight: 700;
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px var(--c-input-bg) inset !important;
+      -webkit-text-fill-color: var(--c-white) !important;
+      background-color: var(--c-input-bg) !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+    }
 
     &::placeholder {
       opacity: 0.7;
@@ -94,7 +105,7 @@ const name = id;
     }
 
     &:hover:not(:focus):not(:disabled) {
-      background-color: #2a2a2a;
+      // background-color: #2a2a2a;
     }
 
     &:disabled {
@@ -103,24 +114,24 @@ const name = id;
     }
 
     &:readonly {
-      background-color: #1a1a1a;
+      // background-color: #1a1a1a;
       cursor: default;
     }
 
     // バリデーションエラー時のスタイル
     &:invalid:not(:placeholder-shown) {
-      outline: 1px solid var(--c-input-error);
-      background-color: rgba(255, 107, 107, 0.1);
+      // outline: 1px solid var(--c-input-error);
+      // background-color: rgba(255, 107, 107, 0.1);
     }
 
     // 必須フィールドで空の場合のスタイル
     &:required:invalid:not(:focus):not(:placeholder-shown) {
-      outline: 1px solid var(--c-input-error);
+      // outline: 1px solid var(--c-input-error);
     }
 
     // 正常な入力時のスタイル
     &:valid:not(:placeholder-shown) {
-      outline: 1px solid #51cf66;
+      // outline: 1px solid #51cf66;
     }
   }
 

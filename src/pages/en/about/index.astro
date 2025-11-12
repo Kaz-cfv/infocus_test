@@ -1,0 +1,34 @@
+---
+import Layout from '@layouts/LayoutEn.astro';
+import Head from '@components/about/section/Head.astro';
+import Clients from '@components/about/section/Clients.astro';
+import Business from '@components/about/section/Business.astro';
+import Awards from '@components/about/section/Awards.astro';
+
+const lang = 'en';
+
+const pageMeta = {
+  title: "About",
+};
+---
+
+<Layout
+  title=""
+  pageName="about"
+  meta={pageMeta}
+>
+
+<div class="l-main-content" data-main-content>
+  <Head lang={lang} />
+  <Clients />
+  <Business lang={lang} />
+  <Awards />
+</div>
+
+</Layout>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+</style>

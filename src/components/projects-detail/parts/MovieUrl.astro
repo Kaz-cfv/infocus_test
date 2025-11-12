@@ -21,9 +21,16 @@ function extractYouTubeId(url: string): string | null {
 
 // Vimeo URLからIDを抽出
 function extractVimeoId(url: string): string | null {
-  const pattern = /vimeo\.com\/(\d+)/;
-  const match = url.match(pattern);
-  return match ? match[1] : null;
+  const patterns = [
+    /vimeo\.com\/(\d+)/,
+    /player\.vimeo\.com\/video\/(\d+)/
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
 }
 
 const youtubeId = extractYouTubeId(url);
@@ -43,7 +50,7 @@ const vimeoId = extractVimeoId(url);
 
   {vimeoId && (
     <iframe
-      src={`https://player.vimeo.com/video/${vimeoId}`}
+      src={`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1`}
       title="Vimeo video player"
       frameborder="0"
       allow="autoplay; fullscreen; picture-in-picture"

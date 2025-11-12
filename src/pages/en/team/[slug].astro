@@ -1,0 +1,432 @@
+---
+import Layout from '@layouts/LayoutEn.astro';
+import Article from '@components/team-detail/section/Article.astro';
+import Related from '@components/team-detail/section/Related.astro';
+
+const lang = 'en';
+
+export async function getStaticPaths() {
+  try {
+    // Step 1: Teamデータを取得（ページング対応）
+    let allTeamMembers = [];
+    let currentPage = 1;
+    let hasMorePages = true;
+
+    while (hasMorePages) {
+      const teamResponse = await fetch(
+        `https://infocus.wp.site-prev2.com/api/rest/?path=wp/v2/team&lang=en&per_page=50&page=${currentPage}`
+      );
+
+      if (!teamResponse.ok) {
+        console.error(`⚠️ チームページ${currentPage}でAPIエラー:`, teamResponse.status);
+        break;
+      }
+
+      const pageData = JSON.parse(await teamResponse.text());
+      const pageArray = Array.isArray(pageData) ? pageData : [pageData];
+
+      if (pageArray.length === 0) {
+        hasMorePages = false;
+      } else {
+        allTeamMembers = [...allTeamMembers, ...pageArray];
+
+        if (pageArray.length < 50) {
+          hasMorePages = false;
+        } else {
+          currentPage++;
+        }
+      }
+
+      if (currentPage > 5) {
+        console.warn('⚠️ チームデータページ数上限に達しました');
+        break;
+      }
+    }
+
+    // Step 2: インタビューデータを取得（ページング対応）
+    let allInterviews = [];
+    currentPage = 1;
+    hasMorePages = true;
+
+    while (hasMorePages) {
+      const interviewResponse = await fetch(
+        `https://infocus.wp.site-prev2.com/api/rest/?path=wp/v2/interview&lang=en&per_page=50&page=${currentPage}`
+      );
+
+      if (!interviewResponse.ok) {
+        console.error(`⚠️ インタビューページ${currentPage}でAPIエラー:`, interviewResponse.status);
+        break;
+      }
+
+      const pageData = JSON.parse(await interviewResponse.text());
+      const pageArray = Array.isArray(pageData) ? pageData : [pageData];
+
+      if (pageArray.length === 0) {
+        hasMorePages = false;
+      } else {
+        allInterviews = [...allInterviews, ...pageArray];
+
+        if (pageArray.length < 50) {
+          hasMorePages = false;
+        } else {
+          currentPage++;
+        }
+      }
+
+      if (currentPage > 5) {
+        console.warn('⚠️ インタビューデータページ数上限に達しました');
+        break;
+      }
+    }
+
+    let allProjects = [];
+    currentPage = 1;
+    hasMorePages = true;
+
+    while (hasMorePages) {
+      const projectsResponse = await fetch(
+        `https://infocus.wp.site-prev2.com/api/rest/?path=wp/v2/projects&lang=en&per_page=50&page=${currentPage}`
+      );
+
+      if (!projectsResponse.ok) {
+        console.error(`⚠️ プロジェクトページ${currentPage}でAPIエラー:`, projectsResponse.status);
+        break;
+      }
+
+      const pageData = JSON.parse(await projectsResponse.text());
+      const pageArray = Array.isArray(pageData) ? pageData : [pageData];
+
+      if (pageArray.length === 0) {
+        hasMorePages = false;
+      } else {
+        allProjects = [...allProjects, ...pageArray];
+
+        if (pageArray.length < 50) {
+          hasMorePages = false;
+        } else {
+          currentPage++;
+        }
+      }
+
+      if (currentPage > 5) {
+        console.warn('⚠️ プロジェクトデータページ数上限に達しました');
+        break;
+      }
+    }
+
+    // console.log(`✅ [EN] プロジェクト取得完了: ${allProjects.length}件`);
+
+    // Step 4: 有効なチームメンバーのみフィルタリング
+    const validMembers = allTeamMembers.filter(item => {
+      const hasTitle = item.title && (typeof item.title === 'string' ? item.title.trim() : item.title.rendered);
+      const hasSlug = item.slug;
+      return hasTitle && hasSlug;
+    });
+
+    // Step 5: 日付順でソート（降順 = 新しい順）
+    const sortedMembers = [...validMembers].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return sortedMembers.map((member) => {
+      // 前後のメンバーを特定
+      const currentIndex = sortedMembers.findIndex(p => p.slug === member.slug);
+
+      let prevMember = null;
+      let nextMember = null;
+
+      if (currentIndex !== -1) {
+        if (currentIndex > 0) {
+          const prev = sortedMembers[currentIndex - 1];
+          prevMember = {
+            slug: prev.slug,
+            name: typeof prev.title === 'string' ? prev.title : prev.title.rendered
+          };
+        }
+
+        if (currentIndex < sortedMembers.length - 1) {
+          const next = sortedMembers[currentIndex + 1];
+          nextMember = {
+            slug: next.slug,
+            name: typeof next.title === 'string' ? next.title : next.title.rendered
+          };
+        }
+      }
+
+      // インタビューデータの照合
+      let memberInterview = null;
+      const acfsData = member.acfs || member.acf;
+
+      if (acfsData?.interview && typeof acfsData.interview === 'string' && acfsData.interview.trim() !== '') {
+        const interviewId = parseInt(acfsData.interview.trim());
+        memberInterview = allInterviews.find(interview => interview.id === interviewId);
+      } else if (acfsData?.interview && Array.isArray(acfsData.interview) && acfsData.interview.length > 0) {
+        const interviewId = acfsData.interview[0].ID || acfsData.interview[0].id;
+        memberInterview = allInterviews.find(interview => interview.id === interviewId);
+      }
+
+      // 該当メンバーのプロジェクトをフィルタリング
+      const memberProjects = allProjects.filter(project => {
+        const projectAcfsData = project.acfs || project.acf;
+
+        if (projectAcfsData?.team && Array.isArray(projectAcfsData.team)) {
+          return projectAcfsData.team.some(teamMember => {
+            const teamId = teamMember.id || teamMember.ID;
+            return teamId == member.id;
+          });
+        }
+
+        return false;
+      });
+
+      // console.log(`👤 [EN] ${member.name} (ID: ${member.id})`);
+      // console.log(`   └─ 関連プロジェクト: ${memberProjects.length}件`);
+
+      // if (memberProjects.length > 0) {
+      //   memberProjects.forEach((project, index) => {
+      //     const projectTitle = typeof project.title === 'string'
+      //       ? project.title
+      //       : project.title.rendered;
+      //     console.log(`      ${index + 1}. ${projectTitle}`);
+      //   });
+      // }
+
+      // メンバー情報の構築
+      const memberTitle = typeof member.title === 'string' ? member.title : member.title.rendered;
+
+      return {
+        params: { slug: member.slug },
+        props: {
+          member: {
+            id: member.id,
+            slug: member.slug,
+            name: memberTitle.trim(),
+            image: acfsData?.image?.url || acfsData?.thumbnail?.url || '',
+            description: acfsData?.html || '',
+            position: acfsData?.position || '',
+            positionTags: acfsData && acfsData['position-tag'] && Array.isArray(acfsData['position-tag'])
+              ? acfsData['position-tag']
+              : [],
+            sns: acfsData && acfsData.sns && Array.isArray(acfsData.sns)
+              ? acfsData.sns
+              : [],
+            interview: memberInterview || null
+          },
+          prevMember: prevMember,
+          nextMember: nextMember,
+          memberProjects: memberProjects,
+          otherMembers: sortedMembers
+            .filter(otherMember => otherMember.slug !== member.slug)
+            .map((otherMember) => {
+              const otherAcfsData = otherMember.acfs || otherMember.acf;
+              const otherTitle = typeof otherMember.title === 'string' ? otherMember.title : otherMember.title.rendered;
+
+              // Position情報の構築
+              const tags = [];
+
+              // acfs.positionが存在し、空でない場合は最初に追加
+              if (otherAcfsData?.position && otherAcfsData.position.trim() !== '') {
+                tags.push({
+                  name: otherAcfsData.position.trim(),
+                  url: '/en/team/'
+                });
+              }
+
+              // position-tagを追加
+              // if (otherAcfsData && otherAcfsData['position-tag'] && Array.isArray(otherAcfsData['position-tag'])) {
+              //   otherAcfsData['position-tag'].forEach(tag => {
+              //     if (tag.name) {
+              //       tags.push({
+              //         name: tag.name,
+              //         url: `/en/team/?position=${tag.slug}`
+              //       });
+              //     }
+              //   });
+              // }
+
+              return {
+                id: otherMember.id,
+                name: otherTitle.trim(),
+                pic: otherAcfsData?.thumbnail?.url || otherAcfsData?.image?.url,
+                url: `/en/team/${otherMember.slug}/`,
+                tags: tags
+              };
+            })
+        }
+      };
+    });
+
+  } catch (error) {
+    console.error('❌ [EN] Team静的パス生成でエラー発生:', error);
+    return [];
+  }
+}
+
+const { member, otherMembers, prevMember, nextMember, memberProjects } = Astro.props;
+
+// Positionデータを整形
+const positionData = [];
+
+if (member.position && member.position.trim() !== '') {
+  positionData.push({
+    caption: member.position.trim()
+  });
+}
+
+// if (member.positionTags && member.positionTags.length > 0) {
+//   member.positionTags.forEach(tag => {
+//     positionData.push({
+//       caption: tag.name || ''
+//     });
+//   });
+// }
+
+// SNSリンクデータを整形
+const linksData = [];
+if (member.sns && member.sns.length > 0) {
+  member.sns.forEach(snsItem => {
+    if (snsItem.url && snsItem.url.trim() !== '') {
+      const url = snsItem.url.trim();
+
+      let type = 'text';
+      let caption = 'Website';
+      let snsType = 'website';
+
+      if (url.includes('instagram.com')) {
+        type = 'icon';
+        caption = 'Instagram';
+        snsType = 'instagram';
+      } else if (url.includes('x.com') || url.includes('twitter.com')) {
+        type = 'icon';
+        caption = 'X';
+        snsType = 'x';
+      } else if (url.includes('note.com')) {
+        type = 'icon';
+        caption = 'note';
+        snsType = 'note';
+      } else if (url.includes('threads.net') || url.includes('threads.com')) {
+        type = 'icon';
+        caption = 'Threads';
+        snsType = 'threads';
+      } else if (url.includes('spotify.com')) {
+        type = 'icon';
+        caption = 'Spotify';
+        snsType = 'spotify';
+      }
+
+      linksData.push({
+        type: type,
+        caption: caption,
+        url: url,
+        snsType: snsType
+      });
+    }
+  });
+}
+
+// インタビューデータを整形
+let interviewData = null;
+if (member.interview) {
+  const interviewAcfsData = member.interview.acfs || member.interview.acf;
+  const interviewTitle = typeof member.interview.title === 'string'
+    ? member.interview.title
+    : member.interview.title?.rendered || '';
+
+  interviewData = {
+    title: interviewTitle,
+    description: interviewAcfsData?.text || interviewAcfsData?.description || '',
+    pic: interviewAcfsData?.image?.url,
+    url: interviewAcfsData?.url || member.interview.link || '#'
+  };
+}
+
+const projectsData = (memberProjects || []).map((project) => {
+  const acfsData = project.acfs || project.acf;
+  const projectTitle = typeof project.title === 'string'
+    ? project.title
+    : project.title?.rendered || '';
+
+  // タグ（taxonomy）の整形
+  const tags = [];
+  if (project.taxonomy.projects && Array.isArray(project.taxonomy.projects)) {
+    project.taxonomy.projects.forEach(tax => {
+      if (tax.name) {
+        tags.push({
+          name: tax.name,
+          url: `/en/projects/?category=${tax.slug || ''}`
+        });
+      }
+    });
+  }
+
+  // メイン画像の取得
+  const imageSrc = acfsData?.main?.image?.url || '';
+
+  return {
+    id: project.id,
+    title: projectTitle,
+    tags: tags,
+    imageSrc: imageSrc,
+    url: `/en/projects/${project.slug}/`
+  };
+});
+
+const debugProjects = memberProjects || [];
+
+// メタデータの設定
+const title = member.name;
+const description = member.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
+
+const pageMeta = {
+  title: `${title} | TEAM`,
+  description: description,
+  ogpType: "article"
+};
+---
+
+<Layout
+  title=""
+  pageName="team-detail"
+  meta={pageMeta}
+>
+
+<Article
+  lang={lang}
+  pic={member.image}
+  name={member.name}
+  position={positionData}
+  description={member.description}
+  links={linksData}
+  interview={interviewData}
+  prevMember={prevMember}
+  nextMember={nextMember}
+  projects={projectsData}
+/>
+
+{otherMembers && otherMembers.length > 0 && (
+  <Related members={otherMembers} />
+)}
+
+</Layout>
+
+<!-- 🔎 デバッグ用スクリプト（ブラウザのコンソールに出力） -->
+<!-- <script define:vars={{ member, debugProjects, projectsData }}>
+  console.group(`👤 [EN] ${member.name} (ID: ${member.id})`);
+  console.log(`関連プロジェクト: ${debugProjects.length}件`);
+
+  if (debugProjects.length > 0) {
+    debugProjects.forEach((project, index) => {
+      const title = typeof project.title === 'string'
+        ? project.title
+        : project.title?.rendered || '(タイトルなし)';
+      console.log(`  ${index + 1}. ${title}`);
+    });
+  }
+
+  console.log('\n📦 整形後のデータ:', projectsData);
+  console.log('🎯 Article に渡すデータ件数:', projectsData.length);
+  console.groupEnd();
+</script> -->
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+</style>

@@ -35,7 +35,10 @@ const {
       <dd data-field="website">
         <a class="--blank" href={website} target="_blank" rel="noopener noreferrer">
           Launch
-          <span class="icon"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.886085 6.38999L5.72089 1.55518C4.52041 1.60452 2.40724 1.62918 1.09165 1.64563L1.09165 0.412261L7.85051 0.346481L7.86696 0.362926L7.81762 7.13824L6.55136 7.10535C6.57603 5.79797 6.59247 3.67658 6.64181 2.4761L1.807 7.31091L0.886085 6.38999Z" fill="#1A1A1A"/></svg></span>
+          <span class="icon">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.886085 6.38999L5.72089 1.55518C4.52041 1.60452 2.40724 1.62918 1.09165 1.64563L1.09165 0.412261L7.85051 0.346481L7.86696 0.362926L7.81762 7.13824L6.55136 7.10535C6.57603 5.79797 6.59247 3.67658 6.64181 2.4761L1.807 7.31091L0.886085 6.38999Z" fill="#1A1A1A"/></svg>
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.886085 6.38999L5.72089 1.55518C4.52041 1.60452 2.40724 1.62918 1.09165 1.64563L1.09165 0.412261L7.85051 0.346481L7.86696 0.362926L7.81762 7.13824L6.55136 7.10535C6.57603 5.79797 6.59247 3.67658 6.64181 2.4761L1.807 7.31091L0.886085 6.38999Z" fill="#1A1A1A"/></svg>
+          </span>
         </a>
       </dd>
     </dl>
@@ -79,7 +82,7 @@ const {
       </dt>
       <dd data-field="awards">
         {awards.map(award => (
-          <span>{award.name}</span>
+          <span set:html={award.name}></span>
         ))}
       </dd>
     </dl>
@@ -87,7 +90,7 @@ const {
 </div>
 
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -99,8 +102,8 @@ const {
   margin-block-start: 32px;
   padding-inline: 30px;
   @include me.sp {
-    row-gap: 20px;
-    margin-block-start: 40px;
+    row-gap: 10px;
+    margin-block-start: 32px;
     padding-inline: 20px;
   }
 
@@ -146,6 +149,7 @@ const {
     justify-content: space-between;
     align-items: center;
     column-gap: 6px;
+    overflow: hidden;
     min-width: 112px;
     padding-inline: 8px;
     color: var(--c-black-base);
@@ -153,6 +157,21 @@ const {
     background-color: var(--c-white);
     @include me.pc {
       padding-block: 2px;
+
+      &:hover {
+        .icon {
+          svg {
+            &:first-child {
+              // 右上に抜ける（より遠くへ）
+              transform: translate(150%, -200%);
+            }
+            &:last-child {
+              // 中央に入ってくる
+              transform: translate(-50%, -50%);
+            }
+          }
+        }
+      }
     }
     @include me.sp {
       font-size: 1.3rem;
@@ -163,7 +182,31 @@ const {
       display: inline-flex;
       justify-content: center;
       align-items: center;
+      position: relative;
       width: 9.51px;
+      height: 9.51px;
+
+      @include me.pc {
+        svg {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
+
+          &:last-child {
+            transform: translate(-200%, 150%);
+          }
+        }
+      }
+
+      @include me.sp {
+        svg {
+          &:first-child {
+            display: none;
+          }
+        }
+      }
     }
   }
 
@@ -185,6 +228,11 @@ const {
   [data-field="awards"] {
     span {
       display: block;
+
+      a {
+        color: var(--c-white);
+        text-decoration: underline;
+      }
     }
   }
 }

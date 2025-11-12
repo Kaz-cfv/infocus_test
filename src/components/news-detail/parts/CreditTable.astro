@@ -34,11 +34,11 @@ const { heading, items } = Astro.props;
   </dl>
 </div>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
-div {
+.p-news-detail__creditTable {
 
   h3 {
     margin-block-end: 22px;

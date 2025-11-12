@@ -83,7 +83,13 @@ const { members = [] } = Astro.props;
     }
 
     &.is-collapsed {
-      max-height: var(--collapsed-height);
+      @include me.pc {
+        max-height: 1000px;
+      }
+      @include me.sp {
+        max-height: 1168px;
+      }
+
 
       &::after {
         content: '';
@@ -119,15 +125,20 @@ const { members = [] } = Astro.props;
     column-gap: 25px;
     row-gap: 50px;
     @include me.sp {
-      display: none;
+      grid-template-columns: repeat(2, 1fr);
+      // display: none;
     }
 
     .p-team-detail__related-item {
-      transition: opacity 0.3s ease-in-out;
+      // transition: opacity 0.3s ease-in-out;
+
+      &.is-preview {
+        opacity: 0.3;
+        pointer-events: none;
+      }
 
       &.is-hidden {
-        opacity: 0.1;
-        pointer-events: none;
+        display: none;
       }
     }
   }
@@ -151,9 +162,13 @@ const { members = [] } = Astro.props;
     .p-team-detail__related-item {
       transition: opacity 0.3s ease-in-out;
 
+      &.is-preview {
+        opacity: 0.3;
+        pointer-events: none;
+      }
+
       &.is-hidden {
-        opacity: 0.1;
-        pointer-events: none; // クリックを無効化
+        display: none;
       }
     }
   }

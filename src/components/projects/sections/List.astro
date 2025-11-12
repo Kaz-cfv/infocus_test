@@ -4,170 +4,33 @@ import Info from "../parts/Info.astro";
 
 // Props型定義 - 空のPropsでクライアントサイドで動的に設定
 export interface Props {}
+
+// スケルトンカードの枚数
+const SKELETON_COUNT = 15;
 ---
 
 <Info count={0} />
 
 <div class="p-project-layout l-content" data-columns="5" data-main-content>
   <ul class="p-project-list" id="projectsList">
-    <!-- プロジェクトはクライアントサイドで動的に追加 -->
+    <!-- プロジェクトはProjects.jsのProjectRendererで動的に追加 -->
+     {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+      <li class="p-project-list__item skeleton-item" data-skeleton="true">
+        <div class="c-project-card skeleton">
+          <div class="c-project-card__image-wrapper skeleton-shimmer"></div>
+          <div class="c-project-card__content">
+            <div class="skeleton-title skeleton-shimmer"></div>
+            <div class="skeleton-tags skeleton-shimmer"></div>
+          </div>
+        </div>
+      </li>
+    ))}
   </ul>
 
   <div class="p-project-list__btn">
-    <a href="/projects/?archived=true">ARCHIVED PROJECTS</a>
+    <a href="/projects/?archived=true" id="archivedProjectsLink">ARCHIVED PROJECTS</a>
   </div>
 </div>
-
-<!-- クライアントサイドでAPIデータを受け取る -->
-<script>
-
-  // カスタムイベントでAPIデータを受け取る
-  document.addEventListener('projectsDataLoaded', (event) => {
-    const projectsData = (event as CustomEvent).detail;
-
-
-    // プロジェクトデータを処理
-    let projects = [];
-    let tagMap = {};
-
-    if (Array.isArray(projectsData)) {
-
-      // JSONファイルのデータ形式に対応
-      projects = projectsData
-        .filter(item => {
-          const hasTitle = !!item.title;
-          const hasSlug = !!item.slug;
-          return hasTitle && hasSlug;
-        })
-        .map((item, index) => {
-          let categories = [];
-
-          // カテゴリー情報
-          if (item.taxonomy?.projects && Array.isArray(item.taxonomy.projects)) {
-            categories = item.taxonomy.projects.map(category => ({
-              name: category.name,
-              url: `/projects/?category=${category.slug}`
-            }));
-          }
-
-          // 画像URL取得
-          const imageSrc = item.acfs?.thumbnail?.image?.url || '';
-
-          // カテゴリースラッグの配列を作成
-          const categorySlugs = (item.taxonomy?.projects && Array.isArray(item.taxonomy.projects))
-            ? item.taxonomy.projects.map(tag => tag.slug)
-            : [];
-
-          // タグスラッグの配列を作成
-          const tagSlugs = (item.acfs?.tags && Array.isArray(item.acfs.tags))
-            ? item.acfs.tags.filter(tag => tag.terms?.slug).map(tag => tag.terms.slug)
-            : [];
-
-          // アーカイブフラグの取得
-          const isArchived = item.acfs?.is_archived || false;
-
-          return {
-            id: item.id || index + 1,
-            title: item.title || 'No Title',
-            tags: categories,
-            imageSrc: imageSrc,
-            url: `/projects/${item.slug}/`,
-            type: "default",
-            categorySlugs: categorySlugs,
-            tagSlugs: tagSlugs,
-            isArchived: isArchived
-          };
-        })
-        .sort((a, b) => b.id - a.id);
-
-    }
-
-    // プロジェクト数をInfoコンポーネントに更新
-    const countElements = document.querySelectorAll('.p-project-info__title-num');
-    countElements.forEach(element => {
-      element.textContent = `(${projects.length})`;
-    });
-
-    // プロジェクトリストを動的に追加
-    const projectsList = document.getElementById('projectsList');
-    if (projectsList && projects.length > 0) {
-      projectsList.innerHTML = projects.map(project => {
-        const tagsHtml = project.tags.map((category, index) => {
-          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator">,</span>' : '';
-          return `<a href="${category.url}" class="c-project-card__category js-hover-item">${category.name}</a>${separator}`;
-        }).join('');
-
-        return `
-          <li class="p-project-list__item"
-            data-categories="${project.categorySlugs.join(',')}"
-            data-tags="${project.tagSlugs.join(',')}"
-            data-project-id="${project.id}"
-            data-archived="${project.isArchived}"
-          >
-            <div class="c-project-card" data-id="${project.id}" data-type="${project.type}">
-              <a href="${project.url}" class="c-project-card__image-wrapper">
-                <img src="${project.imageSrc}" alt="${project.title}" class="c-project-card__image" />
-              </a>
-              <div class="c-project-card__content">
-                <h3 class="c-project-card__title">${project.title}</h3>
-                <div class="c-project-card__tags js-hover">
-                  ${tagsHtml}
-                </div>
-              </div>
-            </div>
-          </li>
-        `;
-      }).join('');
-
-      // タグマッピング情報をグローバルに保存
-      window.projectTagMap = tagMap;
-    }
-
-    // DOM生成完了後にNavigationHoverを適用
-    setTimeout(() => {
-      // NavigationHoverの再初期化イベントを発火
-      const hoverEvent = new CustomEvent('reinitializeHover', {
-        detail: { element: projectsList }
-      });
-      document.dispatchEvent(hoverEvent);
-
-      // グローバルなNavigationHoverインスタンスが存在する場合、直接初期化
-      if (window.navigationHover && typeof window.navigationHover.initializeInElement === 'function') {
-        window.navigationHover.initializeInElement(projectsList);
-      }
-
-      // 手動でホバー処理を追加
-      const hoverContainers = projectsList.querySelectorAll('.js-hover');
-      hoverContainers.forEach((container) => {
-        const items = container.querySelectorAll('.js-hover-item');
-        items.forEach((item) => {
-          item.addEventListener('mouseenter', (e) => {
-            const hoveredItem = e.currentTarget as HTMLElement;
-            hoveredItem.classList.add('is-hovered');
-
-            items.forEach(siblingItem => {
-              if (siblingItem !== hoveredItem) {
-                (siblingItem as HTMLElement).classList.add('is-dimmed');
-              }
-            });
-          });
-
-          item.addEventListener('mouseleave', (e) => {
-            const leftItem = e.currentTarget as HTMLElement;
-            leftItem.classList.remove('is-hovered');
-
-            items.forEach(siblingItem => {
-              if (siblingItem !== leftItem) {
-                (siblingItem as HTMLElement).classList.remove('is-dimmed');
-              }
-            });
-          });
-        });
-      });
-
-    }, 100);
-  });
-</script>
 
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
@@ -203,6 +66,31 @@ export interface Props {}
     row-gap: 46px;
   }
 
+  &__item {
+    @include me.pc {
+      // デフォルトでは不透明度0、アニメーション準備完了状態
+      opacity: 0;
+      animation: fadeInUp 0.4s var(--ease-out-quad) forwards;
+
+      // 奇数番目: 下から出現
+      &:nth-child(odd) {
+        animation-name: fadeInFromBottom;
+      }
+
+      // 偶数番目: 上から出現
+      &:nth-child(even) {
+        animation-name: fadeInFromTop;
+      }
+
+      // 順次表示のための遅延（5カラムごとに時間差）
+      @for $i from 1 through 50 {
+        &:nth-child(#{$i}) {
+          animation-delay: #{($i - 1) * 0.05}s; // 0.05秒ずつ遅延
+        }
+      }
+    }
+  }
+
   .c-project-card {
 
     &__title {
@@ -229,7 +117,8 @@ export interface Props {}
   }
 
   &__btn {
-    display: flex;
+    display: none;
+    // display: flex;
     justify-content: center;
     margin-block-start: 150px;
     @include me.sp {
@@ -258,6 +147,23 @@ export interface Props {}
   transition: opacity 0.3s ease-out;
   height: 100%;
 
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-project-card__image-wrapper {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(7px);
+        }
+
+        .c-project-card__image,
+        .c-project-card__video {
+          // 画像自体を拡大（360px → 368px相当）
+          // transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
+  }
+
   &[data-type="cover"] {
     height: 100%;
   }
@@ -266,11 +172,9 @@ export interface Props {}
     display: block;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 16 / 9;
-    flex: 1;
-    @include me.sp {
-      height: 56.1904%;
-    }
+    aspect-ratio: 252 / 142;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
     @at-root [data-type="pickup"] & {
       @include me.pc {
         margin-top: 30px;
@@ -292,14 +196,22 @@ export interface Props {}
         bottom: 0;
       }
     }
+
+    picture {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__image {
-    @include mi.absolute-all;
+    // position: absolute;
+    // top: 0;
+    // left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
   }
 
   &__video {
@@ -307,7 +219,7 @@ export interface Props {}
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
     z-index: 1;
   }
 
@@ -324,17 +236,19 @@ export interface Props {}
   }
 
   &__title {
-    color: var(--c-white);
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 2.32rem;
-    @include me.sp {
-      font-size: 1.6rem;
-    }
-    @at-root [data-type="pickup"] & {
-      font-size: 2rem;
+    a {
+      color: var(--c-white);
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 2.32rem;
       @include me.sp {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+      }
+      @at-root [data-type="pickup"] & {
+        font-size: 2rem;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
       }
     }
   }
@@ -363,5 +277,62 @@ export interface Props {}
     color: var(--c-gray);
     margin-inline-end: 4px;
   }
+}
+
+// 下から出現するアニメーション
+@keyframes fadeInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 上から出現するアニメーション
+@keyframes fadeInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// シンプルな黒背景バージョン
+.skeleton {
+  &-shimmer {
+    background: #1a1a1a; // 黒いプレースホルダー
+    border-radius: 4px;
+
+    // オプション: 微妙なアニメーション
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+// または、グラデーションを使った洗練版
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1a1a1a 0%,
+    #2a2a2a 50%,
+    #1a1a1a 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

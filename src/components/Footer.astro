@@ -1,4 +1,11 @@
 ---
+import NewsLetter from "./NewsLetter.astro"
+
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+
 const sns = [
   {
     name: 'instagram',
@@ -28,12 +35,40 @@ const address = [
     description: '161 Water Street, 20th<br>Floor #2038,<br>New York, NY 10038, USA'
   }
 ]
+
+// フッターナビゲーションの基本項目を定義
+const baseFooterNavItems = [
+  // 左カラム
+  [
+    { title: 'PROJECTS', path: '/projects' },
+    { title: 'NEWS', path: '/news' },
+    { title: 'ABOUT', path: '/about' },
+    { title: 'TEAM', path: '/team' }
+  ],
+  // 右カラム
+  [
+    { title: 'CAREERS', path: '/careers' },
+    { title: 'CONTACT', path: '/contact' },
+    // { title: 'PRIVACY POLICY', path: '/privacy-policy' }
+  ]
+];
+
+// 言語に応じてナビゲーションアイテムのURLを生成
+const footerNavItems = baseFooterNavItems.map(column =>
+  column.map(item => ({
+    ...item,
+    url: lang === 'en' ? `/en${item.path}` : item.path
+  }))
+);
+
+// CONTACT USリンクも言語対応
+const contactUrl = lang === 'en' ? '/en/contact/' : '/contact/';
 ---
 
 <footer class="l-footer js-footer">
   <div class="l-footer__inner">
     <div class="l-footer__contact">
-      <a href="#" class="l-footer__contact-link">
+      <a href={contactUrl} class="l-footer__contact-link">
         CONTACT US
         <span class="l-footer__contact-icon"><svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 10.7274L17.8407 10.7274C15.5348 8.58802 11.5904 4.7066 9.13274 2.29218L11.4083 0L24 12.4389V12.5L11.4083 25L9.13274 22.5856C11.5904 20.2017 15.5348 16.2897 17.8407 14.1504L0 14.1504L0 10.7274Z" fill="white"/></svg></span>
       </a>
@@ -41,27 +76,19 @@ const address = [
 
     <div class="l-footer__content">
       <div class="l-footer__content-inner --left">
-        <div class="l-footer__newsletter">
-          <span class="l-footer__newsletter-icon"><svg width="23" height="14" viewBox="0 0 23 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L11.4872 8L22 1" stroke="white"/><rect x="0.5" y="0.5" width="22" height="13" stroke="white"/></svg></span>
-          <h3 class="l-footer__newsletter-title">NEWS LETTER</h3>
-          <form class="l-footer__newsletter-form">
-            <input type="email" placeholder="Enter Your email" class="l-footer__newsletter-input">
-            <button type="button" class="l-footer__newsletter-button">Subscribe</button>
-          </form>
-        </div>
+        <NewsLetter type="footer" />
       </div>
       <div class="l-footer__content-inner --right">
         <div class="l-footer__nav js-hover">
           <ul class="l-footer__nav-list">
-            <li class="l-footer__nav-item js-hover-item"><a href="/projects">PROJECTS</a></li>
-            <li class="l-footer__nav-item js-hover-item"><a href="/news">NEWS</a></li>
-            <li class="l-footer__nav-item js-hover-item"><a href="/about">ABOUT</a></li>
-            <li class="l-footer__nav-item js-hover-item"><a href="/team">TEAM</a></li>
+            {footerNavItems[0].map((item) => (
+              <li class="l-footer__nav-item js-hover-item"><a href={item.url}>{item.title}</a></li>
+            ))}
           </ul>
           <ul class="l-footer__nav-list">
-            <li class="l-footer__nav-item js-hover-item"><a href="/careers">CAREERS</a></li>
-            <li class="l-footer__nav-item js-hover-item"><a href="/contact">CONTACT</a></li>
-            <li class="l-footer__nav-item js-hover-item"><a href="/privacy-policy">PRIVACY POLICY</a></li>
+            {footerNavItems[1].map((item) => (
+              <li class="l-footer__nav-item js-hover-item"><a href={item.url}>{item.title}</a></li>
+            ))}
             <li class="l-footer__nav-item l-footer__sns">
               {sns.map((item) => (
                 <a href={item.url} class="l-footer__sns-link js-hover-item" data-sns={item.name}>{item.name}</a>
@@ -92,7 +119,7 @@ const address = [
 @use '../assets/scss/mixin' as mi;
 
 .l-footer {
-  border-top: solid 2px var(--c-white);
+  border-top: solid 1px var(--c-white);
   background-color: var(--c-black);
   color: var(--c-white);
   font-family: var(--f-en);
@@ -122,7 +149,6 @@ const address = [
         column-gap: 14px;
         width: 100%;
         height: 100px;
-        border-top: solid 2px var(--c-white);
         font-size: 2.6rem;
       }
     }
@@ -151,7 +177,7 @@ const address = [
       row-gap: 60px;
       padding-inline: 22px;
       padding-block-start: 50px;
-      border-top: 2px solid var(--c-white);
+      border-top: 1px solid var(--c-white);
     }
 
     &-inner {
@@ -328,14 +354,14 @@ const address = [
   }
 
   &__copyright {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: 1.83;
     @include me.pc {
-      display: none;
+      margin-block-start: 24px;
     }
     @include me.sp {
-      margin-top: 50px;
+      margin-block-start: 40px;
       padding-inline: 22px;
     }
   }

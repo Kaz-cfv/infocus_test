@@ -1,4 +1,9 @@
 ---
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+
 interface Link {
   type: string;
   caption: string;
@@ -25,10 +30,10 @@ const { id, name, sub, address, link, description, pic } = Astro.props;
   <div class="c-business-item__info">
     <h3 class="c-business-item__name">{name}</h3>
     <span class="c-business-item__sub">{sub}</span>
-    <div class="c-business-item__description">
+    <div class="c-business-item__description" data-lang={lang}>
       <p set:html={description}></p>
     </div>
-    <p class="c-business-item__address" set:html={address}></p>
+    <p class="c-business-item__address" set:html={address} data-lang={lang}></p>
     <div class="c-business-item__link">
       {link.map((linkItem) => (
         linkItem.type === 'email' ? (
@@ -46,7 +51,6 @@ const { id, name, sub, address, link, description, pic } = Astro.props;
 @use '../../../assets/scss/mixin' as mi;
 
 .c-business-item {
-  border-bottom: solid 1px var(--c-gray02);
   @include me.pc {
     display: flex;
     flex-direction: row-reverse;
@@ -56,7 +60,7 @@ const { id, name, sub, address, link, description, pic } = Astro.props;
     padding-block: 40px;
   }
   @include me.sp {
-    padding-block-end: 63px;
+    padding-block-end: 60px;
   }
 
   &__pic {
@@ -108,6 +112,9 @@ const { id, name, sub, address, link, description, pic } = Astro.props;
     @include me.sp {
       margin-block-start: 24px;
     }
+    &[data-lang="en"] {
+      font-family: var(--f-en);
+    }
 
     p {
 
@@ -119,7 +126,7 @@ const { id, name, sub, address, link, description, pic } = Astro.props;
     font-size: 1.4rem;
     line-height: 1.6;
     @include me.sp {
-      margin-block-start: 32px;
+      margin-block-start: 24px;
     }
     a {
       color: var(--c-gray);

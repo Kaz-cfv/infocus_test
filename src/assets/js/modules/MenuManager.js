@@ -8,6 +8,7 @@ export class MenuManager {
     this.hamburgerBtn = null;
     this.header = null;
     this.menu = null;
+    this.menuInner = null;
     this.isMenuOpen = false;
     this.isScrolled = false;
     this.scrollThreshold = 100; // スクロール判定の閾値
@@ -20,8 +21,9 @@ export class MenuManager {
     this.hamburgerBtn = document.querySelector('.l-header__hamburger');
     this.header = document.querySelector('.l-header');
     this.menu = document.querySelector('.l-menu');
+    this.menuInner = document.querySelector('.l-menu__inner');
 
-    if (!this.hamburgerBtn || !this.header || !this.menu) {
+    if (!this.hamburgerBtn || !this.header || !this.menu || !this.menuInner) {
       console.warn('HeaderMenuManager: 必要な要素が見つかりません');
       return;
     }
@@ -59,8 +61,11 @@ export class MenuManager {
 
     // メニュー外クリックで閉じる
     document.addEventListener('click', (e) => {
-      if (this.isMenuOpen && !this.menu.contains(e.target) && !this.hamburgerBtn.contains(e.target)) {
-        this.closeMenu();
+      if (this.isMenuOpen) {
+        const target = e.target;
+        if (!this.hamburgerBtn.contains(target) && !this.menuInner.contains(target)) {
+          this.closeMenu();
+        }
       }
     });
 

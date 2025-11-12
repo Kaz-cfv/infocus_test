@@ -1,0 +1,97 @@
+---
+import Layout from '@layouts/LayoutEn.astro';
+import Head from '@components/projects/sections/Head.astro';
+import List from '@components/projects/sections/List.astro';
+
+const lang = 'en';
+
+const pageMeta = {
+  title: "PROJECTS",
+};
+---
+
+<Layout
+  title=""
+  pageName="project"
+  meta={pageMeta}
+>
+
+<div class="p-project-content">
+  <Head lang={lang} />
+  <List />
+</div>
+
+</Layout>
+
+<script>
+class ProjectLayoutToggle {
+  constructor() {
+    this.toggleButtons = document.querySelectorAll('.js-project-info-toggle');
+    this.projectLayout = document.querySelector('.p-project-layout');
+
+    this.init();
+  }
+
+  init() {
+    if (this.toggleButtons.length > 0 && this.projectLayout) {
+      this.bindEvents();
+      this.setInitialState();
+    }
+  }
+
+  bindEvents() {
+    this.toggleButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        this.handleToggle(e);
+      });
+    });
+  }
+
+  setInitialState() {
+    // デフォルトで最初のボタンをアクティブに設定
+    if (this.toggleButtons[0]) {
+      this.updateActiveState(this.toggleButtons[0]);
+    }
+  }
+
+  handleToggle(e) {
+    const clickedButton = e.currentTarget;
+    const columns = clickedButton.dataset.columns;
+
+    if (columns && this.projectLayout) {
+      // data-columns属性を更新
+      this.projectLayout.setAttribute('data-columns', columns);
+
+      // アクティブ状態を更新
+      this.updateActiveState(clickedButton);
+    }
+  }
+
+  updateActiveState(activeButton) {
+    // 全てのボタンからアクティブクラスを削除
+    this.toggleButtons.forEach(button => {
+      button.classList.remove('is-active');
+    });
+
+    // クリックされたボタンにアクティブクラスを追加
+    activeButton.classList.add('is-active');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new ProjectLayoutToggle();
+});
+</script>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-project-content {
+  padding-block-end: 150px;
+  @include me.sp {
+    padding-block-end: 100px;
+  }
+}
+
+</style>

@@ -4,6 +4,7 @@
  */
 
 import { ApiClient } from '../modules/ApiClient.js';
+import { CreditLinkManager } from '../modules/CreditLinkManager.js';
 
 export class ProjectDetail {
   constructor() {
@@ -41,6 +42,23 @@ export class ProjectDetail {
   async init() {
     // APIからプロジェクトデータを取得
     await this.fetchProjectDetailData();
+    
+    // クレジットリンクを処理
+    this.initCreditLinks();
+  }
+
+  /**
+   * クレジットリンクマネージャーを初期化
+   */
+  initCreditLinks() {
+    // DOMの準備ができたらCreditLinkManagerを初期化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        new CreditLinkManager();
+      });
+    } else {
+      new CreditLinkManager();
+    }
   }
 
   /**
@@ -48,8 +66,6 @@ export class ProjectDetail {
    */
   async fetchProjectDetailData() {
     try {
-      console.log('🚀 ProjectDetail.js: fetchProjectDetailData開始');
-
       // 全プロジェクトデータを取得
       const allProjectsData = await this.apiClient.getProjectsData();
 
@@ -57,8 +73,6 @@ export class ProjectDetail {
       const currentProject = allProjectsData.find(project => project.slug === this.currentSlug);
 
       if (currentProject) {
-        console.log('✅ ProjectDetail.js: 該当プロジェクト発見:', currentProject);
-
         // カスタムイベントで他のコンポーネントにデータを配信
         const event = new CustomEvent('projectDetailDataLoaded', {
           detail: currentProject

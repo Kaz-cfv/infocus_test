@@ -54,7 +54,7 @@ export class SearchUIManager {
   }
 
   /**
-   * 検索入力要素とラベルを取得
+   * 検索入力要素とラベル（プレースホルダー）を取得
    * @returns {Object} 検索要素のオブジェクト
    */
   getSearchElements() {
@@ -63,9 +63,11 @@ export class SearchUIManager {
     Object.entries(this.config.searchInputs).forEach(([key, config]) => {
       const input = document.getElementById(config.id);
       const label = document.querySelector(config.labelSelector);
+      // プレースホルダーも取得（labelと同じセレクターを使用）
+      const placeholder = document.querySelector(config.labelSelector);
 
       if (input && label) {
-        elements[key] = { input, label };
+        elements[key] = { input, label, placeholder };
         this.log(`Search elements found for ${key}: input(${config.id}), label(${config.labelSelector})`);
       } else {
         this.log(`Search elements not found for ${key}: input(${!!input}), label(${!!label})`);
@@ -79,9 +81,13 @@ export class SearchUIManager {
    * 検索入力フィールドのイベントをバインド
    */
   bindInputEvents() {
-    Object.entries(this.searchElements).forEach(([key, { input, label }]) => {
+    Object.entries(this.searchElements).forEach(([key, { input, label, placeholder }]) => {
       const handleInput = () => {
         this.toggleLabel(input, label);
+        // プレースホルダーも同時に制御
+        if (placeholder) {
+          this.toggleLabel(input, placeholder);
+        }
       };
 
       // 複数のイベントをバインド
@@ -89,8 +95,11 @@ export class SearchUIManager {
         input.addEventListener(eventType, handleInput);
       });
 
-      // 初期状態をチェック
+      // 初期状態をチェック（URLパラメーターから値がセットされている場合に対応）
       this.toggleLabel(input, label);
+      if (placeholder) {
+        this.toggleLabel(input, placeholder);
+      }
 
       this.log(`Input events bound for ${key} (${input.id})`);
     });
@@ -107,12 +116,14 @@ export class SearchUIManager {
     const hasValue = input.value.trim().length > 0;
 
     if (hasValue) {
-      // 文字が入力されている場合はラベルを隠す
+      // 文字が入力されている場合はラベルを完全に非表示
+      label.style.display = 'none';
       label.style.opacity = '0';
       label.style.visibility = 'hidden';
       this.log(`Label hidden for ${input.id}`);
     } else {
       // 文字が入力されていない場合はラベルを表示
+      label.style.display = '';
       label.style.opacity = '';
       label.style.visibility = '';
       this.log(`Label shown for ${input.id}`);

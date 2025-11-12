@@ -75,7 +75,10 @@ const sectionTitles = {
       </h3>
       <div class="graph">
         <figure>
-          <img src="/common/images/career/graph.png" alt={sectionTitles.teamComposition}>
+          <picture>
+            <source media="(max-width: 959px)" srcset="/common/images/career/graph@sp.png">
+            <img src="/common/images/career/graph.png" alt={sectionTitles.teamComposition}>
+          </picture>
         </figure>
       </div>
     </div>
@@ -124,7 +127,7 @@ const sectionTitles = {
 
 .p-career-ourData {
   position: relative;
-  border-top: solid 2px var(--c-gray);
+  border-top: solid 1px var(--c-gray);
   color: var(--c-white);
 
   &__inner {

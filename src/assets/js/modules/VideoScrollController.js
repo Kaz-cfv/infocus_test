@@ -53,8 +53,8 @@ class VideoScrollController {
       // ScrollTriggerで各カードを監視
       ScrollTrigger.create({
         trigger: card,
-        start: "center 60%", // カードの中心がビューポートの60%の位置に来たとき
-        end: "center 40%",   // カードの中心がビューポートの40%の位置を超えたとき
+        start: "top 100%",    // カードのトップがビューポートの最下部の位置に来たとき
+        end: "bottom 5.5%",   // カードのボトムがビューポートの最上部（-ヘッダーの高さ）の位置を超えたとき
 
         onEnter: () => {
           // まるで容疑者がターゲットエリアに入った瞬間のように
@@ -77,7 +77,7 @@ class VideoScrollController {
         },
 
         // デバッグ用（開発時のみ有効にする）
-        markers: false,
+        // markers: true,
         // id: `video-card-${card.dataset.id}`
       });
     });

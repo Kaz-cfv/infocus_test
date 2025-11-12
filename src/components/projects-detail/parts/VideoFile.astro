@@ -1,0 +1,27 @@
+---
+interface Props {
+  videoUrl: string;
+}
+
+const { videoUrl } = Astro.props;
+---
+
+<div class="c-video-file">
+  <video src={videoUrl} autoplay muted loop></video>
+</div>
+
+<style lang="scss">
+@use '../../../assets/scss/mediaquery' as me;
+
+.c-video-file {
+  margin-block-end: 30px;
+  @include me.sp {
+    margin-block-end: 20px;
+  }
+
+  video {
+    width: 100%;
+    height: auto;
+  }
+}
+</style>

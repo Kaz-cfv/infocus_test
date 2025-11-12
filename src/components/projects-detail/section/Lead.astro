@@ -5,11 +5,14 @@ interface Props {
 }
 
 const { title, text } = Astro.props;
+
+// 改行をHTMLの<br>タグに変換する
+const formattedText = text ? text.replace(/\n/g, '<br>') : '';
 ---
 
 <div class="c-article__lead">
   <h2 class="c-article__lead-title">{title}</h2>
-  <div set:html={text}></div>
+  <div set:html={formattedText}></div>
 </div>
 
 
@@ -19,7 +22,9 @@ const { title, text } = Astro.props;
 
 .c-article__lead {
   @include me.pc {
-    margin-inline: 123px;
+    // margin-inline: 123px;]
+    max-width: 72.41%;
+    margin-inline: auto;
     margin-block-start: 70px;
   }
 
@@ -36,9 +41,9 @@ const { title, text } = Astro.props;
     grid-template-columns: 100%;
     align-content: flex-start;
     row-gap: 20px;
-    margin-block-start: 30px;
+    // margin-block-start: 30px;
     font-family: var(--f-jp);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     line-height: 1.7;
     @include me.sp {
       font-size: 1.4rem;

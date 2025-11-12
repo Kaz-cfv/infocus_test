@@ -1,9 +1,9 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Content from '../../components/news-detail/parts/Content.astro';
-import Credit from '../../components/news-detail/section/Credit.astro';
-import Share from '../../components/news-detail/parts/Share.astro';
-import Related from '../../components/news-detail/section/Related.astro';
+import Layout from '@layouts/Layout.astro';
+import Content from '@components/news-detail/parts/Content.astro';
+import Credit from '@components/news-detail/section/Credit.astro';
+import Share from '@components/news-detail/parts/Share.astro';
+import Related from '@components/news-detail/section/Related.astro';
 
 export async function getStaticPaths() {
   // カテゴリー情報を取得するヘルパー関数
@@ -24,76 +24,148 @@ export async function getStaticPaths() {
   }
 
   try {
-    // 静的JSONファイルからニュースデータを取得
-    const response = await fetch('https://infocus.wp.site-prev2.com/api/news.json');
+    // Step 1: ニュースデータを取得（ページング対応）
+    let allNewsArticles = [];
+    let currentPage = 1;
+    let hasMorePages = true;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    while (hasMorePages) {
+      const newsResponse = await fetch(
+        `https://infocus.wp.site-prev2.com/api/rest/?path=wp/v2/news&per_page=50&page=${currentPage}`
+      );
+
+      if (!newsResponse.ok) {
+        console.error(`⚠️ ニュースページ${currentPage}でAPIエラー:`, newsResponse.status);
+        break;
+      }
+
+      const pageData = JSON.parse(await newsResponse.text());
+      const pageArray = Array.isArray(pageData) ? pageData : [pageData];
+
+      // console.log(`📊 ニュースページ${currentPage}で取得: ${pageArray.length}件`);
+
+      if (pageArray.length === 0) {
+        hasMorePages = false;
+      } else {
+        allNewsArticles = [...allNewsArticles, ...pageArray];
+
+        if (pageArray.length < 50) {
+          hasMorePages = false;
+        } else {
+          currentPage++;
+        }
+      }
+
+      // 安全装置：無限ループ防止
+      if (currentPage > 10) {
+        console.warn('⚠️ ニュースデータページ数上限に達しました');
+        break;
+      }
     }
 
-    const newsData = await response.json();
-    const newsArray = Array.isArray(newsData) ? newsData : [newsData];
+    // console.log('📊 全体で取得したニュース記事数:', allNewsArticles.length);
 
-    // 各ニュース記事のパスを生成
-    return newsArray
-      .filter(item => item.title && item.date && item.slug)
-      .map((item) => {
-        const categoryInfo = getCategoryInfo(item.taxonomy?.news);
+    // Step 2: 有効なニュース記事のみフィルタリング
+    const validArticles = allNewsArticles.filter(item => {
+      const hasTitle = item.title && (typeof item.title === 'string' ? item.title.trim() : item.title.rendered);
+      const hasSlug = item.slug;
+      const hasDate = item.date;
+      return hasTitle && hasSlug && hasDate;
+    });
 
-        return {
-          params: { slug: item.slug },
-          props: {
-            article: {
-              id: item.id,
-              slug: item.slug,
-              title: item.title,
-              date: new Date(item.date).toLocaleDateString('ja-JP', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-              }).replace(/\//g, '.'),
-              category: categoryInfo.name,        // 表示用カテゴリー名
-              categorySlug: categoryInfo.slug,    // フィルタリング用スラッグ
-              pic: item.acfs?.news_eyecatch?.url || item.acfs?.news_mv?.url,
-              content: item.acfs?.news_article || '',
-              rawContent: item.acf?.news_article || ''
-            },
-            relatedArticles: newsArray
-              .filter(newsItem => newsItem.title && newsItem.date && newsItem.slug && newsItem.id !== item.id)
-              .sort((a, b) => new Date(b.date) - new Date(a.date))
-              .slice(0, 3)
-              .map(relatedItem => {
-                const relatedCategoryInfo = getCategoryInfo(relatedItem.taxonomy?.news);
+    // console.log('✅ 有効なニュース記事数:', validArticles.length);
 
-                return {
-                  id: relatedItem.id,
-                  slug: relatedItem.slug,
-                  title: relatedItem.title,
-                  date: new Date(relatedItem.date).toLocaleDateString('ja-JP', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  }).replace(/\//g, '.'),
-                  category: relatedCategoryInfo.name,        // 表示用カテゴリー名
-                  categorySlug: relatedCategoryInfo.slug,    // フィルタリング用スラッグ
-                  pic: relatedItem.acfs?.news_eyecatch?.url || relatedItem.acfs?.news_mv?.url,
-                  url: `/news/${relatedItem.slug}/`
-                };
-              })
-          }
-        };
-      });
+    // Step 3: 各ニュース記事のパスを生成
+    return validArticles.map((item) => {
+      // タイトル処理
+      const articleTitle = typeof item.title === 'string' ? item.title : item.title.rendered;
+
+      // ACF/ACFSデータの取得
+      const acfsData = item.acfs || item.acf;
+
+      // カテゴリー情報の処理（新APIのtaxonomy構造に対応）
+      const categoryInfo = getCategoryInfo(item.taxonomy?.news);
+
+      // 日付フォーマット処理
+      const formattedDate = new Date(item.date).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).replace(/\//g, '.');
+
+      // 記事データの構築
+      const articleData = {
+        id: item.id,
+        slug: item.slug,
+        title: articleTitle.trim(),
+        date: formattedDate,
+        category: categoryInfo.name,        // 表示用カテゴリー名
+        categorySlug: categoryInfo.slug,    // フィルタリング用スラッグ
+        pic: acfsData?.news_eyecatch?.url || acfsData?.news_mv?.url || null,
+        content: item.content.rendered || '',
+        rawContent: item.content.rendered || ''
+      };
+
+      // 関連記事データの構築（現在の記事を除く）
+      const relatedArticles = validArticles
+        .filter(newsItem => newsItem.id !== item.id)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 3)
+        .map(relatedItem => {
+          const relatedTitle = typeof relatedItem.title === 'string' ? relatedItem.title : relatedItem.title.rendered;
+          const relatedAcfsData = relatedItem.acfs || relatedItem.acf;
+          const relatedCategoryInfo = getCategoryInfo(relatedItem.taxonomy?.news);
+
+          const relatedFormattedDate = new Date(relatedItem.date).toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }).replace(/\//g, '.');
+
+          return {
+            id: relatedItem.id,
+            slug: relatedItem.slug,
+            title: relatedTitle.trim(),
+            date: relatedFormattedDate,
+            category: relatedCategoryInfo.name,        // 表示用カテゴリー名
+            categorySlug: relatedCategoryInfo.slug,    // フィルタリング用スラッグ
+            pic: relatedAcfsData?.news_eyecatch?.url || relatedAcfsData?.news_mv?.url || null,
+            url: `/news/${relatedItem.slug}/`
+          };
+        });
+
+      // console.log('📰 記事処理完了:', {
+      //   slug: item.slug,
+      //   title: articleTitle.substring(0, 30) + '...',
+      //   hasImage: !!articleData.pic,
+      //   relatedCount: relatedArticles.length,
+      //   category: categoryInfo.name
+      // });
+
+      return {
+        params: { slug: item.slug },
+        props: {
+          article: articleData,
+          relatedArticles: relatedArticles
+        }
+      };
+    });
+
   } catch (error) {
-    console.error('❌ Failed to generate static paths:', error);
+    console.error('❌ News静的パス生成でエラー発生:', error);
     return [];
   }
 }
 
 const { article, relatedArticles } = Astro.props;
 
+// メタデータの設定
+const title = article.title;
+const description = article.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
+
 const pageMeta = {
-  title: `${article.title} | NEWS`,
-  description: article.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...',
+  title: `${title} | NEWS`,
+  description: description,
   ogpType: "article"
 };
 ---
@@ -133,7 +205,10 @@ const pageMeta = {
     slug={article.slug}
   />
 </article>
-<Related relatedArticles={relatedArticles} />
+
+{relatedArticles && relatedArticles.length > 0 && (
+  <Related relatedArticles={relatedArticles} />
+)}
 
 </Layout>
 
@@ -165,10 +240,10 @@ const pageMeta = {
     }
 
     &-title {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       line-height: 1.5;
       @include me.sp {
-        font-size: 1.6rem;
+        font-size: 1.8rem;
       }
     }
 
@@ -219,7 +294,7 @@ const pageMeta = {
     line-height: 1.6;
   }
 
-  h2 {
+  > h2 {
     margin-block-end: 12px;
     font-size: 1.8rem;
     @include me.sp {
@@ -227,7 +302,7 @@ const pageMeta = {
     }
   }
 
-  h3 {
+  > h3 {
     margin-block-end: 12px;
     font-size: 1.5rem;
     @include me.sp {
@@ -235,9 +310,9 @@ const pageMeta = {
     }
   }
 
-  h4,
-  h5,
-  h6 {
+  > h4,
+  > h5,
+  > h6 {
     font-size: 1.4rem;
     margin-block-end: 12px;
     font-weight: 400;
@@ -245,7 +320,7 @@ const pageMeta = {
   }
 
   p {
-    margin-block-end: 50px;
+    margin-block-end: 24px;
     font-size: 1.4rem;
     line-height: 1.8;
   }
@@ -255,6 +330,9 @@ const pageMeta = {
     position: relative;
     margin-block-end: 4px;
     color: var(--c-white);
+    overflow-wrap: anywhere;
+    font-size: 1.1rem;
+    opacity: 0.7;
     @include me.pc {
       &::after {
         content: "";
@@ -264,6 +342,7 @@ const pageMeta = {
         width: 100%;
         height: 1px;
         background-color: var(--c-white);
+        opacity: 0.7;
       }
     }
     @include me.sp {
@@ -271,12 +350,12 @@ const pageMeta = {
     }
   }
 
-  em,
-  i {
+  > em,
+  > i {
     font-style: italic;
   }
 
-  u {
+  > u {
     position: relative;
     text-decoration: none;
     &::after {
@@ -290,11 +369,11 @@ const pageMeta = {
     }
   }
 
-  figure {
+  > figure {
     margin-block-end: 30px;
   }
 
-  figcaption {
+  > figcaption {
     display: inline-block;
     margin-block-start: 20px;
     font-size: 1.2rem;
@@ -303,5 +382,65 @@ const pageMeta = {
       margin-block-start: 10px;
     }
   }
+}
+
+.p-news-detail__creditTitle {
+  margin-block-end: 40px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.p-news-detail__creditTable {
+  display: grid;
+  grid-template-columns: 100%;
+  align-content: flex-start;
+  row-gap: 40px;
+
+  h3 {
+    font-size: 1.8rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 146px 1fr;
+    align-content: flex-start;
+    column-gap: 60px;
+    row-gap: 12px;
+    @include me.sp {
+      column-gap: 32px;
+    }
+  }
+
+  dt {
+    opacity: .5;
+    color: var(--c-white);
+    font-size: 1.4rem;
+  }
+
+  dd {
+    color: var(--c-white);
+    font-size: 1.4rem;
+    font-weight: 600;
+
+    a {
+      position: relative;
+      color: var(--c-white);
+      @include me.pc {
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: var(--c-white);
+        }
+      }
+      @include me.sp {
+        text-decoration: underline;
+      }
+    }
+  }
+
 }
 </style>

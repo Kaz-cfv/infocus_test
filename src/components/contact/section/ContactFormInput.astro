@@ -6,20 +6,29 @@ import FormFileUpload from '../parts/FormFileUpload.astro';
 
 const categoryOptions = [
   { slug: 'new_project', value: 'New Project', label: 'New Project', checked: false },
-  { slug: 'recruit', value: 'Recruit', label: 'Recruit', checked: false },
+  { slug: 'collaboration', value: 'Collaboration', label: 'Collaboration', checked: false },
+  { slug: 'career', value: 'Career', label: 'Career', checked: false },
   { slug: 'other', value: 'Other', label: 'Other', checked: false }
 ];
 
-const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL1qTB3vVyWZ4mIUfVOFbdFarZ9NQ/formResponse';
+const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSd-SYX3CfyqBZSFt7gOhcRx-Q1itfNDqnAySlLdK-VCLWpc4g/formResponse';
 ---
 
 <div class="contact__content" data-state="input">
+  <div class="p-contact-form__head">
+    <h2 class="p-contact-form__title">CONTACT US</h2>
+    <!-- <p class="p-contact-form__subtitle">Let's have a conversation.</p> -->
+    <p class="p-contact-form__desc">
+      *ファイルを添付される場合はストレージサービス等を利用してお送りください。
+    </p>
+  </div>
+
   <form class="p-contact-form__form contact__form" id="inquiryForm" action={url} method="POST">
 
     <!-- Category Selection -->
-    <div class="contact__item --require" data-fields="entry.6962889">
+    <div class="contact__item --require" data-fields="entry.972746247">
       <FormRadio
-        name="entry.6962889"
+        name="entry.972746247"
         label="Category"
         options={categoryOptions}
         required
@@ -29,9 +38,9 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- Name Field -->
-    <div class="contact__item --require" data-fields="entry.315956304">
+    <div class="contact__item --require" data-fields="entry.228129435">
       <FormInput
-        id="entry.315956304"
+        id="entry.228129435"
         label="Name"
         type="text"
         required
@@ -43,9 +52,9 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- Company Field -->
-    <div class="contact__item" data-fields="entry.2098499189">
+    <div class="contact__item" data-fields="entry.265766020">
       <FormInput
-        id="entry.2098499189"
+        id="entry.265766020"
         label="Your Company"
         type="text"
         placeholder=""
@@ -56,9 +65,9 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- Email Field -->
-    <div class="contact__item --require" data-fields="entry.1584875005">
+    <div class="contact__item --require" data-fields="entry.789109179">
       <FormInput
-        id="entry.1584875005"
+        id="entry.789109179"
         label="Email"
         type="email"
         required
@@ -70,9 +79,9 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- Title Field -->
-    <div class="contact__item" data-fields="entry.939554866">
+    <div class="contact__item" data-fields="entry.2092520827">
       <FormInput
-        id="entry.939554866"
+        id="entry.2092520827"
         label="Title"
         type="text"
         placeholder=""
@@ -82,9 +91,9 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- Message Field -->
-    <div class="contact__item --require" data-fields="entry.668384495">
+    <div class="contact__item --require" data-fields="entry.1745369629">
       <FormTextarea
-        id="entry.668384495"
+        id="entry.1745369629"
         label="Message"
         required
         placeholder=""
@@ -96,7 +105,7 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     </div>
 
     <!-- File Upload -->
-    <!-- <div class="contact__item" data-fields="files">
+    <!-- <div class="contact__item" data-fields="entry.856080106">
       <FormFileUpload
         id="entry.856080106"
         accept=".pdf,.jpg,.jpeg,.mp4"
@@ -164,11 +173,21 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
     &.--button {
       display: flex;
       gap: 20px;
-      justify-content: center;
-      margin-top: 60px;
+      justify-content: flex-start;
+      @include me.pc {
+        margin-top: 60px;
+      }
+      @include me.sp {
+        .c-button {
+          width: 69.285%;
+          max-width: 280px;
+        }
+      }
+
 
       .c-button {
-        min-width: 160px;
+        // min-width: 160px;
+        width: 440px;
         padding: 16px 32px;
         font-size: 1.4rem;
         font-weight: 600;
@@ -199,16 +218,6 @@ const url = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSe8tDxvyKqDNsCCDWwlKPL
             background-color: var(--c-white);
             color: var(--c-black-base);
           }
-        }
-      }
-
-      @include me.sp {
-        flex-direction: column;
-        align-items: center;
-
-        .c-button {
-          width: 100%;
-          max-width: 280px;
         }
       }
     }

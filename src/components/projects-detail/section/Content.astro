@@ -1,5 +1,6 @@
 ---
 import MovieUrl from "../parts/MovieUrl.astro";
+import VideoFile from "../parts/VideoFile.astro";
 import SingleImage from "../parts/SingleImage.astro";
 import TextContent from "../parts/TextContent.astro";
 import TwoColumnImages from "../parts/TwoColumnImages.astro";
@@ -25,7 +26,17 @@ function getImageData(imageData: any): any {
   {contents.map((item) => {
     switch (item.acf_fc_layout) {
       case 'movie_url':
-        return <MovieUrl url={item.url} />;
+        let movieUrl = item.url;
+        if (item.article_movie && item.article_movie.length > 0) {
+          const movieData = item.article_movie[0];
+          if (movieData.movie_player === 'vimeo' && movieData.movie_id) {
+            movieUrl = `https://vimeo.com/${movieData.movie_id}`;
+          }
+        }
+        return <MovieUrl url={movieUrl} />;
+
+      case 'movie':
+        return <VideoFile videoUrl={item.movie.url} />;
 
       case 'image':
         const imageData = getImageData(item.image);
@@ -97,7 +108,7 @@ function getImageData(imageData: any): any {
     padding-inline: 30px;
   }
   @include me.sp {
-    margin-block-start: 60px;
+    margin-block-start: 40px;
   }
 }
 </style>

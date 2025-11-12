@@ -1,4 +1,10 @@
 ---
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
 const category = [
   {
     name: 'BRANDING',
@@ -81,12 +87,12 @@ const tags = [
 <div class="p-project-head" data-type="">
   <!-- Search -->
   <div class="p-project-head__search">
-    <div class="p-project-head__search-input --pc">
-      <input type="text" id="search_category" name="category">
+    <div class="p-project-head__search-input --pc" data-search="projects">
+      <input type="text" id="search_category" name="category" class="js-search-input">
       <label for="search_category" class="p-project-head__search-placeholder">SEARCH</label>
     </div>
     <div class="p-project-head__search-icon js-search-wrap">
-      <button class="p-project-head__search-btn js-search" data-btn="open">
+      <button class="p-project-head__search-btn js-search js-search-btn" data-btn="open">
         検索
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.06641 0.588867C9.09134 0.588967 11.5437 3.04078 11.5439 6.06543C11.5439 9.09028 9.09149 11.5429 6.06641 11.543C3.04124 11.543 0.588867 9.09034 0.588867 6.06543C0.589111 3.04072 3.04139 0.588867 6.06641 0.588867Z" stroke="white" stroke-width="1.17747"/><path d="M13.3572 14.5455C13.5871 14.7754 13.9599 14.7754 14.1898 14.5455C14.4198 14.3156 14.4198 13.9428 14.1898 13.7129L13.3572 14.5455ZM10.1338 10.4897L9.71748 10.906L13.3572 14.5455L13.7735 14.1292L14.1898 13.7129L10.5501 10.0734L10.1338 10.4897Z" fill="white"/></svg>
       </button>
@@ -100,19 +106,19 @@ const tags = [
   <!-- Category -->
   <div class="p-project-head__left">
     <div class="p-project-head__search-input --sp">
-      <input type="text" id="search_category_sp" name="category">
+      <input type="text" id="search_category_sp" name="category" class="js-search-input">
       <label for="search_category_sp" class="p-project-head__search-placeholder">SEARCH</label>
     </div>
 
     <ul class="p-project-head__category">
-      <li class="p-project-head__category-item" data-category="All">
-        <a href="/projects/" aria-current="true">
+      <li class="p-project-head__category-item js-search-category-reset" data-category="All">
+        <a href=`${currentUrl}projects` aria-current="true">
           <span>ALL</span>
         </a>
       </li>
       {category.map(category => (
-        <li class="p-project-head__category-item" data-category={category.name}>
-          <a href={category.slug === 'archived' ? '/projects/?archived=true' : `/projects/?category=${category.slug}`} aria-current="false">
+        <li class="p-project-head__category-item js-search-category-reset" data-category={category.name}>
+          <a href={category.slug === 'archived' ? '/projects/?archived=true' : `${currentUrl}projects/?category=${category.slug}`} aria-current="false">
             <span>{category.name}</span>
           </a>
         </li>
@@ -122,8 +128,9 @@ const tags = [
 
   <ul class="p-project-head__tag js-hover">
     {tags.map(tag => (
-      <li class="p-project-head__tag-item js-hover-item">
-        <a href={`/projects/?tag=${tag.slug}`}>{tag.name}</a>
+      <li class="p-project-head__tag-item">
+        <a href={`${currentUrl}projects/?tag=${tag.slug}`} class="js-hover-item">{tag.name}</a>
+        <span class="p-project-head__tag-separator js-hover-item">/</span>
       </li>
     ))}
   </ul>
@@ -148,7 +155,7 @@ const tags = [
     grid-template-columns: 1fr max-content;
     column-gap: 41.65px;
     row-gap: 40px;
-    margin-block-start: 51px;
+    margin-block-start: 40px;
     padding-inline: 20px;
     overflow: hidden;
     &::after {
@@ -184,15 +191,25 @@ const tags = [
     @include me.pc {
       max-width: 384px;
     }
+    @include me.sp {
+      @at-root [data-type="search"] & {
+        width: 130%;
+      }
+    }
 
     &-item {
       @include me.pc {
         min-width: 60.18px;
       }
 
+      &[data-category="ARCHIVED"] {
+        display: none;
+      }
+
       a {
         display: block;
         position: relative;
+        z-index: 1;
         padding-inline: 16px;
         padding-block: 5px 6px;
         color: var(--c-white);
@@ -201,6 +218,14 @@ const tags = [
         text-align: center;
         @include me.pc {
           font-size: 1.2rem;
+          transition: color .3s var(--ease-out-quad);
+          &:hover {
+            color: var(--c-black-base);
+
+            &::before {
+              background-color: var(--c-white);
+            }
+          }
         }
         &::before {
           content: "";
@@ -212,10 +237,26 @@ const tags = [
           height: 100%;
           border: solid 1px var(--c-gray);
           border-radius: 9.4rem;
+          transition: background-color .3s var(--ease-out-quad);
+        }
+        &[data-filter="current"] {
+          // pointer-events: none;
+          a {
+            color: var(--c-white);
+          }
+          .p-project-head__tag-separator {
+            color: var(--c-gray);
+          }
+        }
+        &[data-filter="uncurrent"] {
+          a,
+          .p-project-head__tag-separator {
+            color: var(--c-gray);
+          }
         }
         &[aria-current="true"] {
           color: var(--c-black-base);
-          pointer-events: none;
+          // pointer-events: none;
           &::before {
             border-color: var(--c-gray02);
             background-color: var(--c-white);
@@ -262,6 +303,10 @@ const tags = [
       transform: translateY(-50%);
       z-index: 2;
       color: var(--c-gray);
+      font-size: 1.4rem;
+      @include me.pc {
+        font-size: 1.2rem;
+      }
     }
 
     &-input {
@@ -301,6 +346,7 @@ const tags = [
         border: none;
         background: transparent;
         color: var(--c-white);
+        font-size: 1.4rem;
         @include me.pc {
           padding-inline-end: 18px;
         }
@@ -379,14 +425,8 @@ const tags = [
       display: inline-flex;
       align-items: flex-start;
       column-gap: 6px;
-      &::after {
-        content: "/";
-        display: block;
-        color: var(--c-white);
-        font-size: 1.4rem;
-      }
       &:last-child {
-        &::after {
+        .p-project-head__tag-separator {
           display: none;
         }
       }
@@ -396,6 +436,12 @@ const tags = [
         font-size: 1.4rem;
         font-weight: 600;
       }
+    }
+
+    &-separator {
+      pointer-events: none;
+      font-size: 1.4rem;
+      font-weight: 600;
     }
 
   }

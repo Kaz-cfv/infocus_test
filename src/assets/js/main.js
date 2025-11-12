@@ -89,7 +89,10 @@ class App {
   initSearch() {
     const searchElements = document.querySelectorAll('[data-search]');
     if (searchElements.length > 0) {
-      this.components.set('search', new SearchManager());
+      const searchManager = new SearchManager();
+      this.components.set('search', searchManager);
+      // グローバルに公開（Projects.jsからアクセスできるように）
+      window.searchManager = searchManager;
     }
   }
 

@@ -1,72 +1,104 @@
 ---
 import Menu from '../components/Menu.astro';
 
-const navigationItems = [
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+
+// ナビゲーションの基本項目を定義
+const baseNavigationItems = [
   {
     title: 'PROJECTS',
-    url: '/projects/',
-    isActive: false,
+    path: '/projects/',
     navi: 'projects',
     isBlank: false
   },
   {
     title: 'NEWS',
-    url: '/news/',
-    isActive: false,
+    path: '/news/',
     navi: 'news',
     isBlank: false
   },
   {
     title: 'ABOUT',
-    url: '/about/',
-    isActive: false,
+    path: '/about/',
     navi: 'about',
     isBlank: false
   },
   {
     title: 'TEAM',
-    url: '/team/',
-    isActive: false,
+    path: '/team/',
     navi: 'team',
     isBlank: false
   },
   {
     title: 'CAREERS',
-    url: '/careers/',
-    isActive: false,
+    path: '/careers/',
     navi: 'careers',
     isBlank: false
   },
   {
     title: 'CONTACT',
-    url: '/contact/',
-    isActive: false,
+    path: '/contact/',
     navi: 'contact',
     isBlank: false
   },
   // 区切り線用の特殊アイテム
   {
     title: '',
-    url: '',
+    path: '',
     isDivider: true,
     navi: '',
     isBlank: false
   },
   {
     title: 'IFFD',
-    url: 'https://iffd.in-focus.co.jp/',
-    isActive: false,
+    path: 'https://iffd.in-focus.co.jp/',
     navi: 'iffd',
+    isBlank: true,
+    isExternal: true
+  },
+  {
+    title: 'IFNY',
+    path: '',
+    navi: 'ifny',
     isBlank: true
   },
   {
     title: 'STORE',
-    url: '/store/',
-    isActive: false,
+    path: 'https://newframing.com/',
     navi: 'store',
-    isBlank: false
+    isBlank: true
   }
 ];
+
+// 言語に応じてナビゲーションアイテムのURLを生成
+const navigationItems = baseNavigationItems.map(item => {
+  if (item.isDivider) {
+    return {
+      ...item,
+      url: item.path,
+      isActive: false
+    };
+  }
+
+  if (item.isExternal) {
+    return {
+      ...item,
+      url: item.path,
+      isActive: false
+    };
+  }
+
+  // 通常のページの場合、言語に応じてURLを生成
+  const url = lang === 'en' ? `/en${item.path}` : item.path;
+  return {
+    ...item,
+    url,
+    isActive: false
+  };
+});
 
 const currentPath = Astro.url.pathname;
 navigationItems.forEach(item => {
@@ -74,13 +106,53 @@ navigationItems.forEach(item => {
     item.isActive = true;
   }
 });
+
+// 現在のパスから言語切り替えURLを生成
+const generateLanguageUrls = () => {
+  let basePath = currentPath;
+
+  // 英語パスの場合、/en/ プレフィックスを除去
+  if (basePath.startsWith('/en/')) {
+    basePath = basePath.replace('/en/', '/');
+  }
+
+  // トップページの場合の処理
+  if (basePath === '/') {
+    return {
+      ja: '/',
+      en: '/en/'
+    };
+  }
+
+  // その他のページの場合
+  return {
+    ja: basePath,
+    en: `/en${basePath}`
+  };
+};
+
+const languageUrls = generateLanguageUrls();
+
+// 言語切り替えのURL設定
+const languageLinks = {
+  ja: {
+    url: languageUrls.ja,
+    state: lang === 'ja' ? 'current' : ''
+  },
+  en: {
+    url: languageUrls.en,
+    state: lang === 'en' ? 'current' : ''
+  }
+};
+
+const logoUrl = lang === 'en' ? '/en/' : '/';
 ---
 
 <header class="l-header js-header">
   <div class="l-header__inner">
     <div class="l-header__inner-left">
       <!-- ロゴ -->
-      <a href="/" class="l-header__logo">
+      <a href={logoUrl} class="l-header__logo">
          <svg width="80" height="31" viewBox="0 0 80 31" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.27973 0H0V23.2832H3.27973V0Z" fill="white"/><path d="M13.7736 13.2592L9.17906 0H5.90414V23.2832H9.17906V10.0097L13.7736 23.2832H13.7784H17.0485V0H13.7736V13.2592Z" fill="white"/><path d="M22.9533 10.3518H27.543V7.12606H22.9533V3.23523H28.853V0H22.9533C22.5226 0 22.0961 0.0836817 21.6982 0.246267C21.3003 0.408853 20.9387 0.647158 20.6342 0.947577C20.3296 1.248 20.0881 1.60464 19.9232 1.99716C19.7584 2.38968 19.6736 2.81037 19.6736 3.23523V23.2784H22.9533V10.3518Z" fill="white"/><path d="M48.5265 23.2784H54.4213V20.048H48.5265V3.23523H54.4213V0H48.5265C47.6604 0.00502445 46.8316 0.348246 46.2215 0.954561C45.6114 1.56088 45.2695 2.38091 45.2708 3.23523V20.048C45.2708 20.9015 45.6132 21.7203 46.2232 22.3256C46.8332 22.9309 47.6612 23.2734 48.5265 23.2784Z" fill="white"/><path d="M80 20.2855V13.4825C79.9975 12.6266 79.6506 11.8066 79.0357 11.2027C78.4208 10.5988 77.588 10.2603 76.7203 10.2615H73.4406V3.47278H79.3402V0.237549H73.4406C72.5707 0.237549 71.7365 0.578402 71.1214 1.18513C70.5064 1.79185 70.1608 2.61474 70.1608 3.47278V10.2615C70.1608 11.1158 70.5039 11.9354 71.1149 12.5408C71.726 13.1462 72.5552 13.4882 73.4213 13.492H76.7155V20.2855H70.1656V23.5208H76.7203C77.5901 23.5208 78.4243 23.1799 79.0394 22.5732C79.6545 21.9665 80 21.1436 80 20.2855Z" fill="white"/><path d="M60.3262 23.2784H64.2609C65.1307 23.2784 65.9649 22.9376 66.58 22.3309C67.1951 21.7241 67.5406 20.9013 67.5406 20.0432V0H64.2609V20.048H60.3262V0H57.0513V20.048C57.0513 20.9047 57.3963 21.7264 58.0105 22.3323C58.6246 22.9381 59.4576 23.2784 60.3262 23.2784Z" fill="white"/><path d="M34.0982 23.2784H39.3477C40.2159 23.2772 41.0481 22.9364 41.662 22.3309C42.2759 21.7253 42.6213 20.9044 42.6226 20.048V3.23523C42.6226 2.37719 42.2771 1.5543 41.662 0.947577C41.0469 0.340854 40.2127 0 39.3429 0L34.0982 0C33.2292 0.00125876 32.3962 0.342668 31.7822 0.949255C31.1682 1.55584 30.8233 2.37802 30.8233 3.23523V20.048C30.8246 20.9044 31.17 21.7253 31.7839 22.3309C32.3978 22.9364 33.23 23.2772 34.0982 23.2784ZM34.0982 3.23048H39.3429V20.048H34.0982V3.23048Z" fill="white"/><path d="M17.0488 27.1646H0V30.3998H17.0488V27.1646Z" fill="white"/><path d="M79.9994 27.1646H19.6736V30.3998H79.9994V27.1646Z" fill="white"/></svg>
       </a>
 
@@ -92,14 +164,14 @@ navigationItems.forEach(item => {
               <li class="l-header__nav-item l-header__nav-item--divider"></li>
             ) : (
               <li class="l-header__nav-item js-hover-item" data-navi={item.navi}>
-                <a href={item.url}>{item.title}</a>
+                <a href={item.url} target={item.isBlank ? '_blank' : '_self'} rel={item.isBlank ? 'noopener noreferrer' : ''}>{item.title}</a>
               </li>
             )
           ))}
           <li class="l-header__nav-item js-lang" data-navi="lang">
-            <a href="/en/" class="js-lang-item" data-state="">EN</a>
+            <a href={languageLinks.en.url} class="js-lang-item" data-state={languageLinks.en.state}>EN</a>
             /
-            <a href="/" class="js-lang-item" data-state="current">JA</a>
+            <a href={languageLinks.ja.url} class="js-lang-item" data-state={languageLinks.ja.state}>JA</a>
           </li>
         </ul>
       </nav>
@@ -108,9 +180,9 @@ navigationItems.forEach(item => {
     <div class="l-header__inner-right">
       <!-- 言語切り替え -->
       <div class="l-header__lang js-hover js-lang">
-        <a href="/en/" class="l-header__lang-link js-lang-item js-hover-item" data-state="">EN</a>
+        <a href={languageLinks.en.url} class="l-header__lang-link js-lang-item js-hover-item" data-state={languageLinks.en.state}>EN</a>
         <span>/</span>
-        <a href="/" class="l-header__lang-link js-lang-item js-hover-item" data-state="current">JA</a>
+        <a href={languageLinks.ja.url} class="l-header__lang-link js-lang-item js-hover-item" data-state={languageLinks.ja.state}>JA</a>
       </div>
 
       <!-- ハンバーガーメニューボタン -->
@@ -120,7 +192,7 @@ navigationItems.forEach(item => {
       </button>
     </div>
   </div>
-  <Menu />
+  <Menu lang={lang} />
 </header>
 
 <style lang="scss">
@@ -154,7 +226,7 @@ navigationItems.forEach(item => {
     // height: 80px;
     height: 53.42px;
     padding-inline: 40px;
-    border-bottom: 2px solid var(--c-white);
+    border-bottom: 1px solid var(--c-white);
     background-color: var(--c-black-base);
     transition: background-color .3s ease-out, border-bottom-color .3s ease-out;
     @include me.sp {
@@ -203,8 +275,8 @@ navigationItems.forEach(item => {
     display: block;
     // width: 80px;
     // height: 30px;
-    width: 49px;
-    height: 19px;
+    width: 57px;
+    height: 22px;
     @include me.sp {
       width: 61px;
       height: 23px;

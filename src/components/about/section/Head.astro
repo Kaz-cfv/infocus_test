@@ -1,13 +1,30 @@
 ---
 import InfoList from '../parts/InfoList.astro';
 
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+
+// 言語別のテキスト定義
+const texts = {
+  ja: {
+    title: 'A digital branding studio<br>In Tokyo and New York',
+    description: 'IN FOCUSは、東京とニューヨークを拠点に活動するデジタルブランディングスタジオです。<br>多様な専門性を持つメンバーが企業やブランドの核にあるストーリーや独自性をコンセプトに、Web、映像、グラフィック、写真といった領域を横断し、新しい視点を提案します。'
+  },
+  en: {
+    title: 'A digital branding studio<br>In Tokyo and New York',
+    description: 'IN FOCUS is a digital branding studio based in Tokyo and New York.<br>Our diverse team of specialists work seamlessly between web, video, graphic, and photography disciplines to bring fresh perspectives to the core elements of our clients’ businesses—strengthening and expanding their brands, particularly across vital digital touchpoints.'
+  }
+};
+
 const info = {
   company: {
     slug: 'company',
     caption: 'COMPANY',
     list: [
       {
-        text: 'IN FOCUS株式会社',
+        text: lang === 'ja' ? 'IN FOCUS株式会社' : 'IN FOCUS Inc.',
       },
     ]
   },
@@ -16,7 +33,7 @@ const info = {
     caption: 'CEO',
     list: [
       {
-        text: '井口 忠正',
+        text: lang === 'ja' ? '井口 忠正' : 'Tadamasa Iguchi',
       },
     ],
   },
@@ -39,9 +56,69 @@ const info = {
     ],
   },
   branding: {
-    slug: 'branding',
-    caption: 'BRANDING',
+    slug: 'what_we_do',
+    caption: 'WHAT WE DO',
     list: [
+      {
+        text: 'Branding',
+      },
+      {
+        text: 'Strategy',
+      },
+      {
+        text: 'Creative Direction',
+      },
+      {
+        text: 'Art Direction',
+      },
+    ],
+  },
+  production: {
+    slug: 'production',
+    caption: '',
+    list: [
+      {
+        text: 'Photo Direction',
+      },
+      {
+        text: 'Web Design & Development',
+      },
+      {
+        text: 'Film Production',
+      },
+      {
+        text: 'Graphic Design',
+      },
+    ],
+  },
+  extras: {
+    slug: 'management',
+    caption: '',
+    list: [
+      {
+        text: 'Editorial Production',
+      },
+      {
+        text: 'Localization',
+      },
+      {
+        text: 'Social Media Management',
+      },
+      {
+        text: 'Creative Space Management',
+      },
+    ],
+  },
+  what_we_do_1: {
+    slug: 'what_1',
+    caption: 'WHAT WE DO',
+    list: [
+      {
+        text: 'Branding',
+      },
+      {
+        text: 'Strategy',
+      },
       {
         text: 'Creative Direction',
       },
@@ -52,17 +129,14 @@ const info = {
         text: 'Photo Direction',
       },
       {
-        text: 'Localization',
+        text: 'Web Design & Development',
       },
     ],
   },
-  production: {
-    slug: 'production',
-    caption: 'PRODUCTION',
+  what_we_do_2: {
+    slug: 'what_2',
+    caption: '',
     list: [
-      {
-        text: 'Web Design & Development',
-      },
       {
         text: 'Film Production',
       },
@@ -72,12 +146,9 @@ const info = {
       {
         text: 'Editorial Production',
       },
-    ],
-  },
-  extras: {
-    slug: 'extras',
-    caption: 'EXTRAS',
-    list: [
+      {
+        text: 'Localization',
+      },
       {
         text: 'Social Media Management',
       },
@@ -87,68 +158,74 @@ const info = {
     ],
   },
 }
+
+// 現在の言語のテキストを取得
+const currentTexts = texts[lang];
 ---
 
 <section class="p-about-head">
-  <h1 class="p-about-head__title">
-    A Digital Branding Studio<br>In Tokyo and New York
-  </h1>
+  <h1 class="p-about-head__title" set:html={currentTexts.title} data-lang={lang}></h1>
 
   <div class="p-about-head__content">
-    <p class="p-about-head__content-description">
-      IN FOCUSは、東京とニューヨークを拠点に活動するデジタルブランディングスタジオです。<br>
-      多様な専門性を持つメンバーが企業やブランドの核にあるストーリーや独自性をコンセプトに、Web、映像、グラフィック、写真といった領域を横断し、新しい視点を提案します。
-    </p>
+    <p class="p-about-head__content-description" set:html={currentTexts.description} data-lang={lang}></p>
     <figure class="p-about-head__content-pic">
       <img src="/common/images/about/graph.png" alt="">
     </figure>
 
     <div class="p-about-head__content-info">
-      <div class="p-about-head__content-infoRow">
-        <div class="p-about-head__content-infoItem" data-item={info.company.slug}>
-          <InfoList
-            caption={info.company.caption}
-            list={info.company.list}
-          />
-        </div>
-        <div class="p-about-head__content-infoItem" data-item={info.ceo.slug}>
-          <InfoList
-            caption={info.ceo.caption}
-            list={info.ceo.list}
-          />
-        </div>
-        <div class="p-about-head__content-infoItem" data-item={info.established.slug}>
-          <InfoList
-            caption={info.established.caption}
-            list={info.established.list}
-          />
-        </div>
-        <div class="p-about-head__content-infoItem" data-item={info.capital.slug}>
-          <InfoList
-            caption={info.capital.caption}
-            list={info.capital.list}
-          />
-        </div>
+      <div class="p-about-head__content-infoItem" data-item={info.company.slug}>
+        <InfoList
+          caption={info.company.caption}
+          list={info.company.list}
+        />
       </div>
-      <div class="p-about-head__content-infoRow">
-        <div class="p-about-head__content-infoItem" data-item={info.branding.slug}>
-          <InfoList
-            caption={info.branding.caption}
-            list={info.branding.list}
-          />
-        </div>
-        <div class="p-about-head__content-infoItem" data-item={info.production.slug}>
-          <InfoList
-            caption={info.production.caption}
-            list={info.production.list}
-          />
-        </div>
-        <div class="p-about-head__content-infoItem" data-item={info.extras.slug}>
-          <InfoList
-            caption={info.extras.caption}
-            list={info.extras.list}
-          />
-        </div>
+      <div class="p-about-head__content-infoItem" data-item={info.ceo.slug}>
+        <InfoList
+          caption={info.ceo.caption}
+          list={info.ceo.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.established.slug}>
+        <InfoList
+          caption={info.established.caption}
+          list={info.established.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.capital.slug}>
+        <InfoList
+          caption={info.capital.caption}
+          list={info.capital.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.branding.slug}>
+        <InfoList
+          caption={info.branding.caption}
+          list={info.branding.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.production.slug}>
+        <InfoList
+          caption={info.production.caption}
+          list={info.production.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.extras.slug}>
+        <InfoList
+          caption={info.extras.caption}
+          list={info.extras.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.what_we_do_1.slug}>
+        <InfoList
+          caption={info.what_we_do_1.caption}
+          list={info.what_we_do_1.list}
+        />
+      </div>
+      <div class="p-about-head__content-infoItem" data-item={info.what_we_do_2.slug}>
+        <InfoList
+          caption={info.what_we_do_2.caption}
+          list={info.what_we_do_2.list}
+        />
       </div>
     </div>
 
@@ -161,22 +238,26 @@ const info = {
 @use '../../../assets/scss/mixin' as mi;
 
 .p-about-head {
-  margin-block-start: 100px;
+  margin-block-start: 80px;
   padding-inline: 30px;
   padding-block-end: 156px;
+  @include me.pc {
+    max-width: 1440px;
+    margin-inline: auto;
+  }
   @include me.sp {
-    margin-block-start: 84px;
+    margin-block-start: 60px;
     padding-inline: 20px;
-    padding-block-end: 163px;
+    padding-block-end: 60px;
   }
 
   &__title {
-    font-size: 9.2rem;
+    font-size: 8.8rem;
     font-weight: 600;
     letter-spacing: -.02rem;
-    line-height: 1.1;
+    line-height: 1.35;
     @include me.sp {
-      font-size: 3rem;
+      font-size: 2.8rem;
       line-height: 1.4;
     }
   }
@@ -184,27 +265,36 @@ const info = {
   &__content {
     display: grid;
     grid-template-columns: 100%;
-    margin-block-start: 80px;
+    margin-block-start: 40px;
     @include me.pc {
       align-items: flex-end;
       grid-template-columns: 1fr 496px;
       column-gap: 143px;
-      row-gap: 120px;
+      row-gap: 80px;
+    }
+    @media (max-width: 1399px) {
+      grid-template-columns: 53.1vw 1fr;
+    }
+    @media (max-width: 959px) {
+      grid-template-columns: 100%;
     }
     @include me.sp {
-      row-gap: 54px;
+      row-gap: 60px;
       margin-block-start: 50px;
     }
 
     &-description {
       font-family: var(--f-jp);
-      font-size: 1.5rem;
-      line-height: 1.8;
+      font-size: 1.6rem;
+      line-height: 2;
       @include me.pc {
         max-width: 793px;
       }
       @include me.sp {
         font-size: 1.4rem;
+      }
+      &[data-lang="en"] {
+        font-family: var(--f-en);
       }
     }
 
@@ -214,16 +304,20 @@ const info = {
         grid-row: 1 / 3;
       }
       @include me.sp {
-        margin-inline: 60px;
+        margin-inline: 12px;
       }
     }
 
     &-info {
       display: grid;
       @include me.pc {
-        row-gap: 80px;
+        grid-template-columns: repeat(4, max-content);
+        column-gap: 74px;
+        row-gap: 50px;
       }
       @include me.sp {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 11px;
         row-gap: 32px;
       }
     }
@@ -244,30 +338,21 @@ const info = {
 
   &__content-infoItem {
     @include me.pc {
-      &[data-item="company"],
-      &[data-item="branding"] {
-        width: 127px;
-        margin-inline-end: 115px;
-      }
-      &[data-item="ceo"],
-      &[data-item="established"] {
-        width: calc(188px * .5);
-      }
-      &[data-item="established"] {
-        margin-inline-end: 48px;
-        .c-infoList {
-          grid-template-columns: max-content;
-          justify-content: flex-end;
-        }
-      }
       &[data-item="production"] {
-        width: 188px;
-        margin-inline-end: 48px;
+        grid-column: 2 / 4;
+      }
+      &[data-item="what_1"],
+      &[data-item="what_2"] {
+        display: none;
+      }
+    }
+    @include me.sp {
+      &[data-item="what_we_do"],
+      &[data-item="production"],
+      &[data-item="management"] {
+        display: none;
       }
     }
   }
-
-
 }
-
 </style>

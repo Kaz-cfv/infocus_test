@@ -1,29 +1,18 @@
 ---
 import ProjectCard from "../parts/ProjectCard.astro";
 
-// Props型定義 - 空のPropsでクライアントサイドで動的に設定
-export interface Props {}
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
 ---
 <section class="p-home-projects">
-  <!-- <ul class="p-home-projects__list --pickup">
-    {pickup.map((project) => (
-      <li class="p-home-projects__card">
-        <ProjectCard
-          id={project.id}
-          title={project.title}
-          tags={project.tags}
-          imageSrc={project.imageSrc}
-          type={project.type}
-          url={project.url}
-        />
-      </li>
-    ))}
-  </ul> -->
-  <ul class="p-home-projects__list" id="projectsList">
+  <ul class="p-home-projects__list" id="projectsList" data-language="{lang}">
     <!-- プロジェクトはクライアントサイドで動的に追加される前の初期表示 -->
   </ul>
   <div class="p-home-projects__link">
-    <a href="/projects/">
+    <a href=`${currentUrl}projects/`>
       ALL PROJECTS
       <span><svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 14.1601L23.7876 14.1601C20.713 11.3362 15.4539 6.21272 12.177 3.02567L15.2111 0L32 16.4193V16.5L15.2111 33L12.177 29.813C15.4539 26.6663 20.713 21.5024 23.7876 18.6785H0L0 14.1601Z" fill="white"/></svg></span>
     </a>
@@ -32,9 +21,62 @@ export interface Props {}
 
 <!-- クライアントサイドでAPIデータを受け取る -->
 <script>
+  import { VideoScrollController } from '../../../assets/js/modules/VideoScrollController'; // 適切なパスに変更してください
+
+  // VideoScrollControllerのインスタンスを保持
+  let videoController = null;
+
+  /**
+   * 現在の言語を検出（公安の情報分析のように正確に）
+   */
+  function detectCurrentLanguage() {
+    // data-language属性から取得を試みる
+    const projectsList = document.getElementById('projectsList');
+    if (projectsList) {
+      const langAttr = projectsList.getAttribute('data-language');
+      if (langAttr && (langAttr === 'en' || langAttr === 'ja')) {
+        return langAttr;
+      }
+    }
+
+    // フォールバック: URLから検出
+    return window.location.pathname.includes('/en/') ? 'en' : 'ja';
+  }
+
+  /**
+   * 言語に応じたプロジェクトURLを生成
+   * @param {string} slug - プロジェクトのスラッグ
+   * @returns {string} 適切な言語パスのURL
+   */
+  function getLocalizedProjectURL(slug) {
+    const currentLanguage = detectCurrentLanguage();
+
+    if (currentLanguage === 'en') {
+      return `/en/projects/${slug}`;
+    } else {
+      return `/projects/${slug}`;
+    }
+  }
+
+  /**
+   * 言語に応じたタグフィルターURLを生成
+   * @param {string} tagSlug - タグのスラッグ
+   * @returns {string} 適切な言語パスのタグフィルターURL
+   */
+  function getLocalizedTagURL(tagSlug) {
+    const currentLanguage = detectCurrentLanguage();
+
+    if (currentLanguage === 'en') {
+      return `/en/projects/?category=${tagSlug}`;
+    } else {
+      return `/projects/?category=${tagSlug}`;
+    }
+  }
+
   // カスタムイベントでAPIデータを受け取る
   document.addEventListener('homeDataLoaded', (event) => {
     const homeData = (event as CustomEvent).detail;
+    const currentLanguage = detectCurrentLanguage();
 
     // プロジェクトデータを処理
     let projectsData = [];
@@ -58,7 +100,8 @@ export interface Props {}
           imageSrc: '',
           videoSrc: '',
           tags: [],
-          isMobile: pickupItem.is_mobile !== false
+          isMobile: pickupItem.is_mobile !== false,
+          language: currentLanguage // 言語情報を追加
         };
 
         if (pickupItem.acf_fc_layout === 'post') {
@@ -66,14 +109,14 @@ export interface Props {}
           const post = pickupItem.post || {};
           const acfs = post.acfs || {};
 
-          // タグ情報の処理
+          // タグ情報の処理（言語対応版） -> 中身はカテゴリ
           const tags = [];
-          if (acfs.tags && Array.isArray(acfs.tags)) {
-            acfs.tags.forEach(tagItem => {
-              if (tagItem.terms && tagItem.terms.name) {
+          if (acfs.category && Array.isArray(acfs.category)) {
+            acfs.category.forEach(categoryItem => {
+              if (categoryItem.name) {
                 tags.push({
-                  name: tagItem.terms.name,
-                  url: `/projects/?tag=${tagItem.terms.slug || ''}`
+                  name: categoryItem.name,
+                  url: getLocalizedTagURL(categoryItem.slug || '') // 言語対応版URL
                 });
               }
             });
@@ -82,12 +125,13 @@ export interface Props {}
           mappedData = {
             cardType: 'post',
             id: post.ID || 0,
-            url: `/projects/${post.post_name || ''}`,
+            url: getLocalizedProjectURL(post.post_name || ''), // 言語対応版URL
             title: post.post_title || '',
             imageSrc: post.acfs?.main?.image?.url || '',
             videoSrc: '',
             tags: tags,
-            isMobile: pickupItem.is_mobile !== false
+            isMobile: pickupItem.is_mobile !== false,
+            language: currentLanguage
           };
 
         } else if (pickupItem.acf_fc_layout === 'image') {
@@ -95,13 +139,14 @@ export interface Props {}
           mappedData = {
             cardType: 'image',
             id: pickupItem.image?.ID || 0,
-            url: pickupItem.link || '#',
+            url: pickupItem.link.url || '#', // 外部リンクはそのまま
             title: pickupItem.image?.title || '',
             imageSrc: pickupItem.image?.url || '',
             videoSrc: '',
             tags: [],
             type: 'cover',
-            isMobile: pickupItem.is_mobile !== false
+            isMobile: pickupItem.is_mobile !== false,
+            language: currentLanguage
           };
 
         } else if (pickupItem.acf_fc_layout === 'movie') {
@@ -109,20 +154,21 @@ export interface Props {}
           mappedData = {
             cardType: 'movie',
             id: pickupItem.image?.ID || 0,
-            url: pickupItem.link || '#',
+            url: pickupItem.link.url || '#', // 外部リンクはそのまま
             title: pickupItem.image?.title || '',
             imageSrc: '',
             videoSrc: pickupItem.file || '',
             tags: [],
             type: 'cover',
-            isMobile: pickupItem.is_mobile !== false
+            isMobile: pickupItem.is_mobile !== false,
+            language: currentLanguage
           };
         }
 
         return mappedData;
       });
 
-      // console.log('🚀 プロジェクトデータ取得:', projectsData.length + '件');
+      // console.log(`🚀 プロジェクトデータ取得 (${currentLanguage}):`, projectsData.length + '件');
     }
 
     // プロジェクトデータをグローバルに保存
@@ -140,13 +186,13 @@ export interface Props {}
       projectsList.innerHTML = projectsData.map(project => {
         const mobileClass = project.isMobile ? '' : 'sp-hidden';
         const tagsHtml = project.tags.map((tag, index) => {
-          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator">,</span>' : '';
+          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator js-hover-item">,</span>' : '';
           return `<a href="${tag.url}" class="c-project-card__category js-hover-item">${tag.name}</a>${separator}`;
         }).join('');
 
         return `
-          <li class="p-home-projects__card ${mobileClass}">
-            <div class="c-project-card" data-id="${project.id}" data-type="${project.type || project.cardType}">
+          <li class="p-home-projects__card ${mobileClass}" data-language="${project.language}">
+            <div class="c-project-card mouse-over" data-id="${project.id}" data-type="${project.type || project.cardType}">
               <a href="${project.url}" class="c-project-card__image-wrapper">
                 ${project.videoSrc ?
                   `<video src="${project.videoSrc}" class="c-project-card__video" muted loop playsinline preload="metadata"></video>` :
@@ -154,7 +200,9 @@ export interface Props {}
                 }
               </a>
               <div class="c-project-card__content">
-                <h3 class="c-project-card__title">${project.title}</h3>
+                <h3 class="c-project-card__title">
+                  <a href=${project.url}>${project.title}</a>
+                </h3>
                 <div class="c-project-card__tags js-hover">
                   ${tagsHtml}
                 </div>
@@ -164,49 +212,90 @@ export interface Props {}
         `;
       }).join('');
 
-      // DOM生成完了後にNavigationHoverを適用
+      // console.log(`✅ Home project links updated for ${currentLanguage} language`);
+
+      // DOM生成完了後の処理を統合
       setTimeout(() => {
-        // NavigationHoverの再初期化イベントを発火
-        const hoverEvent = new CustomEvent('reinitializeHover', {
-          detail: { element: projectsList }
-        });
-        document.dispatchEvent(hoverEvent);
+        // VideoScrollControllerを初期化
+        initializeVideoController();
 
-        // グローバルなNavigationHoverインスタンスが存在する場合、直接初期化
-        if (window.navigationHover && typeof window.navigationHover.initializeInElement === 'function') {
-          window.navigationHover.initializeInElement(projectsList);
+        // NavigationHoverの再初期化
+        initializeNavigationHover(projectsList);
+
+      }, 100);
+    }
+  });
+
+  /**
+   * VideoScrollControllerの初期化
+   * 動的に生成されたカード後に実行される
+   */
+  function initializeVideoController() {
+    try {
+      // 既存のインスタンスがあれば破棄
+      if (videoController) {
+        if (typeof videoController.destroy === 'function') {
+          videoController.destroy();
         }
+      }
 
-        // 手動でホバー処理を追加
-        const hoverContainers = projectsList.querySelectorAll('.js-hover');
-        hoverContainers.forEach((container) => {
-          const items = container.querySelectorAll('.js-hover-item');
-          items.forEach((item) => {
-            item.addEventListener('mouseenter', (e) => {
-              const hoveredItem = e.currentTarget as HTMLElement;
-              hoveredItem.classList.add('is-hovered');
+      // 新しいVideoScrollControllerインスタンスを作成
+      videoController = new VideoScrollController();
+    } catch (error) {
+      console.error('❌ VideoScrollController initialization failed:', error);
+    }
+  }
 
-              items.forEach(siblingItem => {
-                if (siblingItem !== hoveredItem) {
-                  (siblingItem as HTMLElement).classList.add('is-dimmed');
-                }
-              });
-            });
+  /**
+   * NavigationHoverの初期化
+   * 既存のロジックを関数化
+   */
+  function initializeNavigationHover(projectsList) {
+    // NavigationHoverの再初期化イベントを発火
+    const hoverEvent = new CustomEvent('reinitializeHover', {
+      detail: { element: projectsList }
+    });
+    document.dispatchEvent(hoverEvent);
 
-            item.addEventListener('mouseleave', (e) => {
-              const leftItem = e.currentTarget as HTMLElement;
-              leftItem.classList.remove('is-hovered');
+    // グローバルなNavigationHoverインスタンスが存在する場合、直接初期化
+    if (window.navigationHover && typeof window.navigationHover.initializeInElement === 'function') {
+      window.navigationHover.initializeInElement(projectsList);
+    }
 
-              items.forEach(siblingItem => {
-                if (siblingItem !== leftItem) {
-                  (siblingItem as HTMLElement).classList.remove('is-dimmed');
-                }
-              });
-            });
+    // 手動でホバー処理を追加
+    const hoverContainers = projectsList.querySelectorAll('.js-hover');
+    hoverContainers.forEach((container) => {
+      const items = container.querySelectorAll('.js-hover-item');
+      items.forEach((item) => {
+        item.addEventListener('mouseenter', (e) => {
+          const hoveredItem = e.currentTarget as HTMLElement;
+          hoveredItem.classList.add('is-hovered');
+
+          items.forEach(siblingItem => {
+            if (siblingItem !== hoveredItem) {
+              (siblingItem as HTMLElement).classList.add('is-dimmed');
+            }
           });
         });
 
-      }, 100);
+        item.addEventListener('mouseleave', (e) => {
+          const leftItem = e.currentTarget as HTMLElement;
+          leftItem.classList.remove('is-hovered');
+
+          items.forEach(siblingItem => {
+            if (siblingItem !== leftItem) {
+              (siblingItem as HTMLElement).classList.remove('is-dimmed');
+            }
+          });
+        });
+      });
+    });
+  }
+
+  // ページがアンロードされる時にVideoControllerをクリーンアップ
+  window.addEventListener('beforeunload', () => {
+    if (videoController && typeof videoController.destroy === 'function') {
+      videoController.destroy();
     }
   });
 </script>
@@ -237,7 +326,40 @@ export interface Props {}
   &__card {
     border-right: solid 1px var(--c-gray02);
     border-bottom: solid 1px var(--c-gray02);
-    border-left: solid 1px var(--c-gray02);
+    // border-left: solid 1px var(--c-gray02);
+    @include me.pc {
+      &:first-child,
+      &:nth-child(2) {
+        border-top: none;
+      }
+      &:nth-child(4n+6) {
+        border-right-color: transparent;
+      }
+    }
+    @include me.sp {
+      &:first-child,
+      &:nth-child(2),
+      &:nth-child(2n) {
+        border-right: none;
+      }
+    }
+
+    &:first-child {
+      @include me.pc {
+        grid-column: 1 / 3;
+      }
+      @include me.sp {
+        grid-column: 1 / 3;
+      }
+    }
+    &:nth-child(2) {
+      @include me.pc {
+        grid-column: 3 / 5;
+      }
+      @include me.sp {
+        grid-column: 1 / 3;
+      }
+    }
 
     &.sp-hidden {
       @include me.sp {
@@ -247,18 +369,18 @@ export interface Props {}
 
     &:nth-child(4n) {
       @include me.pc {
-        border-right-color: transparent;
+        // border-right-color: transparent;
       }
     }
     &:nth-child(2n) {
       @include me.sp {
-        border-right-color: transparent;
+        // border-right-color: transparent;
       }
     }
   }
 
   &__link {
-    border-top: solid 2px var(--c-white);
+    border-top: solid 1px var(--c-white);
 
     a {
       display: flex;
@@ -267,7 +389,7 @@ export interface Props {}
       column-gap: 27px;
       padding-block: 72px;
       color: var(--c-white);
-      font-size: 5.8rem;
+      font-size: 5.2rem;
       font-weight: 700;
       @include me.sp {
         column-gap: 14px;
@@ -297,13 +419,30 @@ export interface Props {}
   transition: opacity 0.3s ease-out;
   height: 100%;
 
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-project-card__image-wrapper {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(7px);
+        }
+
+        .c-project-card__image,
+        .c-project-card__video {
+          // 画像自体を拡大（360px → 368px相当）
+          // transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
+  }
+
   &[data-type="cover"] {
     height: 100%;
   }
 
   &:not([data-type="cover"]) {
     @include me.pc {
-      padding-bottom: 78px;
+      padding-bottom: 40px;
     }
     @include me.sp {
       padding-bottom: 7.701vw;
@@ -323,6 +462,8 @@ export interface Props {}
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
     @at-root [data-type="pickup"] & {
       @include me.pc {
         margin-top: 30px;
@@ -347,7 +488,7 @@ export interface Props {}
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
     @include me.sp {
       aspect-ratio: 16 / 9;
     }
@@ -358,7 +499,7 @@ export interface Props {}
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
     z-index: 2;
     @at-root .c-project-card.is-play & {
       opacity: 1;
@@ -383,17 +524,19 @@ export interface Props {}
   }
 
   &__title {
-    color: var(--c-white);
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 2.32rem;
-    @include me.sp {
-      font-size: 1.4rem;
-    }
-    @at-root [data-type="pickup"] & {
-      font-size: 2rem;
+    a {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 2.32rem;
       @include me.sp {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
+      }
+      @at-root [data-type="pickup"] & {
+        font-size: 2rem;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
       }
     }
   }

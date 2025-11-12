@@ -19,12 +19,12 @@ const { creditData } = Astro.props;
 @use '../../../assets/scss/mixin' as mi;
 
 .p-project-detail__credit {
+  margin-block-start: 56px;
   @include me.pc {
-    margin-inline-start: 116px;
-    margin-block-start: 80px;
-  }
-  @include me.sp {
-    margin-block-start: 50px;
+    // margin-inline-start: 116px;
+    max-width: calc(44.5vw + (16px * 2));
+    margin-inline: auto;
+    padding-inline: 32px;
   }
 
   &-title {
@@ -54,11 +54,12 @@ const { creditData } = Astro.props;
 
   dl {
     display: grid;
-    grid-template-columns: 146px 1fr;
+    grid-template-columns: 210px 1fr;
     align-content: flex-start;
     column-gap: 60px;
     row-gap: 12px;
     @include me.sp {
+      grid-template-columns: 130px 1fr;
       column-gap: 32px;
     }
   }

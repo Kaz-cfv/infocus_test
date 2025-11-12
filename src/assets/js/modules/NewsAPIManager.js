@@ -1,59 +1,166 @@
 /**
  * News API Manager
  * WordPress APIからニュースデータを取得し、動的にコンポーネントに渡す
- * 公安の情報収集システムのように確実にデータを取得する
  */
 
 export class NewsAPIManager {
   constructor() {
-    this.apiEndpoint = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/news?per_page=50';
+    this.baseEndpoint = 'https://infocus.wp.site-prev2.com/wp-json/wp/v2/news';
+    this.currentLanguage = this.detectLanguage();
     this.cache = new Map();
     this.isLoading = false;
 
-    // ページネーション設定（公安の情報管理システムのように精密に）
+    // ページネーション設定
     this.paginationConfig = {
-      pickupCount: 3,        // ピックアップエリア: 1-3件目
-      mainPageSize: 14,      // メインリスト1ページ: 4-17件目（14件）
-      totalPerPage: 17       // 1ページあたりの総件数
+      itemsPerPage: 14,      // 1ページあたり14件
+      currentPage: 1,        // 現在のページ
+      skipCount: 4          // 先頭から除外する件数 (固定1件 + リスト3件 = 4件)
     };
+
+    // エンドポイントは設定完了後に構築
+    this.apiEndpoint = this.buildAPIEndpoint();
+
+    // 固定ピックアップ記事のIDを格納
+    this.fixedPickupId = null;
+  }
+
+  /**
+   * 現在の言語を検出
+   */
+  detectLanguage() {
+    if (typeof window !== 'undefined' && window.location) {
+      const currentPath = window.location.pathname;
+      return currentPath.includes('/en/') ? 'en' : 'ja';
+    }
+    return 'ja';
+  }
+
+  /**
+   * 言語に応じたAPIエンドポイントを構築
+   * offsetパラメータで先頭4件をスキップ
+   */
+  buildAPIEndpoint() {
+    const langParam = `lang=${this.currentLanguage}`;
+    const perPageParam = `per_page=${this.paginationConfig.itemsPerPage}`;
+
+    // スキップすべき合計記事数
+    const offset = this.paginationConfig.skipCount + (this.paginationConfig.currentPage - 1) * this.paginationConfig.itemsPerPage;
+    const offsetParam = `offset=${offset}`;
+
+    return `${this.baseEndpoint}?${langParam}&${perPageParam}&${offsetParam}`;
+  }
+
+  /**
+   * 言語に応じたニュース詳細URLを生成
+   */
+  getLocalizedNewsURL(slug) {
+    if (this.currentLanguage === 'en') {
+      return `/en/news/${slug}`;
+    } else {
+      return `/news/${slug}`;
+    }
   }
 
   /**
    * 初期化処理
-   * まるで事件の初動捜査のような慎重さで
    */
   async init() {
-    console.log('📡 NewsAPIManager: データ取得開始...');
-
     try {
-      // APIからニュースデータを取得
-      const newsData = await this.fetchNewsData();
+      // 1. 固定ピックアップ記事のIDを取得 (API-1のみ利用)
+      if (this.paginationConfig.currentPage === 1) {
+          await this.fetchFixedPickupId();
+      }
 
-      // コンポーネントに動的にPropsを渡す
-      await this.renderNewsComponents(newsData);
+      // ページネーション更新: currentPage が変わった場合は endpoint を更新
+      this.apiEndpoint = this.buildAPIEndpoint();
 
-      console.log('✅ NewsAPIManager: データ取得・表示完了');
+      // 2. メインニュースデータとリストピックアップデータを取得
+      const { fixedNewsItem, listPickupData, mainNewsData } = await this.fetchNewsDataAndSeparate();
 
-      return newsData;
+      // 3. 固定ピックアップエリアを描画 (1ページ目のみ)
+      if (this.paginationConfig.currentPage === 1 && fixedNewsItem) {
+          this.appendToFixedPickupArea(fixedNewsItem);
+      } else if (this.paginationConfig.currentPage > 1) {
+          this.removeFixedPickupSkeleton();
+      }
+
+      // 4. ピックアップリスト（残り3件）を描画 (1ページ目のみ)
+      if (this.paginationConfig.currentPage === 1) {
+          this.renderPickupListArea(listPickupData);
+      } else if (this.paginationConfig.currentPage > 1) {
+          this.removeListPickupSkeleton();
+      }
+
+      // 5. メインリストを描画
+      await this.renderNewsComponents(mainNewsData);
+
+      return mainNewsData;
 
     } catch (error) {
-      console.error('❌ NewsAPIManager: データ取得に失敗', error);
+      console.error(`❌ NewsAPIManager: データ取得に失敗 (${this.currentLanguage})`, error);
       this.handleError(error);
       return [];
     }
   }
 
   /**
-   * WordPress APIからニュースデータを取得
-   * 公安の情報網のように確実に
+   * 固定ピックアップ記事のIDを取得（API-1: infocus/v1/options/news）
+   */
+  async fetchFixedPickupId() {
+    const fixedPickupEndpoint = 'https://infocus.wp.site-prev2.com/wp-json/infocus/v1/options/news';
+
+    try {
+      const response = await fetch(fixedPickupEndpoint, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Fixed Pickup API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const rawData = await response.json();
+      let rawFixedNewsItem = null;
+
+      // API-1のレスポンス構造: { home: { pickup_news: [...] } } からIDを抽出
+      if (rawData?.home?.pickup_news && Array.isArray(rawData.home.pickup_news) && rawData.home.pickup_news.length > 0) {
+        rawFixedNewsItem = rawData.home.pickup_news[0];
+      }
+
+      if (rawFixedNewsItem?.ID) {
+          this.fixedPickupId = rawFixedNewsItem.ID;
+          // console.log(`✅ Fixed Pickup ID found: ${this.fixedPickupId}`);
+      } else {
+          // console.warn('⚠️ 固定ピックアップIDが見つかりません。');
+      }
+
+    } catch (error) {
+      console.error('❌ 固定ピックアップID取得エラー:', error);
+    }
+  }
+
+  /**
+   * WordPress APIからメインリストのデータ（offset適用済み）を取得
+   * ページネーションマネージャーが依存しているため、このメソッドを再定義
    */
   async fetchNewsData() {
-    if (this.isLoading) {
-      console.log('⏳ 既にデータ取得中...');
-      return this.cache.get('newsData') || [];
+    // キャッシュロジックは省略し、直接メインリストを取得する新しいメソッドを呼び出す
+    try {
+        return await this.fetchMainNewsList();
+    } catch (error) {
+        console.error(`🚨 fetchNewsDataエラー:`, error);
+        throw error;
     }
+  }
 
-    this.isLoading = true;
+  /**
+   * メインリスト用データ取得 (オフセット適用済み)
+   */
+  async fetchMainNewsList() {
+    const cacheKey = `newsData_${this.currentLanguage}_page_${this.paginationConfig.currentPage}`;
+
+    // APIエンドポイントが最新か確認
+    this.apiEndpoint = this.buildAPIEndpoint();
 
     try {
       const response = await fetch(this.apiEndpoint, {
@@ -69,288 +176,408 @@ export class NewsAPIManager {
       }
 
       const rawData = await response.json();
-
-      // デバッグ用: 生データの構造をログ出力（公安の情報分析のように）
-      console.log('🔍 APIレスポンスのサンプルデータ:', {
-        total: rawData.length,
-        firstItem: rawData[0] ? {
-          id: rawData[0].id,
-          title: rawData[0].title,
-          slug: rawData[0].slug,
-          acfs_structure: rawData[0].acfs ? Object.keys(rawData[0].acfs) : null,
-          taxonomy_structure: rawData[0].taxonomy ? Object.keys(rawData[0].taxonomy) : null,
-          news_categories: rawData[0].taxonomy?.news || null
-        } : null
-      });
-
-      // データを整形（まるで証拠を整理するように）
       const formattedData = this.formatNewsData(rawData);
 
-      // 整形後のデータ品質をチェック（赤井のような丁寧さで）
-      console.log('✨ データ整形結果:', {
-        original_count: rawData.length,
-        formatted_count: formattedData.length,
-        sample_formatted: formattedData[0] || null,
-        categories_found: [...new Set(formattedData.map(item => item.category))],
-        missing_images: formattedData.filter(item => item.pic === '/common/images/news/default.png').length
-      });
-
       // キャッシュに保存
-      this.cache.set('newsData', formattedData);
-      this.cache.set('lastFetch', Date.now());
+      this.cache.set(cacheKey, formattedData);
+      this.cache.set(`lastFetch_${this.currentLanguage}`, Date.now());
 
       return formattedData;
 
     } catch (error) {
-      console.error('🔍 API取得エラーの詳細:', error);
+      console.error(`🚨 メインリスト取得エラーの詳細 (${this.currentLanguage}):`, error);
       throw error;
-    } finally {
-      this.isLoading = false;
     }
+  }
+
+  /**
+   * メインAPI (API-2) から全データを取得し、固定・リスト・メインに分離
+   */
+  async fetchNewsDataAndSeparate() {
+    const langParam = `lang=${this.currentLanguage}`;
+
+    let listPlusData = [];
+    if (this.paginationConfig.currentPage === 1) {
+        // 1. ピックアップ用 (固定 + リスト3件) のデータ取得
+        const pickupLimit = this.fixedPickupId ? 10 : 4;
+        const listEndpoint = `${this.baseEndpoint}?${langParam}&per_page=${pickupLimit}&page=1`;
+
+        const rawListPlusData = await fetch(listEndpoint).then(res => res.json());
+        listPlusData = this.formatNewsData(rawListPlusData);
+    }
+
+    // 2. メインリスト用データ取得 (fetchMainNewsListを使用)
+    const formattedMainListData = await this.fetchMainNewsList();
+
+    let fixedNewsItem = null;
+    let listPickupData = [];
+
+    if (this.paginationConfig.currentPage === 1) {
+        if (this.fixedPickupId) {
+            // 固定記事を抽出
+            fixedNewsItem = listPlusData.find(item => item.id.toString() === this.fixedPickupId.toString());
+
+            // 固定記事を除いた最新記事からリストピックアップ記事（3件）を決定
+            const nonFixedNews = listPlusData.filter(item => item.id.toString() !== this.fixedPickupId.toString());
+            listPickupData = nonFixedNews.slice(0, 3);
+
+        } else {
+            // 固定記事がない場合、最新の1件目を固定エリアに、2-4件目をリストエリアに
+            fixedNewsItem = listPlusData[0];
+            listPickupData = listPlusData.slice(1, 4);
+        }
+    }
+
+    return {
+      fixedNewsItem,
+      listPickupData,
+      mainNewsData: formattedMainListData
+    };
   }
 
   /**
    * APIから取得したデータをコンポーネント用に整形
-   * 赤井の几帳面さで丁寧に処理（実際のデータ構造に合わせて修正）
    */
   formatNewsData(rawData) {
+    if (!Array.isArray(rawData)) return [];
+
     return rawData.map(item => {
       // 日付をフォーマット
-      const date = new Date(item.date);
-      const formattedDate = date.toLocaleDateString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).replace(/\//g, '.');
+      const date = new Date(item.date || item.post_date);
+      let formattedDate;
 
-      // カテゴリー情報を取得（taxonomy.newsから）
-      const newsCategories = item.taxonomy?.news || [];
-      const primaryCategory = newsCategories[0] || { name: 'その他', slug: 'other' };
-
-      // アイキャッチ画像の処理（acfs.news_mv.urlから取得）
-      let featuredImage = '/common/images/news/default.png'; // デフォルト画像
-      if (item.acfs?.news_mv?.url) {
-        featuredImage = item.acfs.news_mv.url;
+      if (this.currentLanguage === 'en') {
+        formattedDate = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).replace(/\//g, '.');
+      } else {
+        formattedDate = date.toLocaleDateString('ja-JP', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).replace(/\//g, '.');
       }
 
-      // タイトルの処理（title.renderedまたは文字列）
-      let newsTitle = 'タイトルなし';
+      // カテゴリー情報を取得
+      const newsCategories = item.taxonomy?.news || item.categories || [];
+      const primaryCategory = Array.isArray(newsCategories) ? newsCategories[0] : newsCategories;
+
+      const categoryName = primaryCategory?.name || (this.currentLanguage === 'en' ? 'Other' : 'その他');
+      const categorySlug = primaryCategory?.slug || 'other';
+
+      // アイキャッチ画像の処理 (medium_largeとlargeを確実に取得)
+      let featuredImageFallback = 'placeholder-url.jpg';
+      let featuredImageMediumLarge = 'placeholder-url.jpg';
+      let featuredImageLarge = 'placeholder-url.jpg';
+      let imageObject = null;
+
+      // 1. API-2 形式 (ACF: item.acfs.news_mv) を試す
+      if (item.acfs?.news_mv?.url) {
+        imageObject = item.acfs.news_mv;
+      }
+
+      // 2. API-1/API-2 共通のカスタム形式 (item.image) を試す
+      if (!imageObject && item.image?.url) {
+          imageObject = item.image;
+      }
+
+      // 画像オブジェクトから medium_large と large を抽出
+      if (imageObject) {
+          const sizes = imageObject.sizes;
+          const originalUrl = imageObject.url || 'placeholder-url.jpg';
+
+          // large (PC用) を取得
+          featuredImageLarge = sizes?.large?.url || originalUrl;
+
+          // medium_large (SP/Fallback用) を取得
+          featuredImageMediumLarge = sizes?.medium_large?.url || originalUrl;
+
+          // フォールバックを設定
+          featuredImageFallback = originalUrl;
+      }
+
+      // 3. その他のフラットな画像URLを試す (念のため)
+      if (featuredImageMediumLarge === 'placeholder-url.jpg') {
+          const flatUrl = item.featured_image_url || item.image_url || '';
+          if (flatUrl) {
+              featuredImageMediumLarge = flatUrl;
+              featuredImageLarge = flatUrl;
+              featuredImageFallback = flatUrl;
+          }
+      }
+
+      // タイトルの処理
+      let newsTitle = this.currentLanguage === 'en' ? 'No Title' : 'タイトルなし';
       if (typeof item.title === 'string') {
         newsTitle = item.title;
       } else if (item.title?.rendered) {
         newsTitle = item.title.rendered;
+      } else if (item.post_title) { // カスタムレスポンスの場合
+        newsTitle = item.post_title;
       }
+
+
+      // スラッグの処理
+      const newsSlug = item.slug || item.post_name || 'no-slug';
 
       return {
-        id: item.id,
+        id: item.id || item.ID,
         title: newsTitle,
         date: formattedDate,
-        category: primaryCategory.name,
-        categorySlug: primaryCategory.slug,
-        url: `/news/${item.slug}`, // slugを使ってURL構築
-        pic: featuredImage,
-        slug: item.slug,
+        category: categoryName,
+        categorySlug: categorySlug,
+        url: this.getLocalizedNewsURL(newsSlug),
+        picMediumLarge: featuredImageMediumLarge,
+        picLarge: featuredImageLarge,
+        picFallback: featuredImageFallback,
+        slug: newsSlug,
         excerpt: item.excerpt?.rendered || '',
         content: item.content?.rendered || '',
-        rawData: item // デバッグ用に生データも保持
+        language: this.currentLanguage,
+        rawData: item
       };
     }).filter(item => {
-      // 必要な情報が揃っているもののみフィルタ
-      return item.id && item.title && item.slug;
+      // ID、タイトル、スラッグ、有効な画像URLがあることを確認
+      return item.id && item.title && item.slug && item.picMediumLarge !== 'placeholder-url.jpg' && item.picLarge !== 'placeholder-url.jpg';
     });
   }
 
   /**
-   * ピックアップニュースを特定（3件）
-   * 組織の重要情報を選別するように
+   * 固定ピックアップエリアのスケルトンを削除
    */
-  getPickupNews(newsData, currentPage = 1) {
-    // 1ページ目のみピックアップを表示
-    if (currentPage !== 1) {
-      return [];
-    }
-
-    // 最新、3件をピックアップとして取得
-    return newsData
-      .sort((a, b) => new Date(b.rawData.date) - new Date(a.rawData.date))
-      .slice(0, this.paginationConfig.pickupCount);
-  }
-
-  /**
-   * メインリスト用ニュースを取得（ページネーション対応）
-   * 公安の情報管理のように精密に分類
-   */
-  getMainNews(newsData, currentPage = 1) {
-    const sorted = newsData.sort((a, b) => new Date(b.rawData.date) - new Date(a.rawData.date));
-
-    if (currentPage === 1) {
-      // 1ページ目: 4-17件目（14件）
-      return sorted.slice(
-        this.paginationConfig.pickupCount, // 3件目の次から
-        this.paginationConfig.totalPerPage  // 17件目まで
-      );
-    } else {
-      // 2ページ目以降: 18件目以降
-      const startIndex = this.paginationConfig.totalPerPage + ((currentPage - 2) * this.paginationConfig.mainPageSize);
-      const endIndex = startIndex + this.paginationConfig.mainPageSize;
-
-      return sorted.slice(startIndex, endIndex);
-    }
-  }
-
-  /**
-  * 動的にNewsコンポーネントを描画
-  * まるで証拠を整理して事件の全体像を組み立てるように
-  */
-  async renderNewsComponents(newsData, currentPage = 1) {
-  console.log('🎨 コンポーネント描画開始...', {
-      total: newsData.length,
-    currentPage,
-    config: this.paginationConfig
-  });
-
-  // ページ別にデータを分類（公安の情報管理のように）
-  const pickupNews = this.getPickupNews(newsData, currentPage);
-  const mainNews = this.getMainNews(newsData, currentPage);
-
-  // ピックアップセクションを描画（1ページ目のみ）
-  if (currentPage === 1 && pickupNews.length > 0) {
-    this.renderPickupSection(pickupNews);
-  } else {
-    // 2ページ目以降はピックアップエリアを非表示にする
-    const pickupSection = document.querySelector('[data-pickup-section]');
-    if (pickupSection) {
-      pickupSection.style.display = 'none';
-    }
-  }
-
-    // メインリストを描画
-    this.renderMainNewsList(mainNews, newsData, currentPage);
-
-    // フィルタリング用に全データを保存
-    this.storeDataForFiltering(newsData);
-
-    console.log('✨ 描画完了:', {
-      pickup: pickupNews.length,
-      main: mainNews.length,
-      page: currentPage
-    });
-
-    return { pickupNews, mainNews, allNews: newsData, currentPage };
-  }
-
-  /**
-  * ピックアップセクションを描画（3件対応）
-  * 公安の重要情報を整理するように
-   */
-  renderPickupSection(pickupNews) {
-  // 固定アイテム（1件目）の描画
-  const pickupContainer = document.querySelector('.p-news-pickup__list-fixedInner');
-  if (pickupContainer && pickupNews.length > 0) {
-    // 既存の子要素を全てクリア
-    pickupContainer.innerHTML = '';
-
-    // タイトル要素を生成して追加
-    const titleElement = document.createElement('h2');
-    titleElement.className = 'p-news-pickup__list-fixedTitle';
-    titleElement.innerHTML = `
-      PICK UP
-      <span>
-        <svg width="11" height="17" viewBox="0 0 11 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g clip-path="url(#clip0_240_384)">
-            <path d="M11 11.7419V10.0008L9.19249 6.95043L10.6127 0H0.387324L1.81397 6.95043L0 10.0008V11.7419H11Z" fill="white"/>
-            <path d="M6.10035 8.13477H4.89964V17.0004H6.10035V8.13477Z" fill="white"/>
-          </g>
-          <defs>
-            <clipPath id="clip0_240_384">
-              <rect width="11" height="17" fill="white"/>
-            </clipPath>
-          </defs>
-        </svg>
-      </span>
-    `;
-    pickupContainer.appendChild(titleElement);
-
-    // 1件目のニュースカードを生成
-    const newsCard = this.createNewsCardElement(pickupNews[0]);
-    pickupContainer.appendChild(newsCard);
-
-    console.log('🎯 ピックアップ固定アイテム描画完了');
-  }
-
-    // インデックスリスト（2-3件目）の描画
-    const pickupIndexList = document.querySelector('.p-news-pickup__list-index');
-    if (pickupIndexList && pickupNews.length > 1) {
-      // 既存のリストアイテムをクリア
-      pickupIndexList.innerHTML = '';
-
-      // 2件目以降をリストに追加
-      for (let i = 1; i < pickupNews.length; i++) {
-        const listItem = document.createElement('li');
-        listItem.className = 'p-news-pickup__list-item';
-        listItem.setAttribute('data-category', pickupNews[i].categorySlug);
-
-        const newsCard = this.createNewsCardElement(pickupNews[i]);
-        listItem.appendChild(newsCard);
-
-        pickupIndexList.appendChild(listItem);
+  removeFixedPickupSkeleton() {
+    const fixedInner = document.querySelector('.p-news-pickup__list-fixedInner');
+    if (fixedInner) {
+      const skeleton = fixedInner.querySelector('.skeleton-item, .c-news-card.skeleton');
+      if (skeleton) {
+          skeleton.classList.add('fade-out');
+          setTimeout(() => skeleton.remove(), 300);
       }
-
-      console.log('📎 ピックアップインデックス描画完了:', pickupNews.length - 1, '件');
     }
   }
 
   /**
-   * メインニュースリストを描画（ページネーション対応）
-   * 公安の情報管理のように精密に
+   * ピックアップリストエリアのスケルトンを削除
    */
-  renderMainNewsList(mainNews, allNews, currentPage = 1) {
-    const mainList = document.querySelector('.p-news-content__list-index[data-index="news"]');
-    if (!mainList) {
-      console.log('⚠️ メインリストコンテナが見つかりません');
+  removeListPickupSkeleton() {
+    const pickupList = document.querySelector('.p-news-pickup__list-index');
+    if (pickupList) {
+      const skeletonItems = pickupList.querySelectorAll('.skeleton-item');
+      if (skeletonItems.length > 0) {
+          skeletonItems.forEach(item => item.classList.add('fade-out'));
+          setTimeout(() => pickupList.innerHTML = '', 300);
+      }
+    }
+  }
+
+  /**
+   * ピックアップリストを描画 (2〜4件目)
+   */
+  renderPickupListArea(listPickupData) {
+    const pickupList = document.querySelector('.p-news-pickup__list-index');
+    if (!pickupList || !listPickupData.length) {
+      console.warn('⚠️ ピックアップリストまたはデータが見つかりません');
+      this.removeListPickupSkeleton(); // データがない場合もスケルトンは削除
       return;
     }
 
-    // 既存のリストアイテムをクリア
-    mainList.innerHTML = '';
+    // スケルトンをフェードアウトさせてから削除
+    const skeletonItems = pickupList.querySelectorAll('.skeleton-item');
+    if (skeletonItems.length > 0) {
+      skeletonItems.forEach(item => item.classList.add('fade-out'));
 
-    // メインニュースを描画
-    mainNews.forEach(newsItem => {
-      const listItem = this.createNewsListItem(newsItem, 'regular');
-      mainList.appendChild(listItem);
-    });
+      setTimeout(() => {
+          pickupList.innerHTML = '';
 
-    // フィルタリング用に全件データも非表示で追加（初回のみ）
-    if (currentPage === 1) {
-      allNews.forEach(newsItem => {
-        const listItem = this.createNewsListItem(newsItem, 'all');
-        listItem.style.display = 'none';
+          // 取得したリストデータ（2件目以降に相当）をリストに追加
+          listPickupData.forEach((newsItem, index) => {
+              const listItem = this.createPickupListItem(newsItem, index + 2);
+              pickupList.appendChild(listItem);
+          });
+
+          // console.log('✨ Pickup list (2-4 items) rendered');
+      }, 300);
+    } else {
+      pickupList.innerHTML = '';
+      listPickupData.forEach((newsItem, index) => {
+        const listItem = this.createPickupListItem(newsItem, index + 2);
+        pickupList.appendChild(listItem);
+      });
+    }
+  }
+
+  /**
+   * 固定ピックアップエリアに1件目を挿入
+   */
+  appendToFixedPickupArea(newsItem) {
+    const fixedInner = document.querySelector('.p-news-pickup__list-fixedInner');
+    if (!fixedInner) {
+      console.warn('⚠️ 固定ピックアップエリアが見つかりません');
+      return;
+    }
+
+    // スケルトンを検出
+    const skeleton = fixedInner.querySelector('.skeleton-item, .c-news-card.skeleton');
+
+    if (skeleton) {
+      // スケルトンをフェードアウト
+      skeleton.classList.add('fade-out');
+
+      setTimeout(() => {
+        skeleton.remove();
+
+        // 新しいカードを作成して追加
+        const newsCard = this.createNewsCardElement(newsItem);
+        fixedInner.appendChild(newsCard);
+
+        // console.log('✨ Fixed pickup area rendered');
+      }, 300);
+    } else {
+      // 既存のカードがある場合
+      const existingCard = fixedInner.querySelector('.c-news-card');
+
+      if (existingCard) {
+        // 既存のカードの内容を更新
+        this.updateExistingCard(existingCard, newsItem);
+      } else {
+        // 既存のカードがない場合は、新しく作成して追加
+        const newsCard = this.createNewsCardElement(newsItem);
+        fixedInner.appendChild(newsCard);
+      }
+    }
+  }
+
+  /**
+   * 既存のNewsCardの内容を更新
+   */
+  updateExistingCard(cardElement, newsItem) {
+    // リンクとデータ属性を更新
+    cardElement.href = newsItem.url;
+    cardElement.setAttribute('data-card', newsItem.id);
+    cardElement.setAttribute('data-news-id', newsItem.id.toString());
+    cardElement.setAttribute('data-category', newsItem.categorySlug);
+    cardElement.setAttribute('data-language', newsItem.language);
+
+    // 画像を更新
+    const img = cardElement.querySelector('.c-news-card__pic img');
+    if (img) {
+      // medium_large (SP/Fallback用) を img.src に設定
+      img.src = newsItem.picMediumLarge;
+      img.alt = newsItem.title;
+    }
+
+    // picture source を更新 (PC用)
+    const source = cardElement.querySelector('.c-news-card__pic source');
+    if (source) {
+      // large (PC用) を source.srcset に設定
+      source.srcset = newsItem.picLarge;
+    }
+
+    // タイトルを更新
+    const title = cardElement.querySelector('.c-news-card__info-title');
+    if (title) {
+      title.textContent = newsItem.title;
+    }
+
+    // 日付を更新
+    const date = cardElement.querySelector('.c-news-card__info-date');
+    if (date) {
+      date.textContent = newsItem.date;
+    }
+
+    // カテゴリーを更新
+    const category = cardElement.querySelector('.c-news-card__info-category');
+    if (category) {
+      category.textContent = newsItem.category;
+    }
+  }
+
+  /**
+   * ピックアップリストアイテムを作成
+   */
+  createPickupListItem(newsItem, itemNumber) {
+    const listItem = document.createElement('li');
+    listItem.className = 'p-news-pickup__list-item js-search-target';
+    listItem.setAttribute('data-news-item', 'pickup');
+    listItem.setAttribute('data-news-id', newsItem.id.toString());
+    listItem.setAttribute('data-category', newsItem.categorySlug);
+    listItem.setAttribute('data-language', newsItem.language);
+
+    const newsCard = this.createNewsCardElement(newsItem);
+    listItem.appendChild(newsCard);
+
+    return listItem;
+  }
+
+  async renderNewsComponents(newsData) {
+    // メインリストを描画
+    this.renderMainNewsList(newsData);
+
+    return { mainNews: newsData };
+  }
+
+  /**
+   * メインニュースリストを描画
+   */
+  renderMainNewsList(newsData) {
+    const mainList = document.querySelector('.p-news-content__list-index[data-index="news"]');
+    if (!mainList) {
+      console.warn('⚠️ メインリストコンテナが見つかりません');
+      return;
+    }
+
+    // スケルトンをフェードアウトさせてから削除
+    const skeletonItems = mainList.querySelectorAll('.skeleton-item');
+    if (skeletonItems.length > 0) {
+      skeletonItems.forEach(item => item.classList.add('fade-out'));
+
+      setTimeout(() => {
+        // 既存のリストアイテムをクリア
+        mainList.innerHTML = '';
+
+        // ニュースを描画
+        newsData.forEach((newsItem, index) => {
+          const listItem = this.createNewsListItem(newsItem, index + 1);
+          mainList.appendChild(listItem);
+        });
+
+        // console.log(`✨ Main news list rendered: ${newsData.length} items`);
+      }, 300);
+    } else {
+      // スケルトンがない場合（通常は発生しない）
+      mainList.innerHTML = '';
+      newsData.forEach((newsItem, index) => {
+        const listItem = this.createNewsListItem(newsItem, index + 1);
         mainList.appendChild(listItem);
       });
     }
-
-    console.log('📋 メインニュースリスト描画完了:', {
-      main: mainNews.length,
-      total_for_filtering: currentPage === 1 ? allNews.length : 0,
-      page: currentPage
-    });
   }
 
   /**
    * ニュースカード要素を作成
-   * コナンのトリック解明のような精密さで
    */
   createNewsCardElement(newsItem) {
     const cardElement = document.createElement('a');
     cardElement.href = newsItem.url;
-    cardElement.className = 'c-news-card';
+    cardElement.className = 'c-news-card js-search-target mouse-over';
     cardElement.setAttribute('data-card', newsItem.id);
+    cardElement.setAttribute('data-news-id', newsItem.id.toString());
     cardElement.setAttribute('data-category', newsItem.categorySlug);
+    cardElement.setAttribute('data-language', newsItem.language);
 
-    // NewsCard コンポーネントの HTML 構造を正確に再現
     cardElement.innerHTML = `
       <figure class="c-news-card__pic">
-        <img src="${newsItem.pic}" alt="${newsItem.title}" loading="lazy">
+        <picture>
+          <source media="(min-width: 960px)" srcset="${newsItem.picLarge}">
+          <img
+            src="${newsItem.picMediumLarge}"
+            alt="${newsItem.title}"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
       </figure>
       <div class="c-news-card__info">
         <p class="c-news-card__info-title">${newsItem.title}</p>
@@ -367,11 +594,13 @@ export class NewsAPIManager {
   /**
    * ニュースリストアイテムを作成
    */
-  createNewsListItem(newsItem, itemType) {
+  createNewsListItem(newsItem, itemNumber) {
     const listItem = document.createElement('li');
-    listItem.className = 'p-news-content__list-item';
-    listItem.setAttribute('data-news-item', itemType);
+    listItem.className = 'p-news-content__list-item js-search-target';
+    listItem.setAttribute('data-news-item', 'regular');
+    listItem.setAttribute('data-news-id', newsItem.id.toString());
     listItem.setAttribute('data-category', newsItem.categorySlug);
+    listItem.setAttribute('data-language', newsItem.language);
 
     const newsCard = this.createNewsCardElement(newsItem);
     listItem.appendChild(newsCard);
@@ -380,35 +609,16 @@ export class NewsAPIManager {
   }
 
   /**
-   * フィルタリング機能用にデータを保存
-   * 公安の情報管理システムのように
-   */
-  storeDataForFiltering(newsData) {
-    // グローバルに保存（既存のフィルタリングシステムが利用）
-    window.newsData = newsData;
-
-    // カテゴリー一覧も保存
-    const categories = [...new Set(newsData.map(item => ({
-      name: item.category,
-      slug: item.categorySlug
-    })))];
-
-    window.newsCategories = categories;
-
-    console.log('🗃️ フィルタリング用データ保存完了');
-  }
-
-  /**
    * エラーハンドリング
-   * 事件解決の最後の砦として
    */
   handleError(error) {
-    console.error('🚨 NewsAPIManager Error:', error);
+    console.error(`🚨 NewsAPIManager Error (${this.currentLanguage}):`, error);
 
-    // ユーザーにエラーを表示
-    this.showErrorMessage('ニュースの取得に失敗しました。しばらく後に再度お試しください。');
+    const errorMessage = this.currentLanguage === 'en'
+      ? 'Failed to fetch news. Please try again later.'
+      : 'ニュースの取得に失敗しました。しばらく後に再度お試しください。';
 
-    // フォールバック: 既存の静的データを表示
+    this.showErrorMessage(errorMessage);
     this.showFallbackContent();
   }
 
@@ -438,8 +648,6 @@ export class NewsAPIManager {
    * フォールバックコンテンツを表示
    */
   showFallbackContent() {
-    console.log('🔄 フォールバックコンテンツを表示');
-    // 既存の静的なNewsCardを表示状態に戻す
     const staticCards = document.querySelectorAll('.c-news-card');
     staticCards.forEach(card => {
       card.style.display = 'block';
@@ -447,15 +655,65 @@ export class NewsAPIManager {
   }
 
   /**
+   * 検索結果を取得（ページネーション用）
+   * @param {string} query - 検索クエリ
+   * @param {number} page - 取得するページ番号
+   * @param {number} perPage - 1ページあたりの件数
+   * @returns {Promise<Object>} 検索結果とページネーション情報
+   */
+  async fetchSearchResults(query, page = 1, perPage = 14) {
+    try {
+      const langParam = `lang=${this.currentLanguage}`;
+      const searchParam = `search=${encodeURIComponent(query)}`;
+      const perPageParam = `per_page=${perPage}`;
+      const pageParam = `page=${page}`;
+
+      const searchEndpoint = `${this.baseEndpoint}?${langParam}&${searchParam}&${perPageParam}&${pageParam}`;
+
+      const response = await fetch(searchEndpoint, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Search API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const rawData = await response.json();
+      const totalItems = parseInt(response.headers.get('X-WP-Total') || '0');
+      const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '1');
+
+      // データを整形
+      const formattedData = this.formatNewsData(rawData);
+
+      return {
+        data: formattedData,
+        totalItems,
+        totalPages,
+        currentPage: page,
+        perPage
+      };
+
+    } catch (error) {
+      console.error('❌ 検索結果取得エラー:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 公開API
-   * 外部から安全にアクセスできるインターフェース
    */
   getPublicAPI() {
     return {
       refetch: () => this.fetchNewsData(),
-      getCache: () => this.cache.get('newsData'),
+      getCache: () => this.cache.get(`newsData_${this.currentLanguage}_page_${this.paginationConfig.currentPage}`),
       clearCache: () => this.cache.clear(),
-      isLoading: () => this.isLoading
+      isLoading: () => this.isLoading,
+      getCurrentLanguage: () => this.currentLanguage,
+      fetchSearchResults: (query, page, perPage) => this.fetchSearchResults(query, page, perPage)
     };
   }
 }

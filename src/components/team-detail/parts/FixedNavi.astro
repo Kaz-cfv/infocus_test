@@ -1,5 +1,11 @@
 ---
 interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
+interface Props {
   prevMember?: {
     slug: string;
     name: string;
@@ -21,7 +27,7 @@ const { prevMember = null, nextMember = null } = Astro.props;
     >
       {prevMember ? (
         <a
-          href={`/team/${prevMember.slug}/`}
+          href={`${currentUrl}team/${prevMember.slug}/`}
           title={prevMember.name}
         >
           Prev
@@ -31,7 +37,7 @@ const { prevMember = null, nextMember = null } = Astro.props;
       )}
     </li>
     <li data-navi="team" class="p-team-detail__fixedNavi-item">
-      <a href="/team/">Back to Teams</a>
+      <a href=`${currentUrl}team/`>Back to Teams</a>
     </li>
     <li
       data-navi="next"
@@ -39,7 +45,7 @@ const { prevMember = null, nextMember = null } = Astro.props;
     >
       {nextMember ? (
         <a
-          href={`/team/${nextMember.slug}/`}
+          href={`${currentUrl}team/${nextMember.slug}/`}
           title={nextMember.name}
         >
           Next
@@ -65,7 +71,7 @@ const { prevMember = null, nextMember = null } = Astro.props;
   }
 
   &-item {
-    height: 60px;
+    height: 50px;
     &:last-child a {
       &::after {
         background-color: transparent;
@@ -90,6 +96,7 @@ const { prevMember = null, nextMember = null } = Astro.props;
       color: var(--c-white);
       font-size: 1.4rem;
       font-weight: 600;
+      transition: color .3s var(--ease-out-quad);
 
       &::after {
         content: "";
@@ -104,10 +111,11 @@ const { prevMember = null, nextMember = null } = Astro.props;
 
     // ホバー効果（有効な場合のみ）
     &:not(.--disabled) a {
-      transition: background-color .3s var(--ease-in-out-quad);
+      transition: background-color .3s var(--ease-out-quad);
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--c-white);
+        color: var(--c-black-base);
       }
     }
   }

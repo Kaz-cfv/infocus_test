@@ -4,6 +4,8 @@ import Footer from '../components/Footer.astro';
 import Meta from './Meta.astro';
 import type { MetaProps } from './Meta.astro';
 
+const lang = 'en';
+
 interface Props {
   title: string;
   pageName: string;
@@ -70,13 +72,13 @@ try {
   <body data-page={pageName} class={`p-${pageName}`}>
     <div class="l-container">
 
-      <Header />
+      <Header lang={lang} />
 
       <main class="l-main">
         <slot />
       </main>
 
-      <Footer />
+      <Footer lang={lang} />
 
     </div>
   </body>

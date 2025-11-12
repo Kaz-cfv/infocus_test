@@ -107,8 +107,27 @@ button, select {
 a:focus,
 input:focus,
 button:focus {
-  // outline: 0;
+  outline: 0;
   // box-shadow: 0 0 4px .2rem var(--c-focus);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    -webkit-text-fill-color: var(--c-white) !important;
+    background-color: transparent !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+  }
+}
+
+input:-internal-autofill-selected {
+  background-color: transparent !important;
 }
 
 .pc {

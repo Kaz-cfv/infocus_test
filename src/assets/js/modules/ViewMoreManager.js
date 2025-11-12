@@ -2,29 +2,63 @@
  * ViewMoreManager - 「VIEW ALL」機能の汎用マネージャー
  *
  * 使用例:
+ * // About/Awards向け
  * new ViewMoreManager({
  *   contentSelector: '.js-awards-summary-content',
  *   itemsSelector: '.js-awards-hidden',
  *   buttonSelector: '.js-awards-more-btn',
- *   moreContainerSelector: '.js-awards-more'
+ *   moreContainerSelector: '.js-awards-more',
+ *   useItemBasedHeight: true,
+ *   firstItemSelector: '.p-about-awards__summary-item:first-child'
+ * });
+ *
+ * // Team/Related向け
+ * new ViewMoreManager({
+ *   contentSelector: '.js-more-content',
+ *   itemsSelector: '.p-team-detail__related-item.is-preview, .p-team-detail__related-item.is-hidden',
+ *   buttonSelector: '.js-more-btn',
+ *   moreContainerSelector: '.p-team-detail__related-more',
+ *   maxVisibleItems: 10,
+ *   useItemBasedHeight: false
  * });
  */
 
 export class ViewMoreManager {
   constructor(options = {}) {
     this.config = {
+      // セレクタ設定
       contentSelector: '[data-viewmore-content]',
       itemsSelector: '[data-viewmore-hidden]',
       buttonSelector: '[data-viewmore-btn]',
       moreContainerSelector: '[data-viewmore-container]',
+
+      // 表示制御
       maxVisibleItems: 10,
-      collapsedHeightOffset: 150,
-      collapsedHeightProperty: '--collapsed-height',
+      previewItems: 5, // プレビュー表示する件数（うっすら見える）
+
+      // 高さ計算方式
       useItemBasedHeight: false, // trueの場合、最初のアイテム基準で高さ計算
       firstItemSelector: null,
+      collapsedHeightOffset: 150, // 折りたたみ時の追加オフセット
+      collapsedHeightProperty: '--collapsed-height',
+
+      // グラデーション設定
       enableGradientOverlay: true,
+      gradientHeight: 150, // グラデーションの高さ
+      gradientStops: [
+        { position: 0, opacity: 0 },
+        { position: 20, opacity: 0.1 },
+        { position: 40, opacity: 0.3 },
+        { position: 70, opacity: 0.6 },
+        { position: 100, opacity: 1 }
+      ],
+
+      // アニメーション
       animationDuration: 600,
+
+      // デバッグ
       debug: false,
+
       ...options
     };
 
@@ -33,9 +67,9 @@ export class ViewMoreManager {
   }
 
   init() {
-    if (this.config.debug) {
-      // console.log('ViewMoreManager initialized with config:', this.config);
-    }
+    // if (this.config.debug) {
+    //   console.log('ViewMoreManager initialized with config:', this.config);
+    // }
 
     this.setupViewMoreButton();
     this.setupInitialVisibility();
@@ -80,9 +114,9 @@ export class ViewMoreManager {
         );
         content.classList.add('is-collapsed');
 
-        if (this.config.debug) {
-          // console.log('ViewMoreManager: Collapsed height set to:', collapsedHeight + 'px');
-        }
+        // if (this.config.debug) {
+        //   console.log('ViewMoreManager: Collapsed height set to:', collapsedHeight + 'px');
+        // }
       }
     });
   }
@@ -98,9 +132,18 @@ export class ViewMoreManager {
   }
 
   calculateMaxItemsBasedHeight(content) {
-    const items = document.querySelectorAll(`${this.config.contentSelector} > *`);
+    // アイテムリストを取得（ulなどの親要素を考慮）
+    const listElement = content.querySelector('ul, ol') || content;
+    const items = listElement.querySelectorAll(':scope > li, :scope > .p-team-detail__related-item, :scope > *:not(.p-team-detail__related-columns)');
+
+    // if (this.config.debug) {
+    //   console.log('ViewMoreManager: Found items:', items.length);
+    // }
 
     if (items.length <= this.config.maxVisibleItems) {
+      // if (this.config.debug) {
+      //   console.log('ViewMoreManager: Items less than maxVisibleItems, no collapse needed');
+      // }
       return 0;
     }
 
@@ -112,25 +155,32 @@ export class ViewMoreManager {
       const targetItemRect = targetItem.getBoundingClientRect();
       const contentRect = content.getBoundingClientRect();
 
-      return targetItemRect.bottom - contentRect.top + this.config.collapsedHeightOffset;
+      const calculatedHeight = targetItemRect.bottom - contentRect.top + this.config.collapsedHeightOffset;
+
+      // if (this.config.debug) {
+      //   console.log('ViewMoreManager: Target item index:', targetIndex);
+      //   console.log('ViewMoreManager: Calculated height:', calculatedHeight);
+      // }
+
+      return calculatedHeight;
     }
 
     return 0;
   }
 
   setupInitialVisibility() {
-    const hiddenItems = document.querySelectorAll(this.config.itemsSelector);
+    const items = document.querySelectorAll(this.config.itemsSelector);
     const viewMoreButton = document.querySelector(this.config.moreContainerSelector);
 
     // 隠された項目がない場合はボタンを非表示
-    if (hiddenItems.length === 0) {
+    if (items.length === 0) {
       if (viewMoreButton) {
         viewMoreButton.classList.add('is-hidden');
       }
 
-      if (this.config.debug) {
-        console.log('ViewMoreManager: No hidden items found, hiding button');
-      }
+      // if (this.config.debug) {
+      //   console.log('ViewMoreManager: No hidden items found, hiding button');
+      // }
     }
   }
 
@@ -143,9 +193,9 @@ export class ViewMoreManager {
         this.toggleViewMore();
       });
 
-      if (this.config.debug) {
-        // console.log('ViewMoreManager: Button event listener attached');
-      }
+      // if (this.config.debug) {
+      //   console.log('ViewMoreManager: Button event listener attached');
+      // }
     } else if (this.config.debug) {
       console.warn('ViewMoreManager: Button not found:', this.config.buttonSelector);
     }
@@ -159,7 +209,7 @@ export class ViewMoreManager {
     if (!this.isExpanded && hiddenItems.length > 0) {
       // 全て表示
       hiddenItems.forEach((item) => {
-        item.classList.remove('js-awards-hidden', 'is-hidden'); // 両方のクラスに対応
+        item.classList.remove('js-awards-hidden', 'is-hidden', 'is-preview');
         // data属性からも削除
         if (item.hasAttribute('data-viewmore-hidden')) {
           item.removeAttribute('data-viewmore-hidden');
@@ -179,7 +229,7 @@ export class ViewMoreManager {
       this.isExpanded = true;
 
       if (this.config.debug) {
-        // console.log('ViewMoreManager: Expanded view, showing all items');
+        console.log('ViewMoreManager: Expanded view, showing all items');
       }
 
       // カスタムイベントを発火
@@ -201,7 +251,7 @@ export class ViewMoreManager {
     document.dispatchEvent(event);
 
     if (this.config.debug) {
-      // console.log(`ViewMoreManager: Dispatched event "${eventName}"`, detail);
+      console.log(`ViewMoreManager: Dispatched event "${eventName}"`, detail);
     }
   }
 
@@ -210,7 +260,7 @@ export class ViewMoreManager {
     this.config = { ...this.config, ...newConfig };
 
     if (this.config.debug) {
-      // console.log('ViewMoreManager: Config updated:', this.config);
+      console.log('ViewMoreManager: Config updated:', this.config);
     }
   }
 
@@ -231,7 +281,7 @@ export class ViewMoreManager {
     this.calculateCollapsedHeight();
 
     if (this.config.debug) {
-      // console.log('ViewMoreManager: Reset to initial state');
+      console.log('ViewMoreManager: Reset to initial state');
     }
   }
 

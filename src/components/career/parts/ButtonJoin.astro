@@ -1,7 +1,13 @@
 ---
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
 ---
 
-<a href="/contact/" class="c-button-join">
+<a href=`${currentUrl}contact/` class="c-button-join">
   <span>JOIN US</span>
 </a>
 
@@ -14,6 +20,7 @@
   justify-content: center;
   align-items: center;
   min-height: 56px;
+  border-radius: 4px;
   background-color: var(--c-white);
   font-size: 1.8rem;
   font-weight: 700;

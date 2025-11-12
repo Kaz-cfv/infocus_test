@@ -22,6 +22,19 @@ interface InterviewData {
   url?: string;
 }
 
+interface Tag {
+  name: string;
+  url: string;
+}
+
+interface ProjectData {
+  id: number;
+  title: string;
+  tags: Tag[];
+  imageSrc: string;
+  url: string;
+}
+
 interface Props {
   pic: string;
   name: string;
@@ -37,9 +50,20 @@ interface Props {
     slug: string;
     name: string;
   } | null;
+  projects?: ProjectData[];
 }
 
-const { pic, name, position, description, links, interview, prevMember = null, nextMember = null } = Astro.props;
+const {
+  pic,
+  name,
+  position,
+  description,
+  links,
+  interview,
+  prevMember = null,
+  nextMember = null,
+  projects = []
+} = Astro.props;
 ---
 
 <article class="p-team-detail-article" data-main-content>
@@ -54,7 +78,11 @@ const { pic, name, position, description, links, interview, prevMember = null, n
       links={links}
     />
   </section>
-  <!-- <Projects /> -->
+
+  {projects && projects.length > 0 && (
+    <Projects projects={projects} />
+  )}
+
   {interview && (interview.title || interview.description) && (
     <Interview
       title={interview.title || ''}
@@ -63,6 +91,7 @@ const { pic, name, position, description, links, interview, prevMember = null, n
       url={interview.url}
     />
   )}
+
   <div class="p-team-detail-article__navi">
     <FixedNavi prevMember={prevMember} nextMember={nextMember} />
   </div>
@@ -79,14 +108,22 @@ const { pic, name, position, description, links, interview, prevMember = null, n
     grid-template-columns: 100%;
     align-content: flex-start;
     @include me.pc {
-      grid-template-columns: 570px 1fr;
+      grid-template-columns: 39.5833vw 1fr;
     }
   }
 
   &__pic {
     aspect-ratio: 1 / 1;
+    width: 100%;
+    height: 100%;
     @include me.pc {
       border-right: solid 1px var(--c-gray);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 

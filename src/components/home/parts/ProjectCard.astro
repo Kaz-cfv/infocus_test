@@ -66,7 +66,7 @@ const linkProps = shouldOpenInNewTab
 // });
 ---
 
-<div class="c-project-card" data-id={id} data-type={type}>
+<div class="c-project-card mouse-over" data-id={id} data-type={type}>
   <a {...linkProps} class="c-project-card__image-wrapper">
     {imageSrc && (
       <img src={imageSrc} alt={imageAlt} class="c-project-card__image" />
@@ -83,7 +83,9 @@ const linkProps = shouldOpenInNewTab
     )}
   </a>
   <div class="c-project-card__content">
-    <h3 class="c-project-card__title">{title}</h3>
+    <h3 class="c-project-card__title">
+      <a href={url}>{title}</a>
+    </h3>
     <div class="c-project-card__tags js-hover">
       {tags.map((tag, index) => (
         <>
@@ -106,20 +108,37 @@ const linkProps = shouldOpenInNewTab
   transition: opacity 0.3s ease-out;
   height: 100%;
 
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-project-card__image-wrapper {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(3px);
+        }
+
+        .c-project-card__image,
+        .c-project-card__video {
+          // 画像自体を拡大（360px → 368px相当）
+          transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
+  }
+
   &[data-type="cover"] {
     height: 100%;
   }
 
   &:not([data-type="cover"]) {
     @include me.pc {
-      padding-bottom: 78px;
+      padding-bottom: 40px;
     }
     @include me.sp {
       padding-bottom: 7.701vw;
     }
     &[data-type="pickup"] {
       @include me.pc {
-        padding-bottom: 50px;
+        padding-bottom: 40px;
       }
       @include me.sp {
         padding-bottom: 25px;
@@ -132,6 +151,8 @@ const linkProps = shouldOpenInNewTab
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
+    clip-path: inset(0px);
+    transition: clip-path 0.3s cubic-bezier(0, 0, 0.17, 1);
     @at-root [data-type="pickup"] & {
       @include me.pc {
         margin-top: 30px;
@@ -156,7 +177,7 @@ const linkProps = shouldOpenInNewTab
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
     @include me.sp {
       aspect-ratio: 16 / 9;
     }
@@ -167,7 +188,7 @@ const linkProps = shouldOpenInNewTab
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
     z-index: 2;
     @at-root .c-project-card.is-play & {
       opacity: 1;
@@ -192,17 +213,19 @@ const linkProps = shouldOpenInNewTab
   }
 
   &__title {
-    color: var(--c-white);
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 2.32rem;
-    @include me.sp {
-      font-size: 1.4rem;
-    }
-    @at-root [data-type="pickup"] & {
-      font-size: 2rem;
+    a {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 2.32rem;
       @include me.sp {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
+      }
+      @at-root [data-type="pickup"] & {
+        font-size: 2rem;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
       }
     }
   }

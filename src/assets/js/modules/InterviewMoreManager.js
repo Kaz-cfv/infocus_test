@@ -63,15 +63,15 @@ export class InterviewMoreManager {
     const button = document.querySelector(this.config.buttonSelector);
 
     // 隠すべきアイテムがない場合はボタンを非表示
-    if (this.hiddenItems.length === 0) {
-      if (button) {
-        button.style.display = 'none';
-      }
-      if (this.config.debug) {
-        console.log('No items to hide, button hidden');
-      }
-      return;
-    }
+    // if (this.hiddenItems.length === 0) {
+    //   if (button) {
+    //     button.style.display = 'none';
+    //   }
+    //   if (this.config.debug) {
+    //     // console.log('No items to hide, button hidden');
+    //   }
+    //   return;
+    // }
 
     // 隠すアイテムにクラスを追加
     this.hiddenItems.forEach((item) => {
@@ -112,9 +112,9 @@ export class InterviewMoreManager {
     this.isExpanded = true;
     this.dispatchCustomEvent('interview:expanded');
 
-    if (this.config.debug) {
-      console.log('Showing all hidden items');
-    }
+    // if (this.config.debug) {
+    //   console.log('Showing all hidden items');
+    // }
   }
 
   dispatchCustomEvent(eventName, detail = {}) {
@@ -130,9 +130,9 @@ export class InterviewMoreManager {
 
     document.dispatchEvent(event);
 
-    if (this.config.debug) {
-      console.log(`Dispatched event "${eventName}"`, detail);
-    }
+    // if (this.config.debug) {
+    //   console.log(`Dispatched event "${eventName}"`, detail);
+    // }
   }
 
   // リセット機能（必要に応じて）

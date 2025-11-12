@@ -1,11 +1,62 @@
 ---
-
+interface Props {
+  type: string;
+  lang?: 'en' | 'ja';
+}
+const { type, lang = 'ja' } = Astro.props;
 ---
-<div class="c-newsletter">
-  <div class="c-newsletter__title">NEWS LETTER</div>
-  <form class="c-newsletter__form">
-    <input type="email" placeholder="Enter Your email" class="c-newsletter__input">
-    <button type="button" class="c-newsletter__button">Subscribe</button>
+
+<div class="c-newsletter" data-type={type}>
+  <div class="c-newsletter__title">
+    {type=="footer" && (
+      <span class="c-newsletter__icon">
+        <svg width="23" height="14" viewBox="0 0 23 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L11.4872 8L22 1" stroke="white"/>
+          <rect x="0.5" y="0.5" width="22" height="13" stroke="white"/>
+        </svg>
+      </span>
+    )}
+    NEWS LETTER
+  </div>
+
+  <!-- MailChimp Integration -->
+  <form
+    class="c-newsletter__form"
+    action="https://in-focus.us4.list-manage.com/subscribe/post?u=0a7dddf7574b17f6e759668a3&id=6273d793be&f_id=003615eaf0"
+    method="post"
+    id="mc-embedded-subscribe-form"
+    name="mc-embedded-subscribe-form"
+    target="_blank"
+    novalidate
+  >
+    <input
+      type="email"
+      name="EMAIL"
+      placeholder="Enter Your email"
+      class="c-newsletter__input required email"
+      id="mce-EMAIL"
+      required
+      autocomplete="email"
+    >
+    <button
+      type="submit"
+      class="c-newsletter__button"
+      name="subscribe"
+      id="mc-embedded-subscribe"
+    >
+      Subscribe
+    </button>
+
+    <!-- MailChimp spam protection (honeypot) -->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true">
+      <input type="text" name="b_0a7dddf7574b17f6e759668a3_6273d793be" tabindex="-1" value="">
+    </div>
+
+    <!-- Response messages container -->
+    <div class="c-newsletter__responses">
+      <div class="c-newsletter__response c-newsletter__response--error" id="mce-error-response" style="display: none;"></div>
+      <div class="c-newsletter__response c-newsletter__response--success" id="mce-success-response" style="display: none;"></div>
+    </div>
   </form>
 </div>
 
@@ -18,21 +69,60 @@
   grid-template-columns: max-content 1fr;
   align-items: center;
   column-gap: 8px;
-  row-gap: 16px;
-  @include me.pc {
-    width: 454px;
+
+  &[data-type="menu"] {
+    @include me.pc {
+      row-gap: 1.6rem;
+      width: 454px;
+    }
+    @include me.sp {
+      row-gap: 1rem;
+    }
   }
-  @include me.sp {
-    row-gap: 10px;
+
+  &[data-type="footer"] {
+    @include me.pc {
+      width: 338px;
+      row-gap: 1.2rem;
+    }
+    @include me.sp {
+      row-gap: 1rem;
+      width: calc(100% - 19.6899%);
+    }
+  }
+
+  &__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 23px;
+    height: 14px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   &__title {
     color: var(--c-white);
-    font-size: 2rem;
     font-weight: 700;
-    line-height: 2.2;
-    @include me.sp {
-      font-size: 1.8rem;
+
+    @at-root [data-type="menu"] & {
+      font-size: 2rem;
+      line-height: 2.2;
+      @include me.sp {
+        font-size: 1.8rem;
+      }
+    }
+
+    @at-root [data-type="footer"] & {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: center;
+      column-gap: 8px;
+      grid-column: 1 / 3;
+      font-size: 1.4rem;
     }
   }
 
@@ -47,30 +137,270 @@
   &__input {
     width: 100%;
     padding: 0;
-    padding-block-end: 9px;
     background: transparent;
     border: none;
     border-radius: 0;
     border-bottom: 1px solid var(--c-white);
     color: var(--c-gray);
     font-family: var(--f-en);
-    font-size: 1.6rem;
     font-weight: 400;
     line-height: 2.2rem;
+    transition: border-color 0.3s ease, color 0.3s ease;
+
+    &::placeholder {
+      color: var(--c-gray);
+      opacity: 0.7;
+    }
+
+    &:focus {
+      outline: none;
+      border-bottom-color: var(--c-white);
+      color: var(--c-white);
+    }
+
+    &:valid {
+      color: var(--c-white);
+    }
+
+    @at-root [data-type="menu"] & {
+      padding-block-end: 9px;
+      font-size: 1.6rem;
+    }
+
+    @at-root [data-type="footer"] & {
+      font-size: 1.4rem;
+    }
   }
 
   &__button {
-    height: 40px;
-    padding-inline: 21.42px;
     background-color: var(--c-white);
     color: #1A1A1A;
     font-family: var(--f-en);
-    font-size: 1.6rem;
     font-weight: 700;
     line-height: 2.2rem;
-    @include me.sp {
-      padding-inline: 17.42px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: var(--c-gray);
+      color: var(--c-white);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @at-root [data-type="menu"] & {
+      height: 40px;
+      padding-inline: 21.42px;
+      font-size: 1.6rem;
+      @include me.sp {
+        padding-inline: 17.42px;
+      }
+    }
+
+    @at-root [data-type="footer"] & {
+      padding-inline: 1rem;
+      font-size: 1.4rem;
+    }
+  }
+
+  &__responses {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.8rem;
+    z-index: 10;
+  }
+
+  &__response {
+    padding: 0.8rem 1rem;
+    font-size: 1.2rem;
+    border-radius: 4px;
+    font-family: var(--f-en);
+
+    @at-root [data-type="menu"] & {
+      font-size: 1.3rem;
+      padding: 1rem 1.2rem;
+    }
+
+    &--error {
+      background-color: rgba(255, 59, 48, 0.15);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      color: #ff6b6b;
+    }
+
+    &--success {
+      background-color: rgba(52, 199, 89, 0.15);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+      color: #51cf66;
+    }
+  }
+
+  // Loading state
+  &.--loading {
+    .c-newsletter__button {
+      position: relative;
+      color: transparent;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 16px;
+        height: 16px;
+        margin: -8px 0 0 -8px;
+        border: 2px solid #1A1A1A;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: newsletter-spin 0.8s linear infinite;
+      }
     }
   }
 }
+
+@keyframes newsletter-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 </style>
+
+<script>
+// MailChimp integration script
+if (typeof window !== 'undefined') {
+  // Initialize MailChimp field validation arrays
+  if (!window.fnames) {
+    window.fnames = [];
+    window.ftypes = [];
+    window.fnames[0] = 'EMAIL';
+    window.ftypes[0] = 'email';
+    window.fnames[1] = 'FNAME';
+    window.ftypes[1] = 'text';
+    window.fnames[2] = 'LNAME';
+    window.ftypes[2] = 'text';
+    window.fnames[3] = 'ADDRESS';
+    window.ftypes[3] = 'address';
+    window.fnames[4] = 'PHONE';
+    window.ftypes[4] = 'phone';
+    window.fnames[5] = 'BIRTHDAY';
+    window.ftypes[5] = 'birthday';
+    window.fnames[6] = 'MMERGE6';
+    window.ftypes[6] = 'text';
+  }
+
+  // Enhanced form handling
+  const forms = document.querySelectorAll('#mc-embedded-subscribe-form');
+
+  forms.forEach(form => {
+    const emailInput = form.querySelector('#mce-EMAIL') as HTMLInputElement;
+    const submitButton = form.querySelector('#mc-embedded-subscribe') as HTMLButtonElement;
+    const newsletterContainer = form.closest('.c-newsletter');
+    const errorDiv = form.querySelector('#mce-error-response') as HTMLElement;
+    const successDiv = form.querySelector('#mce-success-response') as HTMLElement;
+
+    if (!emailInput || !submitButton) return;
+
+    // Email validation function
+    const isValidEmail = (email: string): boolean => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+
+    // Show message function
+    const showMessage = (type: 'error' | 'success', message: string) => {
+      const messageDiv = type === 'error' ? errorDiv : successDiv;
+      const otherDiv = type === 'error' ? successDiv : errorDiv;
+
+      if (messageDiv) {
+        messageDiv.innerHTML = message;
+        messageDiv.style.display = 'block';
+      }
+      if (otherDiv) {
+        otherDiv.style.display = 'none';
+      }
+
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        if (messageDiv) {
+          messageDiv.style.display = 'none';
+        }
+      }, 5000);
+    };
+
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+
+      // Client-side validation
+      if (!email) {
+        showMessage('error', 'Please enter your email address.');
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        showMessage('error', 'Please enter a valid email address.');
+        return;
+      }
+
+      // Show loading state
+      if (newsletterContainer) {
+        newsletterContainer.classList.add('--loading');
+      }
+      submitButton.disabled = true;
+
+      // Submit to MailChimp
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // MailChimp doesn't support CORS
+      })
+      .then(() => {
+        // Since we're using no-cors, we can't read the response
+        // But we can assume success if no network error occurred
+        showMessage('success', 'Thank you for subscribing! Please check your email to confirm.');
+        emailInput.value = '';
+      })
+      .catch(() => {
+        showMessage('error', 'An error occurred. Please try again later.');
+      })
+      .finally(() => {
+        // Remove loading state
+        if (newsletterContainer) {
+          newsletterContainer.classList.remove('--loading');
+        }
+        submitButton.disabled = false;
+      });
+    });
+
+    // Real-time email validation
+    emailInput.addEventListener('input', function() {
+      if (errorDiv && errorDiv.style.display === 'block') {
+        errorDiv.style.display = 'none';
+      }
+    });
+
+    // Enter key handler
+    emailInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+  });
+}
+</script>

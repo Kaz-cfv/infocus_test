@@ -1,45 +1,25 @@
 ---
-import InterviewCard from "../parts/InterviewCard.astro";
-
-interface Props {
-  interviews: any[];
-}
-
-const { interviews } = Astro.props;
-
-// 6件以上の場合にVIEW ALLボタンを表示
-const showViewAll = interviews.length >= 6;
+// インタビューデータはクライアントサイド(Jobs.js)で取得・レンダリング
 ---
 
 <aside class="p-jobs-aside">
   <h2 class="p-jobs-aside__title">STAFF INTERVIEW</h2>
 
   <div class="p-jobs-aside__content">
+    <!-- インタビューカードは Jobs.js で動的に生成 -->
     <ul class="p-jobs-aside__list js-more-content">
-      {interviews.map((interview, index) => (
-        <li class="p-jobs-aside__list-item js-more-item">
-          <InterviewCard
-            title={interview.title.rendered}
-            image={interview.acfs.image?.url}
-            name={interview.acfs.name || ''}
-            position={interview.acfs.position || ''}
-            url={interview.acfs.url}
-          />
-        </li>
-      ))}
+      <!-- Cards will be rendered by Jobs.js -->
     </ul>
-
-    {showViewAll && (
-      <div class="p-jobs-aside__btn">
-        <button class="js-more">
-          <span>VIEW ALL</span>
-        </button>
-      </div>
-    )}
+    <!-- VIEW ALL ボタンも Jobs.js で表示制御 -->
+    <div class="p-jobs-aside__btn">
+      <button class="js-more">
+        <span>VIEW ALL</span>
+      </button>
+    </div>
   </div>
 </aside>
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
@@ -124,4 +104,78 @@ const showViewAll = interviews.length >= 6;
   }
 }
 
+.c-interview-card {
+  display: grid;
+  row-gap: 12px;
+  @include me.pc {
+    &.mouse-over {
+      &:hover {
+        .c-interview-card__thumb {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(7px);
+        }
+
+        .c-interview-card__thumb img {
+          // 画像自体を拡大（360px → 368px相当）
+          // transform: scale(1.0222); // 368/360 = 1.0222
+        }
+      }
+    }
+  }
+
+  &__thumb {
+    display: block;
+    aspect-ratio: 340 / 192;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
+
+    img {
+      transition: transform 0.3s cubic-bezier(0, 0, 0.17, 1);
+    }
+  }
+
+  &__info {
+    display: grid;
+    row-gap: 10px;
+
+    &-title {
+      a {
+        color: var(--c-white);
+        font-size: 1.6rem;
+        font-weight: 600;
+        line-height: 1.7;
+      }
+    }
+
+    &-staff {
+      color: var(--c-white);
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    &-tags {
+      display: flex;
+      column-gap: 8px;
+
+      li {
+        display: flex;
+        column-gap: 8px;
+        color: rgba($color: #AAAAAA, $alpha: 0.9);
+        font-size: 1.4rem;
+        font-weight: 700;
+
+        &:not(:last-child) {
+          &::after {
+            content: "/";
+          }
+        }
+
+        a, span {
+          color: rgba($color: #AAAAAA, $alpha: 0.9);
+        }
+      }
+    }
+  }
+}
 </style>

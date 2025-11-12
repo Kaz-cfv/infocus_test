@@ -1,4 +1,10 @@
 ---
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
 // ポジションのデータ
 const positions = [
   { name: "Creative Director", slug: "creative-director" },
@@ -22,16 +28,21 @@ const positions = [
   <h2 class="p-team-head__title">TEAM</h2>
 
   <ul class="p-team-head__position js-hover">
+    <li class="p-team-head__position-item" data-filter="">
+      <a href={`${currentUrl}team/`} class="js-hover-item">ALL</a>
+      <span class="p-team-head__position-separator js-hover-item">/</span>
+    </li>
     {positions.map((position => (
-      <li class="p-team-head__position-item js-hover-item" data-filter="">
-        <a href={`/team/?position=${position.slug}`}>{position.name}</a>
+      <li class="p-team-head__position-item" data-filter="">
+        <a href={`${currentUrl}team/?position=${position.slug}`} class="js-hover-item">{position.name}</a>
+        <span class="p-team-head__position-separator js-hover-item">/</span>
       </li>
     )))}
   </ul>
 
-  <div class="p-team-head__btn" data-filter="current">
+  <!-- <div class="p-team-head__btn" data-filter="current">
     <a href="/team/">ALL</a>
-  </div>
+  </div> -->
 </div>
 
 
@@ -43,7 +54,7 @@ const positions = [
   display: grid;
   grid-template-columns: 100%;
   align-content: flex-start;
-  margin-block-start: 50px;
+  margin-block-start: 40px;
   padding-inline: 30px;
   @include me.pc {
     grid-template-columns: max-content 453px;
@@ -82,22 +93,23 @@ const positions = [
       display: flex;
       align-items: center;
       column-gap: 9px;
-      &::after {
-        content: "/";
-      }
       &:last-child {
-        &::after {
+        .p-team-head__position-separator {
           display: none;
         }
       }
       &[data-filter="current"] {
-        pointer-events: none;
+        // pointer-events: none;
         a {
           color: var(--c-white);
         }
+        .p-team-head__position-separator {
+          color: var(--c-gray);
+        }
       }
       &[data-filter="uncurrent"] {
-        a {
+        a,
+        .p-team-head__position-separator {
           color: var(--c-gray);
         }
       }
@@ -107,6 +119,12 @@ const positions = [
         font-size: 1.4rem;
         font-weight: 700;
       }
+    }
+
+    &-separator {
+      pointer-events: none;
+      font-size: 1.4rem;
+      font-weight: 700;
     }
 
   }

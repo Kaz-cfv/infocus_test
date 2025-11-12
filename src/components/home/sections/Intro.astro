@@ -1,26 +1,65 @@
 ---
 // Props型定義 - 空のPropsでクライアントサイドで動的に設定
-export interface Props {}
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
 ---
 
 <div class="p-home-intro">
   <div class="p-home-intro-head">
-    <h1 class="p-home-intro-head__caption">We are&nbsp;<br>a digital branding studio</h1>
-    <a href="/about/" class="p-home-intro-head__link">
+    <h1 class="p-home-intro-head__caption">
+      A digital branding studio In Tokyo <br>and New York
+    </h1>
+    <a href=`${currentUrl}about/` class="p-home-intro-head__link">
       Learn more
       <span class="p-home-intro-head__icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.54 5.044H7.596C6.684 4.204 5.124 2.68 4.152 1.732L5.052 0.831999L10.032 5.716V5.74L5.052 10.648L4.152 9.7C5.124 8.764 6.684 7.228 7.596 6.388H0.54V5.044Z" fill="white"/></svg></span>
     </a>
   </div>
-  <ul class="p-home-intro-category" id="introCategoryList">
+  <ul class="p-home-intro-category" id="introCategoryList" data-language="{lang}">
     <!-- カテゴリはクライアントサイドで動的に追加 -->
   </ul>
 </div>
 
 <!-- クライアントサイドでAPIデータを受け取る -->
 <script>
+  /**
+   * 現在の言語を検出
+   */
+  function detectCurrentLanguage() {
+    // data-language属性から取得を試みる
+    const categoryList = document.getElementById('introCategoryList');
+    if (categoryList) {
+      const langAttr = categoryList.getAttribute('data-language');
+      if (langAttr && (langAttr === 'en' || langAttr === 'ja')) {
+        return langAttr;
+      }
+    }
+
+    // フォールバック: URLから検出
+    return window.location.pathname.includes('/en/') ? 'en' : 'ja';
+  }
+
+  /**
+   * 言語に応じたプロジェクトURLを生成
+   * @param {string} path - 相対パス
+   * @returns {string} 適切な言語パスのURL
+   */
+  function getLocalizedProjectsURL(path = '') {
+    const currentLanguage = detectCurrentLanguage();
+
+    if (currentLanguage === 'en') {
+      return `/en/projects/${path}`;
+    } else {
+      return `/projects/${path}`;
+    }
+  }
+
   // カスタムイベントでAPIデータを受け取る
   document.addEventListener('homeDataLoaded', (event) => {
     const homeData = (event as CustomEvent).detail;
+    const currentLanguage = detectCurrentLanguage();
 
     // カテゴリデータを処理
     let categories = [];
@@ -52,16 +91,14 @@ export interface Props {}
 
       // 全プロジェクト数を計算
       totalProjects = categories.reduce((total, cat) => total + cat.count, 0);
-
-      // console.log('📊 カテゴリ取得:', categories.length + '件', 'Total:', totalProjects);
     }
 
-    // カテゴリリストを動的に追加
+    // カテゴリリストを動的に追加（言語対応版）
     const categoryList = document.getElementById('introCategoryList');
     if (categoryList) {
       const allItem = `
         <li class="p-home-intro-category__item" data-catgory="ALL">
-          <a href="/projects/" class="p-home-intro-category__link">
+          <a href="${getLocalizedProjectsURL()}" class="p-home-intro-category__link">
             <span class="p-home-intro-category__name">ALL</span>
             <span class="p-home-intro-category__num">${totalProjects}</span>
           </a>
@@ -70,7 +107,7 @@ export interface Props {}
 
       const categoryItems = categories.map(category => `
         <li class="p-home-intro-category__item" data-catgory="${category.name}">
-          <a href="/projects/?category=${category.slug}" class="p-home-intro-category__link">
+          <a href="${getLocalizedProjectsURL(`?category=${category.slug}`)}" class="p-home-intro-category__link">
             <span class="p-home-intro-category__name">${category.name}</span>
             <span class="p-home-intro-category__num">${category.count}</span>
           </a>
@@ -78,6 +115,8 @@ export interface Props {}
       `).join('');
 
       categoryList.innerHTML = allItem + categoryItems;
+
+      // console.log(`✅ Intro category links updated for ${currentLanguage} language`);
     }
   });
 </script>
@@ -87,12 +126,13 @@ export interface Props {}
 @use '../../../assets/scss/mixin' as mi;
 
 .p-home-intro {
-  border-top: solid 2px var(--c-white);
-  border-bottom: solid 2px var(--c-white);
+  border-top: solid 1px var(--c-white);
+  border-bottom: solid 1px var(--c-white);
   @include me.pc {
     display: grid;
     grid-template-columns: 956px 1fr;
     align-items: center;
+    min-height: 286px;
     @media screen and (max-width: 1140px) {
       display: grid;
       grid-template-columns: 1fr 184px;
@@ -114,7 +154,7 @@ export interface Props {}
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 2px;
+        height: 1px;
         background-color: var(--c-white);
       }
     }
@@ -151,9 +191,6 @@ export interface Props {}
       display: flex;
       justify-content: center;
       align-items: center;
-      @include me.sp {
-        transform: rotate(90deg) translateX(1px);
-      }
     }
   }
 
@@ -174,7 +211,7 @@ export interface Props {}
         background-color: var(--c-gray02);
       }
       &:last-child {
-        background-color: transparent;
+        // background-color: transparent;
       }
     }
 
@@ -186,9 +223,16 @@ export interface Props {}
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-inline: 8px 13px;
+      padding-inline: 8px calc(13px + 13px);
       padding-block: 13px;
       font-weight: 700;
+      @include me.pc {
+        transition: background-color .3s var(--ease-out-quad), color .3s var(--ease-out-quad);
+        &:hover {
+          background-color: var(--c-white);
+          color: var(--c-black-base);
+        }
+      }
       @include me.sp {
         padding-inline: 16px;
         padding-block: 11px 9px;

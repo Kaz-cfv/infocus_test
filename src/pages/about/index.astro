@@ -1,9 +1,11 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Head from '../../components/about/section/Head.astro';
-import Clients from '../../components/about/section/Clients.astro';
-import Business from '../../components/about/section/Business.astro';
-import Awards from '../../components/about/section/Awards.astro';
+import Layout from '@layouts/Layout.astro';
+import Head from '@components/about/section/Head.astro';
+import Clients from '@components/about/section/Clients.astro';
+import Business from '@components/about/section/Business.astro';
+import Awards from '@components/about/section/Awards.astro';
+import Cube from '@components/about/section/Cube.astro';
+import PressMedia from '@components/about/section/PressMedia.astro';
 
 const pageMeta = {
   title: "About",
@@ -19,8 +21,10 @@ const pageMeta = {
 <div class="l-main-content" data-main-content>
   <Head />
   <Clients />
+  <Cube />
   <Business />
   <Awards />
+  <PressMedia />
 </div>
 
 </Layout>
@@ -30,3 +34,9 @@ const pageMeta = {
 @use '../../assets/scss/mixin' as mi;
 
 </style>
+
+<script>
+import {webgl} from '../../assets/js/modules/WebGL/index.js';
+
+webgl.init();
+</script>

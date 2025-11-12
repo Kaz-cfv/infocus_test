@@ -3,7 +3,7 @@
 
 <div class="contact__content" data-state="complete">
   <div class="p-contact-complete__content">
-    <h2 class="p-contact-complete__title">Thank you for your inquiry</h2>
+    <h2 class="p-contact-complete__title">Thank you for your inquiry.</h2>
     <div class="p-contact-complete__actions">
       <a href="/" class="p-contact-complete__back-btn">
         Back to TOP
@@ -18,11 +18,17 @@
 
 .p-contact-form {
   .contact__content[data-state="complete"] {
+    height: 50vh;
+    max-height: 70vh;
     padding-block: 60px;
     text-align: center;
 
     .p-contact-complete__content {
       // 中央揃え用のコンテナ
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
     }
 
     .p-contact-complete__title {

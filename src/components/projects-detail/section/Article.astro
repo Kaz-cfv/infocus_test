@@ -15,9 +15,10 @@ export interface Props {
     slug: string;
     title: string;
   } | null;
+  lang?: 'en' | 'ja';
 }
 
-const { project, prevProject = null, nextProject = null } = Astro.props;
+const { project, prevProject = null, nextProject = null, lang = 'ja' } = Astro.props;
 
 const getEyecatchData = () => {
   const movieUrl = project.acfs?.main?.movie?.url;
@@ -73,9 +74,9 @@ const article = {
 ---
 
 <article class="p-project-detail-article" data-main-content>
-  <div class="p-project-detail__fixedNavi--sp">
-    <FixedNavi prevProject={prevProject} nextProject={nextProject} />
-  </div>
+  <!-- <div class="p-project-detail__fixedNavi--sp">
+    <FixedNavi prevProject={prevProject} nextProject={nextProject} lang={lang} />
+  </div> -->
   <div class="p-project-detail-article__info">
     <div class="p-project-detail-article__info-inner">
       {article.eyecatch.hasMedia && (
@@ -95,9 +96,9 @@ const article = {
         service={article.service}
         awards={article.awards}
       />
-      <div class="p-project-detail__fixedNavi--pc">
-        <FixedNavi prevProject={prevProject} nextProject={nextProject} />
-      </div>
+    </div>
+    <div class="p-project-detail__fixedNavi--pc">
+      <FixedNavi prevProject={prevProject} nextProject={nextProject} lang={lang} />
     </div>
   </div>
 
@@ -121,8 +122,10 @@ const article = {
     <Credit creditData={article.credit} />
   </div>
 
+  <div class="p-project-detail__fixedNavi--sp">
+    <FixedNavi prevProject={prevProject} nextProject={nextProject} lang={lang} />
+  </div>
 </article>
-
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;
@@ -130,25 +133,32 @@ const article = {
 
 .p-project-detail-article {
   display: grid;
-  grid-template-columns: 100%;
   align-content: flex-start;
   @include me.pc {
     grid-template-columns: 608px 1fr;
+  }
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include me.sp {
+    grid-template-columns: 100%;
   }
 }
 
 .p-project-detail__fixedNavi {
   &--pc {
-    // margin-block-start: 125px;
-    margin-block-start: auto;
+    position: sticky;
+    top: calc(100vh - var(--hd-height-pc-scrolled) - 10px);
+    left: 0;
+    width: 100%;
+    // border-bottom: solid 1px var(--c-gray);
     @include me.sp {
       display: none;
     }
   }
   &--sp {
     position: sticky;
-    top: calc(var(--hd-height-sp) - 1px);
-    // top: calc(100% - var(--hd-height-sp) - 1px);
+    bottom: 0;
     left: 0;
     @include mi.z-contents(1);
     background-color: var(--c-black-base);
@@ -159,12 +169,13 @@ const article = {
 }
 
 .p-project-detail-article__info {
+  position: relative;
   @include me.pc {
     height: 100%;
     border-right: solid 1px var(--c-gray);
   }
   @include me.sp {
-    padding-block-end: 60px;
+    padding-block-end: 40px;
     border-bottom: solid 1px var(--c-gray);
   }
 
@@ -173,11 +184,9 @@ const article = {
       display: flex;
       flex-direction: column;
       position: sticky;
-      top: 0;
+      top: calc(var(--hd-height-pc-scrolled) + 114px);
       left: 0;
-      height: 100vh;
-      padding-block-start: 114px;
-      border-bottom: solid 1px var(--c-gray);
+      padding-block-end: 176px;
     }
   }
 
@@ -208,9 +217,12 @@ const article = {
 
 .p-project-detail-article__content {
   padding-block-end: 180px;
+  @include me.pc {
+    border-bottom: solid 1px var(--c-gray);
+  }
   @include me.sp {
     padding-inline: 20px;
-    padding-block: 60px 80px;
+    padding-block: 40px;
   }
 }
 
@@ -223,5 +235,4 @@ const article = {
     max-width: 100%;
   }
 }
-
 </style>

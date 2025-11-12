@@ -40,7 +40,7 @@ export class Home {
   async fetchHomeData() {
     try {
       const homeData = await this.apiClient.getHomeData();
-      console.log('Home data:', homeData);
+      // console.log('Home data:', homeData);
 
       // カスタムイベントで他のコンポーネントにデータを配信
       const event = new CustomEvent('homeDataLoaded', {

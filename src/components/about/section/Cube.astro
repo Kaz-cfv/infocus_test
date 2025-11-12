@@ -1,0 +1,29 @@
+---
+---
+
+<div class="p-about-cube">
+  <div class="webgl-canvas"></div>
+</div>
+
+<style lang="scss" is:global>
+@use '../../../assets/scss/mediaquery' as me;
+@use '../../../assets/scss/mixin' as mi;
+
+.p-about-cube{
+    width:100%;
+    height:516px;
+    @include me.sp {
+        height:calc(160/420*100vw);
+    }
+    .webgl-canvas{
+        width:100%;
+        height:100%;
+    }
+    canvas{
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+</style>

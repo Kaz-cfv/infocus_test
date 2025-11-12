@@ -1,62 +1,11 @@
 ---
-import Accordion from "../parts/Accordion.astro";
 import ButtonJoin from "../parts/ButtonJoin.astro";
 
 interface Props {
-  positions: any[];
+  lang?: 'en' | 'ja'
 }
 
-const { positions } = Astro.props;
-
-// APIデータをアコーディオン用の形式に変換
-// 改行コードを<br>タグに変換する関数
-const formatTextWithBreaks = (text: string | undefined) => {
-  if (!text) return '';
-  return text.replace(/\r\n|\n|\r/g, '<br>');
-};
-
-const formattedPositions = positions.map(position => ({
-  title: position.title.rendered,
-  place: position.acfs.place,
-  data: [
-    {
-      label: '仕事内容',
-      content: formatTextWithBreaks(position.acfs.details)
-    },
-    {
-      label: '応募資格',
-      content: formatTextWithBreaks(position.acfs.requires)
-    },
-    {
-      label: '教育スキル',
-      content: formatTextWithBreaks(position.acfs.skill)
-    },
-    {
-      label: '雇用形態',
-      content: formatTextWithBreaks(position.acfs.type)
-    },
-    {
-      label: '勤務地',
-      content: formatTextWithBreaks(position.acfs.location)
-    },
-    {
-      label: '勤務時間',
-      content: formatTextWithBreaks(position.acfs.hours)
-    },
-    {
-      label: '給与',
-      content: formatTextWithBreaks(position.acfs.salary)
-    },
-    {
-      label: '待遇',
-      content: formatTextWithBreaks(position.acfs.benefis)
-    },
-    {
-      label: '休日・休暇',
-      content: formatTextWithBreaks(position.acfs.timeoff)
-    }
-  ].filter(item => item.content) // データがある項目のみ表示
-}));
+const { lang = 'ja' } = Astro.props;
 ---
 
 <section id="position" class="p-career-position">
@@ -64,13 +13,7 @@ const formattedPositions = positions.map(position => ({
   <span class="p-career-position__sub">現在募集中のポジション</span>
 
   <div class="p-career-position__content">
-    {formattedPositions.map((item) => (
-      <Accordion
-        title={item.title}
-        sub={item.place}
-        jobData={item.data}
-      />
-    ))}
+    <!-- Career positions will be rendered by JavaScript -->
   </div>
 
   <div class="p-career-position__info">
@@ -86,22 +29,22 @@ const formattedPositions = positions.map(position => ({
   </div>
 
   <div class="p-career-position__btn">
-    <ButtonJoin />
+    <ButtonJoin lang={lang} />
   </div>
 </section>
 
 
-<style lang="scss">
+<style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
 @use '../../../assets/scss/mixin' as mi;
 
 .p-career-position {
   padding-inline: 40px;
   padding-block: 100px;
-  border-top: solid 2px var(--c-gray);
+  border-top: solid 1px var(--c-gray);
   @include me.sp {
     padding-inline: 20px;
-    padding-block: 80px 40px;
+    padding-block: 60px 40px;
   }
 
   &__title {
@@ -174,4 +117,144 @@ const formattedPositions = positions.map(position => ({
   }
 }
 
+details > summary,
+summary {
+  list-style: none;
+  &::-webkit-details-marker,
+  &::marker {
+    display: none;
+  }
+}
+
+.c-accordion {
+
+  &__wrap {
+    padding-block-end: 16px;
+    border-top: solid 1px var(--c-gray03);
+    border-bottom: solid 1px var(--c-gray03);
+    @include me.pc {
+      position: relative;
+      &::after {
+        content: "";
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 62.8px;
+        background-color: var(--c-white);
+        transition: opacity .3s var(--ease-in-out-quad);
+      }
+      &:hover {
+        &::after {
+          opacity: 1;
+        }
+        .c-accordion__head-title,
+        .c-accordion__head-icon {
+          color: var(--c-black-base);
+        }
+        .c-accordion__head-category {
+          color: rgba(#000, 0.5);
+        }
+      }
+    }
+  }
+
+  &__head {
+    display: grid;
+    align-items: center;
+    padding-block: 16px 0;
+    @include me.pc {
+      grid-template-columns: 383px 1fr max-content;
+      column-gap: 14px;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
+    @include me.sp {
+      grid-template-columns: calc(68.6842%) 1fr max-content;
+      column-gap: 20px;
+    }
+
+    &-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+
+    &-category {
+      color: rgba($color: #FFFFFF, $alpha: 0.5);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.4rem;
+      }
+    }
+
+    &-icon {
+      font-size: 1.6rem;
+      line-height: 1.6;
+      @include me.sp {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  &__content {
+    display: grid;
+    row-gap: 32px;
+    padding-block: 36px;
+    @include me.pc {
+      margin-inline-start: calc(383px + 14px);
+    }
+
+    dl {
+      display: grid;
+      row-gap: 12px;
+    }
+
+    dt {
+      font-size: 1.2rem;
+      font-weight: 600;
+      line-height: 1.8;
+    }
+
+    span {
+      display: inline-block;
+      padding-inline: 10px;
+      padding-block: 2px;
+      background-color: var(--c-white);
+      color: var(--c-black-base);
+    }
+
+    dd {
+      font-size: 1.4rem;
+      line-height: 1.7;
+
+      p:not(:first-child) {
+        margin-block-start: 8px;
+      }
+
+      ul {
+        display: grid;
+        row-gap: 4px;
+
+        li {
+          display: grid;
+          grid-template-columns: max-content 1fr;
+          column-gap: 2px;
+
+          &::before {
+            content: "・";
+          }
+        }
+      }
+    }
+  }
+}
 </style>

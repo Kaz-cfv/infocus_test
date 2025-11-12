@@ -27,7 +27,7 @@ const {
 } = Astro.props;
 ---
 
-<div class="c-project-card" data-id={id} data-type={type}>
+<div class="c-project-card mouse-over" data-id={id} data-type={type}>
   <a href={url} class="c-project-card__image-wrapper">
     <img src={imageSrc} alt={imageAlt} class="c-project-card__image">
     {videoSrc && (
@@ -42,12 +42,14 @@ const {
     )}
   </a>
   <div class="c-project-card__content">
-    <h3 class="c-project-card__title">{title}</h3>
-    <div class="c-project-card__tags">
+    <h3 class="c-project-card__title">
+      <a href={url}>{title}</a>
+    </h3>
+    <div class="c-project-card__tags js-hover">
       {tags.map((tag, index) => (
         <>
-          <a href={tag.url} class="c-project-card__category">{tag.name}</a>
-          {index < tags.length - 1 && <span class="c-project-card__separator">,</span>}
+          <a href={tag.url} class="c-project-card__category js-hover-item">{tag.name}</a>
+          {index < tags.length - 1 && <span class="c-project-card__separator js-hover-item">,</span>}
         </>
       ))}
     </div>
@@ -65,22 +67,25 @@ const {
   transition: opacity 0.3s ease-out;
   height: 100%;
 
-  &[data-type="cover"] {
-    height: 100%;
-  }
-
   @include me.pc {
-    &:hover {
-      opacity: 0.8;
+    &.mouse-over {
+      &:hover {
+        .c-project-card__image-wrapper {
+          // 各辺から10px内側にクリップ（360px → 340px相当）
+          clip-path: inset(7px);
+        }
 
-      .c-project-card__image {
-        transform: scale(1.05);
-      }
-
-      .c-project-card__video {
-        transform: scale(1.05);
+        .c-project-card__image,
+        .c-project-card__video {
+          // 画像自体を拡大（360px → 368px相当）
+          // transform: scale(1.0222); // 368/360 = 1.0222
+        }
       }
     }
+  }
+
+  &[data-type="cover"] {
+    height: 100%;
   }
 
   &__image-wrapper {
@@ -88,6 +93,8 @@ const {
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 9;
+    clip-path: inset(0px);
+    transition: clip-path .4s cubic-bezier(0.16, 1.02, 0.52, 1.03);
     @at-root [data-type="pickup"] & {
       @include me.pc {
         margin-top: 30px;
@@ -118,7 +125,6 @@ const {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
   }
 
   &__video {
@@ -126,7 +132,6 @@ const {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
     z-index: 1;
   }
 
@@ -143,17 +148,19 @@ const {
   }
 
   &__title {
-    color: var(--c-white);
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 2.32rem;
-    @include me.sp {
-      font-size: 1.6rem;
-    }
-    @at-root [data-type="pickup"] & {
-      font-size: 2rem;
+    a {
+      color: var(--c-white);
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 2rem;
       @include me.sp {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
+      }
+      @at-root [data-type="pickup"] & {
+        font-size: 2rem;
+        @include me.sp {
+          font-size: 1.8rem;
+        }
       }
     }
   }

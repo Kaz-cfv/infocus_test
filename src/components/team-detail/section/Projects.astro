@@ -1,161 +1,44 @@
 ---
 import ProjectCard from "../../ProjectCard.astro";
 
-const projects = [
-  {
-    id: 1,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/07.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 2,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/02.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 3,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/21.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 4,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/pickup02.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 5,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/01.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 6,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/13.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 7,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/09.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 8,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/22.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 9,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/04.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 10,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/20.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 11,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/23.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 12,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/18.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 13,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/24.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 14,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/25.jpg',
-    url: '/projects/detail/',
-  },
-  {
-    id: 15,
-    title: 'LOEWE x GR8LOEWE x GR8',
-    tags: [
-      { name: 'Web', url: '/category/web' }
-    ],
-    imageSrc: '/common/images/home/projects/26.jpg',
-    url: '/projects/detail/',
-  },
-]
+interface Tag {
+  name: string;
+  url: string;
+}
+
+interface ProjectData {
+  id: number;
+  title: string;
+  tags: Tag[];
+  imageSrc: string;
+  url: string;
+}
+
+interface Props {
+  projects?: ProjectData[];
+}
+
+const { projects = [] } = Astro.props;
 ---
 
-<section class="p-team-detail__project">
-  <h2 class="p-team-detail__project-title">MY PROJECTS</h2>
-  <ul class="p-team-detail__project-list">
-    {projects.map((project) => (
-      <li class="p-team-detail__project-item">
-        <ProjectCard
-          id={project.id}
-          title={project.title}
-          tags={project.tags}
-          imageSrc={project.imageSrc}
-          url={project.url}
-        />
-      </li>
-    ))}
-  </ul>
-</section>
+{projects.length > 0 && (
+  <section class="p-team-detail__project">
+    <h2 class="p-team-detail__project-title">MY PROJECTS</h2>
+    <ul class="p-team-detail__project-list">
+      {projects.map((project) => (
+        <li class="p-team-detail__project-item">
+          <ProjectCard
+            id={project.id}
+            title={project.title}
+            tags={project.tags}
+            imageSrc={project.imageSrc}
+            url={project.url}
+          />
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
 
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
@@ -189,8 +72,8 @@ const projects = [
     }
     @include me.sp {
       grid-template-columns: repeat(2, 1fr);
-      column-gap: 20px;
-      row-gap: 44px;
+      column-gap: 16px;
+      row-gap: 24px;
       margin-block-start: 40px;
     }
   }

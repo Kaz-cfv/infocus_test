@@ -1,4 +1,10 @@
 ---
+interface Props {
+  lang?: 'en' | 'ja'
+}
+const { lang = 'ja' } = Astro.props;
+const currentUrl = lang === 'en' ? '/en/' : '/';
+
 const message = {
   position: '代表取締役',
   name: '井口忠正',
@@ -37,7 +43,7 @@ const message = {
         <p>{desc}</p>
       )))}
     </div>
-    <a href="/careers/jobs/" class="p-career-message__link">READ MORE</a>
+    <a href=`${currentUrl}careers/jobs/` class="p-career-message__link">READ MORE</a>
   </div>
 </section>
 
@@ -49,7 +55,7 @@ const message = {
   display: grid;
   padding-inline: 40px;
   padding-block: 100px;
-  border-top: solid 2px var(--c-gray);
+  border-top: solid 1px var(--c-gray);
   @include me.pc {
     grid-template-columns: 1fr 38.3104%;
     column-gap: 93px;
@@ -57,7 +63,7 @@ const message = {
   @include me.sp {
     row-gap: 32px;
     padding-inline: 20px;
-    padding-block: 80px;
+    padding-block: 80px 60px;
   }
 
   &__head {
