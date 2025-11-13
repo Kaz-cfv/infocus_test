@@ -76,7 +76,7 @@ export class ApiClient {
 
     while (hasMorePages) {
       // langパラメータを含むURLを構築
-      const url = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects?lang=${lang}&per_page=100&page=${currentPage}`;
+      const url = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/projects?lang=${lang}&per_page=100&page=${currentPage}&orderby=menu_order&order=asc`;
       // console.log('API Request:', url);
 
       try {
@@ -119,7 +119,7 @@ export class ApiClient {
 
     while (hasMorePages) {
       // langパラメータを含むURLを構築
-      const url = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/team?lang=${lang}&per_page=50&page=${currentPage}`;
+      const url = `https://infocus.wp.site-prev2.com/wp-json/wp/v2/team?lang=${lang}&per_page=50&page=${currentPage}&orderby=menu_order&order=asc`;
       // console.log('API Request:', url);
 
       try {

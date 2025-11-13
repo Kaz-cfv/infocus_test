@@ -1,102 +1,132 @@
 ---
-// Props型定義 - 空のPropsでクライアントサイドで動的に設定
-export interface Props {}
+// Props型定義
+export interface Hero {
+  movie: string;
+  movie_sp?: string;
+  // 他のフィールドがあれば追加
+}
+
+export interface Props {
+  heros: Hero[];
+}
+
+const { heros = [] } = Astro.props;
 ---
 
-<div class="p-home-kv" data-video id="kvContainer">
-  <div class="p-home-kv__item">
-    <video
-      id="kvVideo"
-      autoplay
-      muted
-      playsinline
-      class="p-home-kv__video"
-    >
-    </video>
-  </div>
+<div class="p-home-kv" data-kv>
+  {heros.length > 0 ? (
+    heros.map((hero, index) => (
+      <div
+        class={`p-home-kv__item ${index === 0 ? 'is-active' : ''}`}
+        data-video-index={index}
+      >
+        <video
+          class="p-home-kv__video p-home-kv__video--pc"
+          autoplay={index === 0}
+          muted
+          playsinline
+          loop={heros.length === 1}
+          src={hero.movie}
+          data-device="pc"
+        />
+
+        {hero.movie_sp && (
+          <video
+            class="p-home-kv__video p-home-kv__video--sp"
+            autoplay={index === 0}
+            muted
+            playsinline
+            loop={heros.length === 1}
+            src={hero.movie_sp}
+            data-device="sp"
+          />
+        )}
+      </div>
+    ))
+  ) : (
+    <div class="p-home-kv__item is-active">
+      <p>動画データがありません</p>
+    </div>
+  )}
 </div>
 
-<!-- クライアントサイドでAPIデータを受け取る -->
 <script>
-  // カスタムイベントでAPIデータを受け取る
-  document.addEventListener('homeDataLoaded', (event) => {
-    const homeData = (event as CustomEvent).detail;
+  class KvVideoManager {
+    private container: HTMLElement | null;
+    private items: NodeListOf<HTMLElement>;
+    private currentIndex: number = 0;
+    private totalVideos: number = 0;
+    private currentVideo: HTMLVideoElement | null = null;
 
-    // ヒーロー動画のデータを処理
-    let herosData = null;
-    if (homeData?.heros) {
-      herosData = homeData.heros;
-    } else if (homeData?.home?.heros) {
-      herosData = homeData.home.heros;
+    constructor() {
+      this.container = document.querySelector('[data-kv]');
+      if (!this.container) return;
+
+      this.items = this.container.querySelectorAll('.p-home-kv__item');
+      this.totalVideos = this.items.length;
+
+      // 1つしかない場合はループ再生なので切り替え不要
+      if (this.totalVideos <= 1) return;
+
+      this.init();
     }
 
-    const videoElement = document.getElementById('kvVideo');
-    if (!videoElement) {
-      console.warn('⚠️ 動画要素が見つかりませんでした');
-      return;
+    private init(): void {
+      // 最初のアクティブな動画を取得
+      const activeItem = this.container?.querySelector('.p-home-kv__item.is-active');
+      if (activeItem) {
+        this.currentVideo = this.getActiveVideo(activeItem as HTMLElement);
+        if (this.currentVideo) {
+          this.currentVideo.addEventListener('ended', this.onVideoEnd.bind(this));
+        }
+      }
     }
-    const video = videoElement as HTMLVideoElement;
 
-    if (herosData && Array.isArray(herosData) && herosData.length > 0) {
+    private getActiveVideo(item: HTMLElement): HTMLVideoElement | null {
       // デバイス判定
       const isSP = window.innerWidth <= 768;
+      const deviceClass = isSP ? 'p-home-kv__video--sp' : 'p-home-kv__video--pc';
 
-      // デバイスに応じて適切な動画URLを選択
-      const videoUrls = herosData.map(hero => {
-        // SP用の動画がある場合はデバイスに応じて切り替え
-        if (isSP && hero.movie_sp) {
-          return hero.movie_sp;
-        }
-        // PC用またはSP用動画がない場合はmovieを使用
-        return hero.movie;
-      }).filter(url => url);
+      // デバイスに応じた動画を取得
+      const video = item.querySelector(`.${deviceClass}`) as HTMLVideoElement;
 
-      let currentIndex = 0;
+      // SP用がない場合はPC用にフォールバック
+      if (!video && isSP) {
+        return item.querySelector('.p-home-kv__video--pc') as HTMLVideoElement;
+      }
 
-      // 動画再生の関数
-      const playNextVideo = () => {
-        if (videoUrls.length === 0) return;
-        const currentUrl = videoUrls[currentIndex];
-        // console.log(`🎥 再生動画: ${currentUrl} (${isSP ? 'SP' : 'PC'})`);
-        video.src = currentUrl;
-        video.load();
-        video.play();
-
-        video.removeEventListener('ended', onVideoEnd);
-        video.addEventListener('ended', onVideoEnd);
-      };
-
-      // 動画終了時の処理
-      const onVideoEnd = () => {
-        currentIndex = (currentIndex + 1) % videoUrls.length;
-        playNextVideo();
-      };
-
-      // リサイズ時の処理
-      let resizeTimer: number;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(() => {
-          const newIsSP = window.innerWidth <= 768;
-          // デバイスが変わった場合
-          if (newIsSP !== isSP) {
-            location.reload(); // 簡単な実装として再読み込み
-          }
-        }, 300);
-      });
-
-      // エラーハンドリング
-      video.addEventListener('error', (e) => {
-        console.error('❌ 動画の読み込みエラー:', e);
-        // エラー発生時も次の動画へ
-        onVideoEnd();
-      });
-
-      // 最初の動画を再生
-      playNextVideo();
-    } else {
-      console.warn('⚠️ 動画データが取得できませんでした');
+      return video;
     }
+
+    private onVideoEnd(): void {
+      // 次のインデックスを計算
+      const nextIndex = (this.currentIndex + 1) % this.totalVideos;
+
+      // 現在のアイテムから is-active を削除
+      this.items[this.currentIndex].classList.remove('is-active');
+
+      // 次のアイテムに is-active を追加
+      this.items[nextIndex].classList.add('is-active');
+
+      // 次の動画を取得して再生
+      const nextVideo = this.getActiveVideo(this.items[nextIndex]);
+      if (nextVideo) {
+        nextVideo.play();
+        // イベントリスナーを付け替え
+        if (this.currentVideo) {
+          this.currentVideo.removeEventListener('ended', this.onVideoEnd.bind(this));
+        }
+        this.currentVideo = nextVideo;
+        this.currentVideo.addEventListener('ended', this.onVideoEnd.bind(this));
+      }
+
+      this.currentIndex = nextIndex;
+    }
+  }
+
+  // ページ読み込み時に初期化
+  document.addEventListener('DOMContentLoaded', () => {
+    new KvVideoManager();
   });
 </script>
 
@@ -118,11 +148,13 @@ export interface Props {}
     left: 0;
     width: 100%;
     height: 100%;
-    @include me.pc {
-      // aspect-ratio: 1440 / 563;
-    }
-    @include me.sp {
-      // aspect-ratio: 4 / 5;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+
+    &.is-active {
+      opacity: 1;
+      pointer-events: auto;
     }
   }
 
@@ -131,7 +163,18 @@ export interface Props {}
     width: 100%;
     height: 100%;
     object-fit: cover;
+
+    &--pc {
+      @include me.sp {
+        display: none;
+      }
+    }
+
+    &--sp {
+      @include me.pc {
+        display: none;
+      }
+    }
   }
 }
-
 </style>

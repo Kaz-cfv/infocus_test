@@ -1,6 +1,28 @@
 ---
-// Props型定義 - 空のPropsでクライアントサイドで動的に設定
-export interface Props {}
+// Props型定義
+export interface AsidesBanner {
+  image?: {
+    url: string;
+  };
+  src?: string;
+}
+
+export interface Props {
+  data?: {
+    contrast_banners?: AsidesBanner[];
+  };
+}
+
+const { data } = Astro.props;
+
+// コントラストバナーのデータを処理
+const contrastBanners = (data || [])
+  .map((banner, index) => ({
+    id: index + 1,
+    imageAlt: 'CONTRAST',
+    src: banner.image.url || ''
+  }))
+  .filter(banner => banner.src);
 ---
 
 <aside class="p-home-aside">
@@ -31,14 +53,21 @@ export interface Props {}
       </a>
     </div>
 
-    <div class="p-home-aside__head-slide" data-slider="layer-slider">
-      <div class="swiper">
-        <div class="swiper-wrapper" id="asidesSlideWrapper">
-          <!-- スライドはクライアントサイドで動的に追加 -->
+    {contrastBanners.length > 0 && (
+      <div class="p-home-aside__head-slide" data-slider="layer-slider">
+        <div class="swiper">
+          <div class="swiper-wrapper">
+            {contrastBanners.map((slide) => (
+              <div class="swiper-slide">
+                <img src={slide.src} alt={slide.imageAlt} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    )}
   </div>
+
   <a href="https://iffd.in-focus.co.jp/" target="_blank" class="p-home-aside__elm" data-aside="iffd">
     <div class="p-home-aside__elm-logo">
       <img src="/common/images/home/logo_iffd.png" alt="IFFD">
@@ -70,41 +99,6 @@ export interface Props {}
     </span>
   </a>
 </aside>
-
-<!-- クライアントサイドでAPIデータを受け取る -->
-<script>
-  // カスタムイベントでAPIデータを受け取る
-  document.addEventListener('homeDataLoaded', (event) => {
-    const homeData = (event as CustomEvent).detail;
-
-    // コントラストバナーのデータを処理
-    let contrastBanners = [];
-
-    // データ構造に応じて柔軟に対応
-    let bannersData = null;
-    if (homeData?.contrast_banners) {
-      bannersData = homeData.contrast_banners;
-    } else if (homeData?.home?.contrast_banners) {
-      bannersData = homeData.home.contrast_banners;
-    }
-
-    if (bannersData && Array.isArray(bannersData)) {
-      contrastBanners = bannersData.map((banner, index) => ({
-        id: index + 1,
-        imageAlt: 'CONTRAST',
-        src: banner.image?.url || banner.src || ''
-      })).filter(banner => banner.src);
-    }
-
-    // スライドを動的に追加
-    const slideWrapper = document.getElementById('asidesSlideWrapper');
-    if (slideWrapper && contrastBanners.length > 0) {
-      slideWrapper.innerHTML = contrastBanners.map(slide =>
-        `<div class="swiper-slide"><img src="${slide.src}" alt="${slide.imageAlt}" /></div>`
-      ).join('');
-    }
-  });
-</script>
 
 <style lang="scss">
 @use '../../../assets/scss/mediaquery' as me;
@@ -333,7 +327,7 @@ export interface Props {}
         .p-home-aside__elm-icon {
           svg {
             &:first-child {
-              // 右上に抜ける（より遠くへ）
+              // 右上に抜ける(より遠くへ)
               transform: translate(150%, -200%);
             }
             &:last-child {

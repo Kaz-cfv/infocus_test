@@ -340,7 +340,7 @@ export class Team {
    */
   async init() {
     // APIからチームデータを取得
-    await this.fetchTeamData();
+    // await this.fetchTeamData();
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {

@@ -1,246 +1,217 @@
 ---
-import ProjectCard from "../parts/ProjectCard.astro";
+// Props型定義
+interface ProjectTag {
+  name: string;
+  url?: string;
+  slug?: string;
+}
+
+interface ProjectData {
+  cardType: 'post' | 'image' | 'movie';
+  id: number;
+  url: string;
+  title: string;
+  imageSrc: string;
+  videoSrc: string;
+  tags: ProjectTag[];
+  type?: string;
+  isMobile: boolean;
+  language: string;
+  acf_fc_layout?: string;
+  post?: any;
+  image?: any;
+  file?: string;
+  link?: {
+    url: string;
+  };
+  is_mobile?: boolean;
+}
 
 interface Props {
-  lang?: 'en' | 'ja'
+  data?: ProjectData[];
+  lang?: 'en' | 'ja';
 }
-const { lang = 'ja' } = Astro.props;
+
+const { data = [], lang = 'ja' } = Astro.props;
 const currentUrl = lang === 'en' ? '/en/' : '/';
+
+/**
+ * 言語に応じたプロジェクトURLを生成
+ */
+function getLocalizedProjectURL(slug: string, language: string): string {
+  if (language === 'en') {
+    return `/en/projects/${slug}`;
+  } else {
+    return `/projects/${slug}`;
+  }
+}
+
+/**
+ * 言語に応じたタグフィルターURLを生成
+ */
+function getLocalizedTagURL(tagSlug: string, language: string): string {
+  if (language === 'en') {
+    return `/en/projects/?category=${tagSlug}`;
+  } else {
+    return `/projects/?category=${tagSlug}`;
+  }
+}
+
+/**
+ * プロジェクトデータを整形（ビルド時処理）
+ */
+const projectsData = data.map((pickupItem, index) => {
+  let mappedData: any = {
+    cardType: pickupItem.acf_fc_layout || 'unknown',
+    id: 0,
+    url: '#',
+    title: '',
+    imageSrc: '',
+    videoSrc: '',
+    tags: [],
+    isMobile: pickupItem.is_mobile !== false,
+    language: lang
+  };
+
+  if (pickupItem.acf_fc_layout === 'post') {
+    // post タイプの処理
+    const post = pickupItem.post || {};
+    const acfs = post.acfs || {};
+
+    // タグ情報の処理（言語対応版） -> 中身はカテゴリ
+    const tags: ProjectTag[] = [];
+    if (acfs.category && Array.isArray(acfs.category)) {
+      acfs.category.forEach((categoryItem: any) => {
+        if (categoryItem.name) {
+          tags.push({
+            name: categoryItem.name,
+            url: getLocalizedTagURL(categoryItem.slug || '', lang)
+          });
+        }
+      });
+    }
+
+    mappedData = {
+      cardType: 'post',
+      id: post.ID || 0,
+      url: getLocalizedProjectURL(post.post_name || '', lang),
+      title: post.post_title || '',
+      imageSrc: post.acfs?.main?.image?.url || '',
+      videoSrc: '',
+      tags: tags,
+      isMobile: pickupItem.is_mobile !== false,
+      language: lang
+    };
+
+  } else if (pickupItem.acf_fc_layout === 'image') {
+    // image タイプの処理
+    mappedData = {
+      cardType: 'image',
+      id: pickupItem.image?.ID || 0,
+      url: pickupItem.link?.url || '#',
+      title: pickupItem.image?.title || '',
+      imageSrc: pickupItem.image?.url || '',
+      videoSrc: '',
+      tags: [],
+      type: 'cover',
+      isMobile: pickupItem.is_mobile !== false,
+      language: lang
+    };
+
+  } else if (pickupItem.acf_fc_layout === 'movie') {
+    // movie タイプの処理
+    mappedData = {
+      cardType: 'movie',
+      id: pickupItem.image?.ID || 0,
+      url: pickupItem.link?.url || '#',
+      title: pickupItem.image?.title || '',
+      imageSrc: '',
+      videoSrc: pickupItem.file || '',
+      tags: [],
+      type: 'cover',
+      isMobile: pickupItem.is_mobile !== false,
+      language: lang
+    };
+  }
+
+  return mappedData;
+});
 ---
+
 <section class="p-home-projects">
-  <ul class="p-home-projects__list" id="projectsList" data-language="{lang}">
-    <!-- プロジェクトはクライアントサイドで動的に追加される前の初期表示 -->
+  <ul class="p-home-projects__list" id="projectsList" data-language={lang}>
+    {projectsData.map((project) => {
+      const mobileClass = project.isMobile ? '' : 'sp-hidden';
+      return (
+        <li class={`p-home-projects__card ${mobileClass}`} data-language={project.language}>
+          <div class="c-project-card mouse-over" data-id={project.id} data-type={project.type || project.cardType}>
+            <a href={project.url} class="c-project-card__image-wrapper">
+              {project.videoSrc ? (
+                <video
+                  src={project.videoSrc}
+                  class="c-project-card__video"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  src={project.imageSrc}
+                  alt={project.title}
+                  class="c-project-card__image"
+                />
+              )}
+            </a>
+            <div class="c-project-card__content">
+              <h3 class="c-project-card__title">
+                <a href={project.url}>{project.title}</a>
+              </h3>
+              <div class="c-project-card__tags js-hover">
+                {project.tags.map((tag, index) => (
+                  <>
+                    <a href={tag.url} class="c-project-card__category js-hover-item">
+                      {tag.name}
+                    </a>
+                    {index < project.tags.length - 1 && (
+                      <span class="c-project-card__separator js-hover-item">,</span>
+                    )}
+                  </>
+                ))}
+              </div>
+            </div>
+          </div>
+        </li>
+      );
+    })}
   </ul>
   <div class="p-home-projects__link">
-    <a href=`${currentUrl}projects/`>
+    <a href={`${currentUrl}projects/`}>
       ALL PROJECTS
       <span><svg width="32" height="33" viewBox="0 0 32 33" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 14.1601L23.7876 14.1601C20.713 11.3362 15.4539 6.21272 12.177 3.02567L15.2111 0L32 16.4193V16.5L15.2111 33L12.177 29.813C15.4539 26.6663 20.713 21.5024 23.7876 18.6785H0L0 14.1601Z" fill="white"/></svg></span>
     </a>
   </div>
 </section>
 
-<!-- クライアントサイドでAPIデータを受け取る -->
 <script>
-  import { VideoScrollController } from '../../../assets/js/modules/VideoScrollController'; // 適切なパスに変更してください
+  import { VideoScrollController } from '../../../assets/js/modules/VideoScrollController';
 
   // VideoScrollControllerのインスタンスを保持
-  let videoController = null;
-
-  /**
-   * 現在の言語を検出（公安の情報分析のように正確に）
-   */
-  function detectCurrentLanguage() {
-    // data-language属性から取得を試みる
-    const projectsList = document.getElementById('projectsList');
-    if (projectsList) {
-      const langAttr = projectsList.getAttribute('data-language');
-      if (langAttr && (langAttr === 'en' || langAttr === 'ja')) {
-        return langAttr;
-      }
-    }
-
-    // フォールバック: URLから検出
-    return window.location.pathname.includes('/en/') ? 'en' : 'ja';
-  }
-
-  /**
-   * 言語に応じたプロジェクトURLを生成
-   * @param {string} slug - プロジェクトのスラッグ
-   * @returns {string} 適切な言語パスのURL
-   */
-  function getLocalizedProjectURL(slug) {
-    const currentLanguage = detectCurrentLanguage();
-
-    if (currentLanguage === 'en') {
-      return `/en/projects/${slug}`;
-    } else {
-      return `/projects/${slug}`;
-    }
-  }
-
-  /**
-   * 言語に応じたタグフィルターURLを生成
-   * @param {string} tagSlug - タグのスラッグ
-   * @returns {string} 適切な言語パスのタグフィルターURL
-   */
-  function getLocalizedTagURL(tagSlug) {
-    const currentLanguage = detectCurrentLanguage();
-
-    if (currentLanguage === 'en') {
-      return `/en/projects/?category=${tagSlug}`;
-    } else {
-      return `/projects/?category=${tagSlug}`;
-    }
-  }
-
-  // カスタムイベントでAPIデータを受け取る
-  document.addEventListener('homeDataLoaded', (event) => {
-    const homeData = (event as CustomEvent).detail;
-    const currentLanguage = detectCurrentLanguage();
-
-    // プロジェクトデータを処理
-    let projectsData = [];
-
-    // データ構造に応じて柔軟に対応
-    let pickupData = null;
-    if (homeData?.projects?.pickup) {
-      pickupData = homeData.projects.pickup;
-    } else if (homeData?.home?.projects?.pickup) {
-      pickupData = homeData.home.projects.pickup;
-    }
-
-    if (pickupData && Array.isArray(pickupData)) {
-      // 仕様に基づいてデータを整形（pickup使用 - acf_fc_layout別対応）
-      projectsData = pickupData.map((pickupItem, index) => {
-        let mappedData = {
-          cardType: pickupItem.acf_fc_layout || 'unknown',
-          id: 0,
-          url: '#',
-          title: '',
-          imageSrc: '',
-          videoSrc: '',
-          tags: [],
-          isMobile: pickupItem.is_mobile !== false,
-          language: currentLanguage // 言語情報を追加
-        };
-
-        if (pickupItem.acf_fc_layout === 'post') {
-          // post タイプの処理
-          const post = pickupItem.post || {};
-          const acfs = post.acfs || {};
-
-          // タグ情報の処理（言語対応版） -> 中身はカテゴリ
-          const tags = [];
-          if (acfs.category && Array.isArray(acfs.category)) {
-            acfs.category.forEach(categoryItem => {
-              if (categoryItem.name) {
-                tags.push({
-                  name: categoryItem.name,
-                  url: getLocalizedTagURL(categoryItem.slug || '') // 言語対応版URL
-                });
-              }
-            });
-          }
-
-          mappedData = {
-            cardType: 'post',
-            id: post.ID || 0,
-            url: getLocalizedProjectURL(post.post_name || ''), // 言語対応版URL
-            title: post.post_title || '',
-            imageSrc: post.acfs?.main?.image?.url || '',
-            videoSrc: '',
-            tags: tags,
-            isMobile: pickupItem.is_mobile !== false,
-            language: currentLanguage
-          };
-
-        } else if (pickupItem.acf_fc_layout === 'image') {
-          // image タイプの処理
-          mappedData = {
-            cardType: 'image',
-            id: pickupItem.image?.ID || 0,
-            url: pickupItem.link.url || '#', // 外部リンクはそのまま
-            title: pickupItem.image?.title || '',
-            imageSrc: pickupItem.image?.url || '',
-            videoSrc: '',
-            tags: [],
-            type: 'cover',
-            isMobile: pickupItem.is_mobile !== false,
-            language: currentLanguage
-          };
-
-        } else if (pickupItem.acf_fc_layout === 'movie') {
-          // movie タイプの処理
-          mappedData = {
-            cardType: 'movie',
-            id: pickupItem.image?.ID || 0,
-            url: pickupItem.link.url || '#', // 外部リンクはそのまま
-            title: pickupItem.image?.title || '',
-            imageSrc: '',
-            videoSrc: pickupItem.file || '',
-            tags: [],
-            type: 'cover',
-            isMobile: pickupItem.is_mobile !== false,
-            language: currentLanguage
-          };
-        }
-
-        return mappedData;
-      });
-
-      // console.log(`🚀 プロジェクトデータ取得 (${currentLanguage}):`, projectsData.length + '件');
-    }
-
-    // プロジェクトデータをグローバルに保存
-    window.homeProjectsData = projectsData;
-
-    // カスタムイベントでプロジェクトデータ更新を通知
-    const projectEvent = new CustomEvent('projectsDataLoaded', {
-      detail: projectsData
-    });
-    document.dispatchEvent(projectEvent);
-
-    // プロジェクトリストを動的に追加（ProjectCardコンポーネントの構造に準拠）
-    const projectsList = document.getElementById('projectsList');
-    if (projectsList && projectsData.length > 0) {
-      projectsList.innerHTML = projectsData.map(project => {
-        const mobileClass = project.isMobile ? '' : 'sp-hidden';
-        const tagsHtml = project.tags.map((tag, index) => {
-          const separator = index < project.tags.length - 1 ? '<span class="c-project-card__separator js-hover-item">,</span>' : '';
-          return `<a href="${tag.url}" class="c-project-card__category js-hover-item">${tag.name}</a>${separator}`;
-        }).join('');
-
-        return `
-          <li class="p-home-projects__card ${mobileClass}" data-language="${project.language}">
-            <div class="c-project-card mouse-over" data-id="${project.id}" data-type="${project.type || project.cardType}">
-              <a href="${project.url}" class="c-project-card__image-wrapper">
-                ${project.videoSrc ?
-                  `<video src="${project.videoSrc}" class="c-project-card__video" muted loop playsinline preload="metadata"></video>` :
-                  `<img src="${project.imageSrc}" alt="${project.title}" class="c-project-card__image" />`
-                }
-              </a>
-              <div class="c-project-card__content">
-                <h3 class="c-project-card__title">
-                  <a href=${project.url}>${project.title}</a>
-                </h3>
-                <div class="c-project-card__tags js-hover">
-                  ${tagsHtml}
-                </div>
-              </div>
-            </div>
-          </li>
-        `;
-      }).join('');
-
-      // console.log(`✅ Home project links updated for ${currentLanguage} language`);
-
-      // DOM生成完了後の処理を統合
-      setTimeout(() => {
-        // VideoScrollControllerを初期化
-        initializeVideoController();
-
-        // NavigationHoverの再初期化
-        initializeNavigationHover(projectsList);
-
-      }, 100);
-    }
-  });
+  let videoController: VideoScrollController | null = null;
 
   /**
    * VideoScrollControllerの初期化
-   * 動的に生成されたカード後に実行される
    */
   function initializeVideoController() {
     try {
       // 既存のインスタンスがあれば破棄
-      if (videoController) {
-        if (typeof videoController.destroy === 'function') {
-          videoController.destroy();
-        }
+      if (videoController && typeof videoController.destroy === 'function') {
+        videoController.destroy();
       }
 
       // 新しいVideoScrollControllerインスタンスを作成
       videoController = new VideoScrollController();
+      // console.log('✅ VideoScrollController initialized');
     } catch (error) {
       console.error('❌ VideoScrollController initialization failed:', error);
     }
@@ -248,9 +219,11 @@ const currentUrl = lang === 'en' ? '/en/' : '/';
 
   /**
    * NavigationHoverの初期化
-   * 既存のロジックを関数化
    */
-  function initializeNavigationHover(projectsList) {
+  function initializeNavigationHover() {
+    const projectsList = document.getElementById('projectsList');
+    if (!projectsList) return;
+
     // NavigationHoverの再初期化イベントを発火
     const hoverEvent = new CustomEvent('reinitializeHover', {
       detail: { element: projectsList }
@@ -290,7 +263,17 @@ const currentUrl = lang === 'en' ? '/en/' : '/';
         });
       });
     });
+
+    // console.log('✅ NavigationHover initialized');
   }
+
+  // DOMContentLoaded後に初期化
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      initializeVideoController();
+      initializeNavigationHover();
+    }, 100);
+  });
 
   // ページがアンロードされる時にVideoControllerをクリーンアップ
   window.addEventListener('beforeunload', () => {

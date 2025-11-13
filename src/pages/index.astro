@@ -14,26 +14,11 @@ const API_ENDPOINT = 'https://infocus.wp.site-prev2.com/wp-json/infocus/v1/optio
 
 let homeData = null;
 try {
-  const response = await fetch(API_ENDPOINT, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36'
-    }
-  });
+  const response = await fetch(API_ENDPOINT);
   if (!response.ok) {
     throw new Error(`API取得失敗: ${response.status}`);
   }
-
-  // テキストとしてまず受信
-  let responseText = await response.text();
-
-  // BOM（\uFEFF）を検知して除去
-  if (responseText.startsWith('\uFEFF')) {
-    responseText = responseText.substring(1);
-  }
-
-  // 浄化されたテキストをパース
-  homeData = JSON.parse(responseText);
-
+  homeData = await response.json();
 } catch (error) {
   console.error('❌ HomeデータAPI取得エラー:', error);
 }
@@ -42,7 +27,7 @@ const heros = homeData?.home?.heros || [];
 const intro = homeData?.home?.projects.catergory || null;
 const projects = homeData?.home?.projects.pickup || [];
 const asides = homeData?.home?.contrast_banners || [];
-console.log('データ:', { heros, intro, projects, asides });
+// console.log('データ:', { heros, intro, projects, asides });
 ---
 
 <Layout
@@ -52,16 +37,10 @@ console.log('データ:', { heros, intro, projects, asides });
 >
 
 <div class="l-main-content" data-main-content>
-  <Kv />
-  <Intro />
-  <Projects />
-  <Asides />
+  <Kv heros={heros} />
+  <Intro data={intro} />
+  <Projects data={projects} />
+  <Asides data={asides} />
 </div>
 
 </Layout>
-
-<style lang="scss" is:global>
-@use '../assets/scss/mediaquery' as me;
-@use '../assets/scss/mixin' as mi;
-
-</style>

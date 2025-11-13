@@ -31,7 +31,7 @@ export class Home {
    * 初期化処理
    */
   async init() {
-    await this.fetchHomeData();
+    // await this.fetchHomeData();
   }
 
   /**

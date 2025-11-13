@@ -1,10 +1,53 @@
 ---
-// Props型定義 - 空のPropsでクライアントサイドで動的に設定
-interface Props {
-  lang?: 'en' | 'ja'
+// Props型定義
+interface CategoryData {
+  term_id?: number;
+  name: string;
+  slug: string;
+  count: number;
+  term_order?: string;
 }
-const { lang = 'ja' } = Astro.props;
+
+interface Props {
+  data?: CategoryData[] | null;
+  lang?: 'en' | 'ja';
+}
+
+const { data = null, lang = 'ja' } = Astro.props;
 const currentUrl = lang === 'en' ? '/en/' : '/';
+
+/**
+ * 言語に応じたプロジェクトURLを生成
+ */
+function getLocalizedProjectsURL(path: string = '', language: string): string {
+  if (language === 'en') {
+    return `/en/projects/${path}`;
+  } else {
+    return `/projects/${path}`;
+  }
+}
+
+/**
+ * カテゴリデータを処理（ビルド時）
+ */
+const categories = data && Array.isArray(data)
+  ? data
+      .map(category => ({
+        termId: category.term_id || 0,
+        name: category.name || '',
+        slug: category.slug || '',
+        count: category.count || 0,
+        termOrder: category.term_order || '0'
+      }))
+      .sort((a, b) => {
+        const orderA = parseInt(a.termOrder) || 0;
+        const orderB = parseInt(b.termOrder) || 0;
+        return orderA - orderB;
+      })
+  : [];
+
+// 全プロジェクト数を計算
+const totalProjects = categories.reduce((total, cat) => total + cat.count, 0);
 ---
 
 <div class="p-home-intro">
@@ -12,114 +55,31 @@ const currentUrl = lang === 'en' ? '/en/' : '/';
     <h1 class="p-home-intro-head__caption">
       A digital branding studio In Tokyo <br>and New York
     </h1>
-    <a href=`${currentUrl}about/` class="p-home-intro-head__link">
+    <a href={`${currentUrl}about/`} class="p-home-intro-head__link">
       Learn more
       <span class="p-home-intro-head__icon"><svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.54 5.044H7.596C6.684 4.204 5.124 2.68 4.152 1.732L5.052 0.831999L10.032 5.716V5.74L5.052 10.648L4.152 9.7C5.124 8.764 6.684 7.228 7.596 6.388H0.54V5.044Z" fill="white"/></svg></span>
     </a>
   </div>
-  <ul class="p-home-intro-category" id="introCategoryList" data-language="{lang}">
-    <!-- カテゴリはクライアントサイドで動的に追加 -->
+  <ul class="p-home-intro-category" id="introCategoryList" data-language={lang}>
+    {/* ALLカテゴリ */}
+    <li class="p-home-intro-category__item" data-catgory="ALL">
+      <a href={getLocalizedProjectsURL('', lang)} class="p-home-intro-category__link">
+        <span class="p-home-intro-category__name">ALL</span>
+        <span class="p-home-intro-category__num">{totalProjects}</span>
+      </a>
+    </li>
+
+    {/* 各カテゴリ */}
+    {categories.map((category) => (
+      <li class="p-home-intro-category__item" data-catgory={category.name}>
+        <a href={getLocalizedProjectsURL(`?category=${category.slug}`, lang)} class="p-home-intro-category__link">
+          <span class="p-home-intro-category__name">{category.name}</span>
+          <span class="p-home-intro-category__num">{category.count}</span>
+        </a>
+      </li>
+    ))}
   </ul>
 </div>
-
-<!-- クライアントサイドでAPIデータを受け取る -->
-<script>
-  /**
-   * 現在の言語を検出
-   */
-  function detectCurrentLanguage() {
-    // data-language属性から取得を試みる
-    const categoryList = document.getElementById('introCategoryList');
-    if (categoryList) {
-      const langAttr = categoryList.getAttribute('data-language');
-      if (langAttr && (langAttr === 'en' || langAttr === 'ja')) {
-        return langAttr;
-      }
-    }
-
-    // フォールバック: URLから検出
-    return window.location.pathname.includes('/en/') ? 'en' : 'ja';
-  }
-
-  /**
-   * 言語に応じたプロジェクトURLを生成
-   * @param {string} path - 相対パス
-   * @returns {string} 適切な言語パスのURL
-   */
-  function getLocalizedProjectsURL(path = '') {
-    const currentLanguage = detectCurrentLanguage();
-
-    if (currentLanguage === 'en') {
-      return `/en/projects/${path}`;
-    } else {
-      return `/projects/${path}`;
-    }
-  }
-
-  // カスタムイベントでAPIデータを受け取る
-  document.addEventListener('homeDataLoaded', (event) => {
-    const homeData = (event as CustomEvent).detail;
-    const currentLanguage = detectCurrentLanguage();
-
-    // カテゴリデータを処理
-    let categories = [];
-    let totalProjects = 0;
-
-    // データ構造に応じて柔軟に対応
-    let projectsData = null;
-    if (homeData?.projects) {
-      projectsData = homeData.projects;
-    } else if (homeData?.home?.projects) {
-      projectsData = homeData.home.projects;
-    }
-
-    if (projectsData?.catergory && Array.isArray(projectsData.catergory)) {
-      // カテゴリデータを処理
-      categories = projectsData.catergory
-        .map(category => ({
-          termId: category.term_id || 0,
-          name: category.name || '',
-          slug: category.slug || '',
-          count: category.count || 0,
-          termOrder: category.term_order || '0'
-        }))
-        .sort((a, b) => {
-          const orderA = parseInt(a.termOrder) || 0;
-          const orderB = parseInt(b.termOrder) || 0;
-          return orderA - orderB;
-        });
-
-      // 全プロジェクト数を計算
-      totalProjects = categories.reduce((total, cat) => total + cat.count, 0);
-    }
-
-    // カテゴリリストを動的に追加（言語対応版）
-    const categoryList = document.getElementById('introCategoryList');
-    if (categoryList) {
-      const allItem = `
-        <li class="p-home-intro-category__item" data-catgory="ALL">
-          <a href="${getLocalizedProjectsURL()}" class="p-home-intro-category__link">
-            <span class="p-home-intro-category__name">ALL</span>
-            <span class="p-home-intro-category__num">${totalProjects}</span>
-          </a>
-        </li>
-      `;
-
-      const categoryItems = categories.map(category => `
-        <li class="p-home-intro-category__item" data-catgory="${category.name}">
-          <a href="${getLocalizedProjectsURL(`?category=${category.slug}`)}" class="p-home-intro-category__link">
-            <span class="p-home-intro-category__name">${category.name}</span>
-            <span class="p-home-intro-category__num">${category.count}</span>
-          </a>
-        </li>
-      `).join('');
-
-      categoryList.innerHTML = allItem + categoryItems;
-
-      // console.log(`✅ Intro category links updated for ${currentLanguage} language`);
-    }
-  });
-</script>
 
 <style lang="scss" is:global>
 @use '../../../assets/scss/mediaquery' as me;
