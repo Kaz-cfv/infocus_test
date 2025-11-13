@@ -14,7 +14,11 @@ const API_ENDPOINT = 'https://infocus.wp.site-prev2.com/wp-json/infocus/v1/optio
 
 let homeData = null;
 try {
-  const response = await fetch(API_ENDPOINT);
+  const response = await fetch(API_ENDPOINT, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.0.0 Safari/537.36'
+    }
+  });
   if (!response.ok) {
     throw new Error(`API取得失敗: ${response.status}`);
   }
